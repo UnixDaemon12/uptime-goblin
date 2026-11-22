@@ -4024,6 +4024,9 @@ test("GDR11-AUTH-CONFIG-01: the commit guard through git commit and its hooks, v
         spawnSync('git', ['-C', r.root, ...args], { env: plainEnv(extra), encoding: 'latin1' });
       const plainSeen = plain(['config', '--get-regexp', '^orbit\\.']).stdout.trim();
       plain(['write-tree']);
+      // Git on Linux checks no racily clean entry in write-tree (Apple Git does); a refresh of the
+      // index does on both, so the repository's own filter driver starts there too.
+      plain(['update-index', '-q', '--refresh']);
       plain(['log', '-1', '--no-walk', '--format=%T %P', signed, '--']);
       const plainWalk = plain(['rev-list', '--format=%H %T %P', c0]).stdout;
       if (!local.length)

@@ -120,6 +120,12 @@ function gitEntry(directory) {
   }
 }
 
+// What Git says when it finds no repository: "not a git repository", or, from Git 2.5x on Linux
+// (measured: 2.56.1; Apple Git 2.54 and Debian's 2.47 still say "not a git repository: (null)"),
+// "gitfile does not point to a valid repository" for a `.git` file naming a missing directory.
+const noRepositoryMessage =
+  /^fatal: (not a git repository|gitfile does not point to a valid repository)\b/m;
+
 // What Git says when its search for a repository met no `.git`.
 const searchFoundNothing =
   /^fatal: not a git repository \(or any (of the parent directories|parent up to mount point)\b/m;
@@ -146,7 +152,7 @@ export function gitProbe(args, { cwd, statuses = [0], encoding = 'utf8' } = {}) 
     !gitBroken &&
     !result.error &&
     result.status === 128 &&
-    /^fatal: not a git repository\b/m.test(stderr);
+    noRepositoryMessage.test(stderr);
   let directory = path.resolve(cwd ?? '.');
   for (let at = 0; args[at] === '-C' && at + 1 < args.length; at += 2)
     directory = path.resolve(directory, args[at + 1]);

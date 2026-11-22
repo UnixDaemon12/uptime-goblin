@@ -3937,7 +3937,8 @@ test(
       `#!/bin/sh\nif [ "$1" = git ]; then\n  for last; do :; done\n  n=$(git -C "$last" log -p -U0 --all 2>/dev/null | grep -c '^+R2-PLANTED-MARKER')\n  printf '%s\\n' "$n" >> '${markerLog}'\nfi\nexec '${path.join(gate.bin, 'gitleaks')}' "$@"\n`,
       { mode: 0o755 }
     );
-    // The files a caller's environment can choose.
+    // The files a caller's environment can choose. Git reads HOME/.config/git/ only while
+    // XDG_CONFIG_HOME is unset (a GitHub runner sets it), so each HOME case unsets it.
     const settingFile = file('setting.gitconfig', '[orbit]\n\tglobal = injected\n');
     const systemFile = file('system.gitconfig', '[orbit]\n\tsystem = injected\n');
     const homeSetting = path.join(work, 'home-setting');
@@ -3981,14 +3982,14 @@ test(
     assert.equal(plainMarkers({}), 1, 'the harness: plain Git shows the planted marker');
     for (const [label, extra] of [
       ['GIT_CONFIG_GLOBAL core.attributesFile', { GIT_CONFIG_GLOBAL: hideGlobal }],
-      ['HOME/.config/git/attributes', { HOME: homeHide }],
+      ['HOME/.config/git/attributes', { HOME: homeHide, XDG_CONFIG_HOME: undefined }],
       ['XDG_CONFIG_HOME/git/attributes', { XDG_CONFIG_HOME: xdgHide }],
     ])
       assert.equal(plainMarkers(extra), 0, `the harness: ${label} hides the marker from plain Git`);
     for (const [label, extra] of [
       ['GIT_CONFIG_GLOBAL', { GIT_CONFIG_GLOBAL: settingFile }],
       ['GIT_CONFIG_SYSTEM', { GIT_CONFIG_SYSTEM: systemFile }],
-      ['HOME/.gitconfig', { HOME: homeSetting }],
+      ['HOME/.gitconfig', { HOME: homeSetting, XDG_CONFIG_HOME: undefined }],
       ['XDG_CONFIG_HOME/git/config', { XDG_CONFIG_HOME: xdgSetting }],
     ])
       assert.notEqual(
@@ -4005,7 +4006,7 @@ test(
     const helpersBefore = helperCalls();
     assert.notEqual(plainClone('helper', { GIT_CONFIG_GLOBAL: toHelper }).clone.status, 0);
     assert.ok(helperCalls() > helpersBefore, 'the harness: the rewrite starts the remote helper');
-    const converted = plainClone('eol', { HOME: homeEol });
+    const converted = plainClone('eol', { HOME: homeEol, XDG_CONFIG_HOME: undefined });
     assert.match(
       fs.readFileSync(path.join(converted.target, 'README.md'), 'utf8'),
       /\r/,
@@ -4113,7 +4114,7 @@ test(
         'GIT_CONFIG_SYSTEM with an orbit.* setting, GIT_CONFIG_NOSYSTEM=0',
         { GIT_CONFIG_SYSTEM: systemFile, GIT_CONFIG_NOSYSTEM: '0' },
       ],
-      ['HOME with a .gitconfig orbit.* setting', { HOME: homeSetting }],
+      ['HOME with a .gitconfig orbit.* setting', { HOME: homeSetting, XDG_CONFIG_HOME: undefined }],
       ['XDG_CONFIG_HOME with a git/config orbit.* setting', { XDG_CONFIG_HOME: xdgSetting }],
       ['GIT_CONFIG_GLOBAL with url.<foreign>.insteadOf=<root>', { GIT_CONFIG_GLOBAL: redirect }],
       [
@@ -4121,9 +4122,15 @@ test(
         { GIT_CONFIG_GLOBAL: toHelper },
       ],
       ['GIT_CONFIG_GLOBAL with core.attributesFile "* -diff"', { GIT_CONFIG_GLOBAL: hideGlobal }],
-      ['HOME with .config/git/attributes "* -diff"', { HOME: homeHide }],
+      [
+        'HOME with .config/git/attributes "* -diff"',
+        { HOME: homeHide, XDG_CONFIG_HOME: undefined },
+      ],
       ['XDG_CONFIG_HOME with git/attributes "* -diff"', { XDG_CONFIG_HOME: xdgHide }],
-      ['HOME with .config/git/attributes "*.md text eol=crlf"', { HOME: homeEol }],
+      [
+        'HOME with .config/git/attributes "*.md text eol=crlf"',
+        { HOME: homeEol, XDG_CONFIG_HOME: undefined },
+      ],
       [
         'own GIT_DIR and an injected GIT_CONFIG_COUNT setting (the record names both)',
         {
@@ -4339,7 +4346,7 @@ test(
       ],
       [
         'HOME with .gitconfig and .config/git/attributes',
-        { env: { HOME: hostileHome, GIT_CONFIG_GLOBAL: undefined } },
+        { env: { HOME: hostileHome, GIT_CONFIG_GLOBAL: undefined, XDG_CONFIG_HOME: undefined } },
       ],
       [
         'XDG_CONFIG_HOME with git/config and git/attributes',
@@ -4492,6 +4499,9 @@ test(
       if (messages.includes(0) || !r12Count(messages, 'R12-MESSAGE-MARKER'))
         found.push('plain git log --format=%B is not the plain message text');
       plain(extra, ['write-tree']);
+      // Git on Linux checks no racily clean entry in write-tree (Apple Git does); a refresh of the
+      // index does on both, so a filter driver the repository defines starts there too.
+      plain(extra, ['update-index', '-q', '--refresh']);
       plain(extra, ['diff', 'HEAD~1', 'HEAD']);
       if (helperStarts().length)
         found.push(`a configured helper started ${helperStarts().length} times`);
@@ -4772,10 +4782,12 @@ test(
         gate.git('update-ref', 'refs/orbit-r12r2/encoded', id);
         try {
           const raw = plain(['cat-file', 'commit', id]);
-          assert.ok(
-            plain(['log', '-1', '--format=%B', id]).includes(marker),
-            'the harness: Git shows the marker'
-          );
+          const shown = plain(['log', '-1', '--format=%B', id]);
+          // glibc's iconv has no HZ converter, so Git on Linux shows an HZ message as its raw
+          // bytes and the hidden marker cannot be shown there; the gate must block it all the same.
+          if (encoding === 'HZ-GB-2312' && shown.includes(Buffer.from(body, 'latin1')))
+            assert.equal(shown.includes(marker), false, 'the harness: Git leaves HZ unconverted');
+          else assert.ok(shown.includes(marker), 'the harness: Git shows the marker');
           assert.equal(raw.includes(0), false, 'the harness: no NUL byte');
           assert.equal(
             raw.includes(marker),
@@ -4827,7 +4839,13 @@ test(
           fs.writeFileSync(helperLog, '');
           stale();
           plain(['write-tree']);
-          assert.ok(starts().length > 0, 'the harness: plain write-tree starts the filter');
+          // Git on Linux checks no racily clean entry in write-tree (Apple Git does); a refresh of
+          // the index does on both.
+          if (!starts().length) plain(['update-index', '-q', '--refresh']);
+          assert.ok(
+            starts().length > 0,
+            'the harness: plain write-tree, or where it checks no racily clean entry (Git on Linux) update-index --refresh, starts the filter'
+          );
           stale();
           const outcome = run();
           assert.deepEqual(gateStarts(), [], 'the filter started in a Git process of the gate');

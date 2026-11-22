@@ -1055,6 +1055,10 @@ test('without docker compose the Compose checks skip, and fail when TEST_REQUIRE
 // a repository it cannot read, is broken: they run and fail with what it did, with or without
 // TEST_REQUIRE.
 const gitSkip = declareGit();
+// Git's words for a repository it cannot read, as a pattern: "not a git repository", or, from Git
+// 2.5x on Linux, "gitfile does not point to a valid repository" for a `.git` file naming a missing
+// directory (test/helpers/git.mjs).
+const noRepository = '(?:not a git repository|gitfile does not point to a valid repository)';
 const checkout = gitCheckout(repository);
 const checkoutSkip = gitMissing ? gitSkip : checkout.outside ? 'not a git checkout' : false;
 // git check-ignore exits 0 for an ignored file and 1 for one that is not; any other result fails
@@ -1215,7 +1219,7 @@ test(
             tests: 2,
             fail: 2,
             says: [
-              new RegExp(`${probe} exited with status 128: fatal: not a git repository`),
+              new RegExp(`${probe} exited with status 128: fatal: ${noRepository}`),
               /\.git exists: a repository Git cannot read, not a source archive/,
             ],
           }
@@ -1278,7 +1282,7 @@ test(
               tests: 2,
               fail: 2,
               says: [
-                new RegExp(`${probe} exited with status 128: fatal: not a git repository`),
+                new RegExp(`${probe} exited with status 128: fatal: ${noRepository}`),
                 /\.git exists: a repository Git cannot read, not a source archive/,
               ],
             }
@@ -1372,7 +1376,7 @@ test(
       fail: 3,
       says: ['v1.4.3', 'v1.4.2'].map(tag => new RegExp(`${probe(tag)} ${what}`)),
     });
-    const unreadable = broken('exited with status 128: fatal: not a git repository');
+    const unreadable = broken(`exited with status 128: fatal: ${noRepository}`);
     unreadable.says.push(/\.git exists: a repository Git cannot read, not a source archive/);
     for (const required of [false, true]) {
       const name = what => `${what}, TEST_REQUIRE ${required ? '=git' : 'unset'}`;

@@ -2331,7 +2331,11 @@ test('R12C1-META-ENC-01: a commit whose encoding header names an encoding in whi
       const shown = plain(['log', '-1', '--format=%B', id]);
       assert.equal(plain(['fsck', '--strict', '--no-dangling']).toString(), '', 'fsck --strict');
       assert.equal(raw.includes(0), false, 'the harness: no NUL byte');
-      assert.ok(shown.includes(marker), 'the harness: Git shows the marker');
+      // glibc's iconv has no HZ converter, so Git on Linux shows an HZ message as its raw bytes
+      // and the hidden marker cannot be shown there; the input must be refused all the same.
+      if (encoding === 'HZ-GB-2312' && shown.includes(body))
+        assert.equal(shown.includes(marker), false, 'the harness: Git leaves HZ unconverted');
+      else assert.ok(shown.includes(marker), 'the harness: Git shows the marker');
       if (refused.some(([name]) => name === encoding)) {
         assert.equal(raw.includes(marker), false, 'the harness: the raw object lacks the marker');
         assert.throws(
