@@ -947,6 +947,33 @@ function startedAt(compose, files, service = 'uptime-goblin') {
   return started;
 }
 
+// A key file's text, as the person who made it reads it back. The recipe gives the file to uid
+// 1000 with mode 0400, so on a Linux host whose user is not uid 1000 (a GitHub runner is uid
+// 1001) only root can read it: there it is read as root in a helper container, as `sudo cat`
+// would. A Mac, or a Linux host whose user is uid 1000, reads it directly. Any other error, or a
+// failed read, still fails the test.
+function readKeyFile(file) {
+  try {
+    return fs.readFileSync(file, 'utf8');
+  } catch (error) {
+    if (error.code !== 'EACCES') throw error;
+    const read = docker(
+      'run',
+      ...limits,
+      '--rm',
+      '--network',
+      'none',
+      '--volume',
+      `${path.dirname(file)}:/d:ro`,
+      'node:24-bookworm-slim',
+      'cat',
+      `/d/${path.basename(file)}`
+    );
+    assert.equal(read.status, 0, read.stderr);
+    return read.stdout;
+  }
+}
+
 // A key file as the recipe makes it (0400), owned by uid 1000 as the image's user needs on a
 // Linux host (a root helper container chowns it; OrbStack lets the container's user read it as it
 // is, measured; Docker Desktop was not tested).
@@ -1213,7 +1240,7 @@ test(
       const kept = spawnSync('sh', ['-c', newKey], { cwd: directory, encoding: 'utf8' });
       assert.equal(kept.status, 0, kept.stderr);
       assert.equal(kept.stdout.trim(), 'orbit_secret_key exists: keep it');
-      assert.equal(fs.readFileSync(path.join(directory, 'orbit_secret_key'), 'utf8'), `${key}\n`);
+      assert.equal(readKeyFile(path.join(directory, 'orbit_secret_key')), `${key}\n`);
     }
 
     // Without the override: a generated secret.key in the volume, with the warning. Then the
@@ -1240,10 +1267,7 @@ test(
       './orbit_secret_key'
     );
     assert.equal(copied.status, 0, copied.stderr);
-    writeKeyFile(
-      directory,
-      fs.readFileSync(path.join(directory, 'orbit_secret_key'), 'utf8').trim()
-    );
+    writeKeyFile(directory, readKeyFile(path.join(directory, 'orbit_secret_key')).trim());
     since = now();
     up(compose, withSecret);
     logs = await healthy(compose, withSecret, since);
@@ -1550,7 +1574,7 @@ test(
     const since = new Date(Date.now() - 1000).toISOString();
     for (const [i, result] of runRecipe(lines, { directory, name }).entries())
       assert.equal(result.status, 0, `${lines[i]}\n${result.stdout}${result.stderr}`);
-    const key = fs.readFileSync(path.join(directory, 'orbit_secret_key'), 'utf8').trim();
+    const key = readKeyFile(path.join(directory, 'orbit_secret_key')).trim();
     assert.match(key, /^[0-9a-f]{64}$/);
     let healthy = false;
     for (let i = 0; i < 90 && !healthy; i++) {
@@ -1721,11 +1745,11 @@ test(
       assert.equal(done.status, 0, `${command}\n${done.stdout}${done.stderr}`);
     }
     assert.equal(
-      fs.readFileSync(path.join(directory, 'orbit_secret_key.unused'), 'utf8'),
+      readKeyFile(path.join(directory, 'orbit_secret_key.unused')),
       `${wrongKey}\n`,
       'the new key, kept aside'
     );
-    const movedKey = fs.readFileSync(path.join(directory, 'orbit_secret_key'), 'utf8').trim();
+    const movedKey = readKeyFile(path.join(directory, 'orbit_secret_key')).trim();
     assert.equal(keyFingerprint(Buffer.from(movedKey, 'hex')), generated);
     assert.deepEqual(
       fs
@@ -2047,7 +2071,7 @@ test(
         assert.equal(done.status, 0, `${command}\n${done.stdout}${done.stderr}`);
       }
       const keyFile = path.join(directory, 'orbit_secret_key');
-      const copied = fs.readFileSync(keyFile, 'utf8').trim();
+      const copied = readKeyFile(keyFile).trim();
       assert.equal(keyFingerprint(Buffer.from(copied, 'hex')), generated, `${removedByHand}`);
       assert.equal(fs.statSync(keyFile).mode & 0o777, 0o400);
       assert.deepEqual(
@@ -2275,7 +2299,7 @@ for (const [state, title] of [
             .readdirSync(directory)
             .filter(file => file.startsWith('orbit_secret_key'))
             .sort()
-            .map(file => [file, fs.readFileSync(path.join(directory, file), 'utf8')])
+            .map(file => [file, readKeyFile(path.join(directory, file))])
         );
       // The last line again and again until it has run in Uptime Goblin's container `times` times, the
       // volume's key checked each time. A container that refuses lives about a second and is
@@ -2484,7 +2508,7 @@ test(
     const [copied] = runRecipe([copyCommand], { directory, name });
     assert.equal(copied.status, 0, copied.stderr);
     assert.equal(copied.stdout, 'orbit_secret_key exists: not replaced; run the check\n');
-    assert.equal(fs.readFileSync(keyFile, 'utf8'), `${b}\n`, 'orbit_secret_key, byte for byte');
+    assert.equal(readKeyFile(keyFile), `${b}\n`, 'orbit_secret_key, byte for byte');
     // The move recipe's first command, run here by mistake (A65): it reads A with a container of
     // its own, goblin-admin finds that A does not open the data, and it stops before it sets B
     // aside or changes any file.
@@ -2492,7 +2516,7 @@ test(
     const [notMoved] = runRecipe([moveCommand], { directory, name });
     assert.notEqual(notMoved.status, 0, notMoved.stdout + notMoved.stderr);
     assert.match(notMoved.stdout, /^Stopped before the end: run the check$/m);
-    assert.equal(fs.readFileSync(keyFile, 'utf8'), `${b}\n`, 'orbit_secret_key, byte for byte');
+    assert.equal(readKeyFile(keyFile), `${b}\n`, 'orbit_secret_key, byte for byte');
     assert.deepEqual(
       fs.readdirSync(directory).filter(file => file.startsWith('orbit_secret_key')),
       ['orbit_secret_key'],
@@ -2545,7 +2569,7 @@ test(
       `Deleted /var/lib/uptime-goblin/secret.key, an older key (fingerprint ${a}) that opens none of this data's keys: the Compose secret (/run/secrets/orbit_secret_key) (fingerprint ${bPrint}) opens them all. A backup or a snapshot (goblin-admin snapshots) of the data from before the key changed still needs that older key. Keep a backup of the key Uptime Goblin uses apart from the data.`
     );
     assert.equal(inVolume(), 1, 'A is gone from the volume');
-    assert.equal(fs.readFileSync(keyFile, 'utf8'), `${b}\n`, 'orbit_secret_key, byte for byte');
+    assert.equal(readKeyFile(keyFile), `${b}\n`, 'orbit_secret_key, byte for byte');
     const [again] = runRecipe([olderLine], { directory, name });
     assert.equal(again.status, 1, again.stdout + again.stderr);
     assert.match(
@@ -2765,14 +2789,19 @@ test(
       'i=0; while [ $i -lt 400 ]; do sleep 60 & i=$((i+1)); done; wait'
     );
     assert.equal(flood.status, 0, flood.stderr);
-    let refused = '';
+    let refused = '',
+      last = '';
     for (let i = 0; i < 40 && !refused; i++) {
       const tried = docker('exec', id, 'true');
       const said = tried.stdout + tried.stderr;
+      last = `exit ${tried.status}: ${said}`;
       if (tried.status !== 0 && /Resource temporarily unavailable/.test(said)) refused = said;
       else await delay(250);
     }
-    assert.ok(refused, 'the flood reached pids_limit: docker exec cannot start a process');
+    assert.ok(
+      refused,
+      `the flood reached pids_limit: docker exec cannot start a process (last try: ${last}; ${docker('stats', '--no-stream', '--format', '{{.PIDs}}', id).stdout.trim()} processes)`
+    );
     const pids = Number(docker('stats', '--no-stream', '--format', '{{.PIDs}}', id).stdout);
     assert.ok(pids > 200 && pids <= 256, `${pids} processes`);
     const answered = helper(

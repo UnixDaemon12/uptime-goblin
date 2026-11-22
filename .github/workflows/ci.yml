@@ -24,7 +24,7 @@ jobs:
   checks:
     name: Format, syntax, unit and integration tests
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     env:
       TEST_REQUIRE: git
     steps:
@@ -122,5 +122,10 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '24'
+          cache: npm
+      # One test runs the source tree with its installed dependencies (node_modules) in a
+      # container beside the image, so the job installs them as the other jobs do.
+      - name: Install locked dependencies without lifecycle scripts
+        run: npm ci --ignore-scripts
       - name: Build, run and health-check the image
         run: npm run test:docker

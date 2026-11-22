@@ -1206,7 +1206,9 @@ fs.copyFileSync = function (from, to, mode) {
     const orbitLine = async () => {
       const result = await nativeAdmin(['status', '--data-dir', data, '--unit', unit]);
       assert.equal(result.code, 0, result.err);
-      return result.out.split('\n').find(line => line.startsWith('Uptime Goblin: '));
+      // The process line is labelled with the release it is about: Orbit for the 1.4.2 found by
+      // its process (Linux), Uptime Goblin where no version is known (status.mjs).
+      return result.out.split('\n').find(line => /^(Uptime Goblin|Orbit): /.test(line));
     };
     const running = await orbitLine();
     await platformSubtest(

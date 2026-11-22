@@ -155,14 +155,18 @@ const newPaths = [
 ];
 
 // The Orbit layout is back as it was, with orbit.service running the previous release, and none
-// of the Uptime Goblin paths but the new release kept in /opt/uptime-goblin.failed.
-function assertRestored(host, before, version = '1.4.3-test.1') {
+// of the Uptime Goblin paths but the new release kept in /opt/uptime-goblin.failed. The installer
+// restarts orbit.service there without waiting for it to serve, so the restarted process writes
+// run/status.json after the installer exits: it is awaited (as makeOrbitHost awaits the first
+// start), never assumed, which a slower machine (a GitHub runner) showed.
+async function assertRestored(host, before, version = '1.4.3-test.1') {
   assert.deepEqual(layout(host), before, 'the Orbit layout is as it was');
   for (const file of newPaths) assert.equal(exists(host, file), false, `${file} is gone`);
   for (const file of ['etc/orbit.env.migrated', 'etc/systemd/system/orbit.service.migrated'])
     assert.equal(exists(host, file), false, `${file} is gone`);
   const state = host.orbitState();
   assert.ok(state?.pid && alive(state.pid), 'orbit.service runs again');
+  await until(() => fs.existsSync(host.path('var/lib/orbit/run/status.json')));
   const status = JSON.parse(fs.readFileSync(host.path('var/lib/orbit/run/status.json'), 'utf8'));
   assert.equal(status.version, version);
 }
@@ -352,7 +356,7 @@ test('a failed upgrade restores the Orbit layout exactly, and the previous relea
     result.stderr,
     /The previous version is running again; the upgrade to 1\.5\.0-test\.1 was rolled back\. The Orbit layout is restored as it was, and orbit\.service runs it\./
   );
-  assertRestored(host, before);
+  await assertRestored(host, before);
   assert.equal(host.installedVersion('opt/uptime-goblin.failed'), '1.5.0-test.1');
   // The next upgrade migrates again.
   const again = await host.install(makeSource(t, { version: '1.5.0-test.2', mode: 'ok' }));
@@ -483,7 +487,7 @@ test('a run cut short while it restored the Orbit layout is finished by the next
   ]);
   assert.equal(again.status, 1, ok(again));
   assert.match(again.stderr, /An earlier run of this installer was cut short/);
-  assertRestored(host, before);
+  await assertRestored(host, before);
 });
 
 test('a move that would cross file systems is refused before anything changes', async t => {
@@ -535,7 +539,7 @@ test('a move that would cross file systems is refused before anything changes', 
     result.stderr,
     /Uptime Goblin was not installed, and the Orbit layout is as it was\./
   );
-  assertRestored(host, before);
+  await assertRestored(host, before);
   assert.equal(exists(host, 'opt/uptime-goblin.failed'), false);
 });
 
@@ -699,7 +703,7 @@ test("restoring the Orbit layout removes the migration's temporary files a cut l
   assert.equal(result.status, 0, ok(result));
   for (const file of ['etc/uptime-goblin.env.goblin-tmp', 'var/lib/uptime-goblin.migrating.tmp'])
     assert.equal(exists(host, file), false, `${file} is removed`);
-  assertRestored(host, before);
+  await assertRestored(host, before);
 });
 
 test('a host with parts of both layouts and no record is refused, changing nothing', async t => {
