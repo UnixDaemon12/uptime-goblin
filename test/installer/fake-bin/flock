@@ -1,0 +1,3 @@
+#!/bin/sh
+# Fake flock for installer tests (macOS has none); see flock.cjs.
+exec node "$(dirname "$0")/flock.cjs" "$@"

@@ -1,0 +1,286 @@
+{
+  "schemaVersion": 1,
+  "runs": {
+    "darwin-full": {
+      "platform": "darwin",
+      "runtimes": ["24", "26"],
+      "files": "all",
+      "requiredFor": ["release"]
+    },
+    "darwin-platform": {
+      "platform": "darwin",
+      "runtimes": ["24", "26"],
+      "files": [
+        "test/db/cli.test.mjs",
+        "test/docs-audit.test.mjs",
+        "test/docs-keys.test.mjs",
+        "test/healthcheck.test.mjs",
+        "test/keyring.test.mjs",
+        "test/notifications.test.mjs",
+        "test/upgrade/identity.test.mjs"
+      ],
+      "requiredFor": ["commit", "release"]
+    },
+    "linux-full": {
+      "platform": "linux",
+      "runtimes": ["24", "26"],
+      "files": "all",
+      "requiredFor": ["commit", "release"]
+    },
+    "t8-container": {
+      "platform": "container",
+      "runtimes": ["24", "26"],
+      "files": ["test/disk-full.test.mjs"],
+      "requiredFor": ["commit", "release"],
+      "images": {
+        "24": {
+          "image": "node:24-bookworm-slim@sha256:0e0ff40c39bc087845bfb27465a0df4ea419520094bc35842ff83dd8cbe6f9b6",
+          "driver": "t8.driver.node24"
+        },
+        "26": null
+      },
+      "hostRuns": ["darwin-full", "linux-full"]
+    }
+  },
+  "entries": [
+    {
+      "id": "t8.environment",
+      "file": "test/disk-full.test.mjs",
+      "name": [
+        "T8 environment: TEST_T8_DIR is an empty 96 MiB tmpfs like the driver’s, and TEST_T8_RUN has the form of its code"
+      ],
+      "platforms": ["container"],
+      "runtimes": ["24", "26"],
+      "prerequisites": [],
+      "evidence": ["t8-container"]
+    },
+    {
+      "id": "t8.part-b",
+      "file": "test/disk-full.test.mjs",
+      "name": [
+        "T8 part B: on a real full file system, sign-in, delivery and a restart work, and space returns"
+      ],
+      "platforms": ["container"],
+      "runtimes": ["24", "26"],
+      "prerequisites": [],
+      "evidence": ["t8-container"]
+    },
+    {
+      "id": "t8.measurements",
+      "file": "test/disk-full.test.mjs",
+      "name": [
+        "T8 measurements (recorded, not gating): WAL slack, and sign-in without the reserve"
+      ],
+      "platforms": ["container"],
+      "runtimes": ["24", "26"],
+      "prerequisites": [],
+      "evidence": ["t8-container"]
+    },
+    {
+      "id": "t8.driver.node24",
+      "file": "test/disk-full.test.mjs",
+      "name": ["T8 part B passes in node:24-bookworm-slim on a size-limited tmpfs"],
+      "platforms": ["darwin", "linux"],
+      "runtimes": ["24", "26"],
+      "prerequisites": ["docker"],
+      "evidence": ["darwin-full", "linux-full"]
+    },
+    {
+      "id": "t8.host-regression",
+      "file": "test/disk-full.test.mjs",
+      "name": [
+        "T8: a TEST_T8_DIR that is not an empty 96 MiB tmpfs fails one test and fills nothing"
+      ],
+      "platforms": ["darwin", "linux"],
+      "runtimes": ["24", "26"],
+      "prerequisites": [],
+      "evidence": ["darwin-full", "linux-full"]
+    },
+    {
+      "id": "docs-audit.log-acl.darwin-file",
+      "file": "test/docs-audit.test.mjs",
+      "name": [
+        "keeping Orbit’s log on macOS: an access list that lets everyone read a file an earlier export left does not reach the private copy"
+      ],
+      "platforms": ["darwin"],
+      "runtimes": ["24", "26"],
+      "prerequisites": [],
+      "evidence": ["darwin-full", "darwin-platform"]
+    },
+    {
+      "id": "docs-audit.log-acl.darwin-inherited",
+      "file": "test/docs-audit.test.mjs",
+      "name": [
+        "keeping Orbit’s log on macOS: an access list entry the folder hands down reaches the new file and lets others read it whatever its mode, as the docs say"
+      ],
+      "platforms": ["darwin"],
+      "runtimes": ["24", "26"],
+      "prerequisites": ["non-root"],
+      "evidence": ["darwin-full", "darwin-platform"]
+    },
+    {
+      "id": "docs-audit.log-acl.linux",
+      "file": "test/docs-audit.test.mjs",
+      "name": [
+        "keeping Orbit’s log on Linux: the entries a folder’s default access list hands down reach the new file masked by its mode 0600, and an access list on the old file does not reach it, as the docs say"
+      ],
+      "platforms": ["linux"],
+      "runtimes": ["24", "26"],
+      "prerequisites": ["acl-tmpdir", "setfacl"],
+      "evidence": ["linux-full"]
+    },
+    {
+      "id": "notifications.proc-environ",
+      "file": "test/notifications.test.mjs",
+      "name": [
+        "on Linux the key from GOBLIN_SECRET_KEY_FILE never enters /proc/<pid>/environ; GOBLIN_SECRET_KEY does"
+      ],
+      "platforms": ["linux"],
+      "runtimes": ["24", "26"],
+      "prerequisites": [],
+      "evidence": ["linux-full"]
+    },
+    {
+      "id": "db-cli.proc-server-found",
+      "file": "test/db/cli.test.mjs",
+      "name": ["a running server.mjs with this data directory is found in /proc (Linux)"],
+      "platforms": ["linux"],
+      "runtimes": ["24", "26"],
+      "prerequisites": [],
+      "evidence": ["linux-full"]
+    },
+    {
+      "id": "db-cli.status.reused-pid.linux",
+      "file": "test/db/cli.test.mjs",
+      "name": [
+        "status tells whether Uptime Goblin runs as offline commands do: goblin.lock for 1.5, the process for 1.4.x, and in a container it says when it cannot tell",
+        "on Linux: a live process that is not Uptime Goblin, named by a 1.4.x record, is not taken for Uptime Goblin (/proc shows its command line)"
+      ],
+      "platforms": ["linux"],
+      "runtimes": ["24", "26"],
+      "prerequisites": [],
+      "evidence": ["linux-full"]
+    },
+    {
+      "id": "db-cli.status.reused-pid.darwin",
+      "file": "test/db/cli.test.mjs",
+      "name": [
+        "status tells whether Uptime Goblin runs as offline commands do: goblin.lock for 1.5, the process for 1.4.x, and in a container it says when it cannot tell",
+        "on macOS: a live process named by a 1.4.x record is taken for Uptime Goblin (there is no /proc to show its command line)"
+      ],
+      "platforms": ["darwin"],
+      "runtimes": ["24", "26"],
+      "prerequisites": [],
+      "evidence": ["darwin-full", "darwin-platform"]
+    },
+    {
+      "id": "db-cli.offline.reused-pid.linux",
+      "file": "test/db/cli.test.mjs",
+      "name": [
+        "offline commands exit 75 while run/status.json names a live Uptime Goblin: 1.4.x takes no lock",
+        "on Linux: a live process that is not Uptime Goblin, named by the record, does not stop the command (/proc shows its command line)"
+      ],
+      "platforms": ["linux"],
+      "runtimes": ["24", "26"],
+      "prerequisites": [],
+      "evidence": ["linux-full"]
+    },
+    {
+      "id": "db-cli.offline.reused-pid.darwin",
+      "file": "test/db/cli.test.mjs",
+      "name": [
+        "offline commands exit 75 while run/status.json names a live Uptime Goblin: 1.4.x takes no lock",
+        "on macOS: a live process named by the record is taken for Uptime Goblin, and the command exits 75 (there is no /proc to show its command line)"
+      ],
+      "platforms": ["darwin"],
+      "runtimes": ["24", "26"],
+      "prerequisites": [],
+      "evidence": ["darwin-full", "darwin-platform"]
+    },
+    {
+      "id": "healthcheck.run-status-swap",
+      "file": "test/healthcheck.test.mjs",
+      "name": [
+        "readRunStatusFile reads the run/ it opened, though run/ is swapped for a link right after that open"
+      ],
+      "platforms": ["linux"],
+      "runtimes": ["24", "26"],
+      "prerequisites": [],
+      "evidence": ["linux-full"]
+    },
+    {
+      "id": "healthcheck.preflight-swap",
+      "file": "test/healthcheck.test.mjs",
+      "name": [
+        "the installer's proxy preflight reads the run/ it opened, though run/ is swapped for a link right after that open"
+      ],
+      "platforms": ["linux"],
+      "runtimes": ["24", "26"],
+      "prerequisites": [],
+      "evidence": ["linux-full"]
+    },
+    {
+      "id": "docs-keys.old-key-file.eacces",
+      "file": "test/docs-keys.test.mjs",
+      "name": [
+        "OLD_KEY_FILE pasted as it is: the key command reads that file in its working directory and stops with 78, ENOENT or EACCES, as the docs say",
+        "from a working directory it cannot enter: EACCES"
+      ],
+      "platforms": ["linux"],
+      "runtimes": ["24", "26"],
+      "prerequisites": ["non-root"],
+      "evidence": ["linux-full"]
+    },
+    {
+      "id": "keyring.remove-copy.deleted-open-file",
+      "file": "test/keyring.test.mjs",
+      "name": [
+        "removeDataKeyCopy: deletes the data directory key only as a copy of a key that opens the data, and never when the source changed",
+        "on Linux: a source deleted while it is still open is never taken for a lasting copy"
+      ],
+      "platforms": ["linux"],
+      "runtimes": ["24", "26"],
+      "prerequisites": [],
+      "evidence": ["linux-full"]
+    },
+    {
+      "id": "upgrade-identity.l6.linux-running",
+      "file": "test/upgrade/identity.test.mjs",
+      "name": [
+        "identity across upgrades and rollbacks (§9.1)",
+        "L6: the kept orbit-admin sees a rolled-back 1.4.2, which keeps no run/status.json",
+        "on Linux: status finds 1.4.2 by its process, and offline commands refuse (75) while it runs"
+      ],
+      "platforms": ["linux"],
+      "runtimes": ["24", "26"],
+      "prerequisites": [],
+      "evidence": ["linux-full"]
+    },
+    {
+      "id": "upgrade-identity.l6.linux-stopped",
+      "file": "test/upgrade/identity.test.mjs",
+      "name": [
+        "identity across upgrades and rollbacks (§9.1)",
+        "L6: the kept orbit-admin sees a rolled-back 1.4.2, which keeps no run/status.json",
+        "on Linux: once 1.4.2 has stopped, status says Orbit is not running"
+      ],
+      "platforms": ["linux"],
+      "runtimes": ["24", "26"],
+      "prerequisites": [],
+      "evidence": ["linux-full"]
+    },
+    {
+      "id": "upgrade-identity.l6.darwin",
+      "file": "test/upgrade/identity.test.mjs",
+      "name": [
+        "identity across upgrades and rollbacks (§9.1)",
+        "L6: the kept orbit-admin sees a rolled-back 1.4.2, which keeps no run/status.json",
+        "on macOS: status says 1.4.2 may be running (there is no /proc to look for it)"
+      ],
+      "platforms": ["darwin"],
+      "runtimes": ["24", "26"],
+      "prerequisites": [],
+      "evidence": ["darwin-full", "darwin-platform"]
+    }
+  ]
+}

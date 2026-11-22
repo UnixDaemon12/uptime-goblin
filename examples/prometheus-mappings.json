@@ -1,0 +1,18 @@
+[
+  {
+    "key": "temperature",
+    "label": "Temperature",
+    "path": "example_temperature_celsius",
+    "labels": { "sensor": "cpu" },
+    "unit": "°C",
+    "scale": 1
+  },
+  {
+    "key": "active_peers",
+    "label": "Active peers",
+    "path": "example_wireguard_active_peers",
+    "labels": { "interface": "wg0" },
+    "unit": "",
+    "scale": 1
+  }
+]

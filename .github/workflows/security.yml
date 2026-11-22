@@ -1,0 +1,47 @@
+name: Security scans
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# This is automated evidence for the exact checkout. Independent review and the complete
+# commit/release gates remain separate requirements; a green scan does not approve a release.
+jobs:
+  scan:
+    name: Source, dependency and container security scans
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+      - name: Install locked dependencies without lifecycle scripts
+        run: npm ci --ignore-scripts
+      - name: Install checksum-pinned security tools
+        run: node scripts/install-security-tools.mjs
+      # The two steps above are not part of the gate and wait for none of its checks: `npm ci`
+      # reaches the npm registry directly, and scripts/install-security-tools.mjs, the checkout's
+      # own script, downloads the pinned scanners, before the gate starts. What follows concerns
+      # the gate's own stages only.
+      # Started with node, not `npm run security:scan`: npm would read a tracked .npmrc, whose
+      # script-shell could replace the gate. The gate itself refuses a tracked .npmrc.
+      # The gate's scan builds the image, installs and audits dependencies and runs Semgrep only
+      # with authorities that do not exist yet: until then it dispatches none of them (no build, no
+      # pull) and records those stages pending. It runs the two lints only once candidate-policy
+      # and platform-manifest pass, and on this runner platform-manifest cannot pass for a 1.5
+      # commit (the gate approvals and reviewed baselines it needs live only in a developer's local
+      # repository), so here it withholds the lints too. It exits 1 (docs/engineering-quality.md).
+      - name: Gate scan mode (it starts no stage whose prerequisites or authority are missing)
+        run: node scripts/security-gate.mjs scan

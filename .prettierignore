@@ -1,0 +1,8 @@
+node_modules/
+release/
+data/
+*.md
+package-lock.json
+LICENSE
+# Canonical JSON (keys sorted, no white space): its sha256 is the catalog identity the gate binds.
+scripts/security-catalog.json

@@ -1,0 +1,12 @@
+#!/bin/sh
+# Model a full/read-only filesystem while rendering the service unit, after partial output.
+if [ "${FAKE_UNIT_WRITE_FAIL:-}" = 1 ]; then
+  case "$1" in
+    's|^ExecStart='*)
+      printf '[Service]\n'
+      echo 'fake sed: simulated service-unit write failure' >&2
+      exit 1
+      ;;
+  esac
+fi
+exec /usr/bin/sed "$@"

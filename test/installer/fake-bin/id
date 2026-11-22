@@ -1,0 +1,5 @@
+#!/bin/sh
+# Installer tests: the account tools; see accounts.cjs. `id -u` (root) without Node, which a test
+# may replace with an old one on PATH.
+if [ "$#" -eq 1 ] && [ "$1" = -u ]; then echo 0; exit 0; fi
+exec node "$(dirname "$0")/accounts.cjs" id "$@"

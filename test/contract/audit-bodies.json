@@ -1,0 +1,1452 @@
+{
+  "$comment": [
+    "Audit spec §6.6: the exact JSON of each answer of the audit routes and of the audit service (audit.list, audit.export, audit.verify), and every audit error body. Names are paths: list.entries, verify.broken.seq_gap, error.audit_query_invalid.to/order (a \"/\" suffix names the second rule of a parameter; `repeated` is any parameter given twice).",
+    "list.* are what audit.list resolves (the body of GET /api/audit); verify.* what audit.verify resolves (GET /api/audit/verify, or goblin-admin verify-audit --json: those with `journal` and `foreignLines`, and verify.incomplete.no_key and verify.incomplete.unknown_key, come only from the CLI); export.* are the answers of GET /api/audit/export, with `body` as text (a CSV starts with the BOM, \\ufeff) and the {rows, more, filename, contentType} audit.export resolves beside it; error.* are {status, headers, body}.",
+    "Volatile values are written as \"<seq>\" (an entry number: seq, ref, a cursor), \"<ms>\" (a time or a duration in milliseconds), \"<hash>\" (64 hex digits), \"<id>\" (a session, request, delivery, instance or key id, or a build), \"<time>\" (a time as auditTime() writes it inside a text), \"<iso>\" (an ISO 8601 time in a CSV cell) and \"<stamp>\" (the YYYYMMDD-HHMMSS of an export file name). Numbers inside texts are written with thousands separators when real.",
+    "verify.anchors holds every anchor that can stand in an intact log; the head-mismatch audit.gap is in verify.broken.log_truncated (it is always log_truncated) and the key.reset that names a head in verify.incomplete.key_reset (the rows it covers are unverifiable).",
+    "Phase 0 contract (frozen): changed only through the integrator, with the agreement of every lane that uses it. Changed at integration: verify.incomplete.unknown_key added (journal lines under a key the keyring does not hold, which no reset removed, leave the result incomplete; the CLI only)."
+  ],
+  "list": {
+    "empty": {
+      "entries": [],
+      "nextCursor": null,
+      "unwritten": null,
+      "retention": {
+        "days": 90,
+        "maxRows": 250000,
+        "rows": 0,
+        "oldest": null
+      }
+    },
+    "entries": {
+      "entries": [
+        {
+          "seq": "<seq>",
+          "time": "<ms>",
+          "action": "users.created",
+          "outcome": "ok",
+          "status": 201,
+          "count": 1,
+          "actor": {
+            "type": "user",
+            "id": "u_admin",
+            "name": "admin",
+            "via": "session",
+            "sessionId": "<id>",
+            "client": "192.0.2.10",
+            "userAgent": "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+          },
+          "requestId": "<id>",
+          "target": {
+            "type": "user",
+            "id": "u_viewer",
+            "name": "viewer"
+          },
+          "ref": null,
+          "result": null,
+          "configRevision": null,
+          "detail": {
+            "role": "viewer"
+          }
+        },
+        {
+          "seq": "<seq>",
+          "time": "<ms>",
+          "action": "system.start",
+          "outcome": "info",
+          "status": null,
+          "count": 1,
+          "actor": {
+            "type": "system",
+            "id": null,
+            "name": "orbit",
+            "via": "system",
+            "sessionId": null,
+            "client": null,
+            "userAgent": null
+          },
+          "requestId": null,
+          "target": {
+            "type": "orbit",
+            "id": null,
+            "name": null
+          },
+          "ref": null,
+          "result": null,
+          "configRevision": 42,
+          "detail": {
+            "version": "1.5.0-dev.2",
+            "build": "<id>",
+            "first": false,
+            "cleanStop": true,
+            "configRevision": 42,
+            "security": {
+              "legacyBasic": true,
+              "insecureHttpSessions": false,
+              "trustProxy": null,
+              "allowedHosts": [],
+              "webhook": true,
+              "keySource": "file"
+            },
+            "securityChanged": ["legacyBasic"]
+          }
+        },
+        {
+          "seq": "<seq>",
+          "time": "<ms>",
+          "action": "source.test",
+          "outcome": "ok",
+          "status": 200,
+          "count": 1,
+          "actor": {
+            "type": "user",
+            "id": "u_admin",
+            "name": "admin",
+            "via": "session",
+            "sessionId": "<id>",
+            "client": "192.0.2.10",
+            "userAgent": "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+          },
+          "requestId": "<id>",
+          "target": {
+            "type": "source",
+            "id": "plex-1",
+            "name": "Plex"
+          },
+          "ref": null,
+          "result": null,
+          "configRevision": null,
+          "detail": {
+            "type": "plex",
+            "savedCredentials": true,
+            "result": "connected",
+            "credentialsCleared": false
+          }
+        },
+        {
+          "seq": "<seq>",
+          "time": "<ms>",
+          "action": "session.login",
+          "outcome": "failed",
+          "status": null,
+          "count": 7,
+          "actor": {
+            "type": "anonymous",
+            "id": null,
+            "name": null,
+            "via": null,
+            "sessionId": null,
+            "client": null,
+            "userAgent": null
+          },
+          "requestId": null,
+          "target": {
+            "type": "account",
+            "id": null,
+            "name": null
+          },
+          "ref": null,
+          "result": null,
+          "configRevision": null,
+          "detail": {
+            "codes": {
+              "invalid_credentials": 6,
+              "locked": 1
+            },
+            "clients": 3,
+            "more": false,
+            "sample": ["192.0.2.20", "192.0.2.21", "198.51.100.7"],
+            "from": "<ms>",
+            "to": "<ms>"
+          }
+        },
+        {
+          "seq": "<seq>",
+          "time": "<ms>",
+          "action": "session.login",
+          "outcome": "failed",
+          "status": null,
+          "count": 1,
+          "actor": {
+            "type": "anonymous",
+            "id": null,
+            "name": null,
+            "via": null,
+            "sessionId": null,
+            "client": "192.0.2.20",
+            "userAgent": "curl/8.5.0"
+          },
+          "requestId": null,
+          "target": {
+            "type": "account",
+            "id": "admin",
+            "name": null
+          },
+          "ref": null,
+          "result": null,
+          "configRevision": null,
+          "detail": {
+            "code": "invalid_credentials",
+            "login": "admin"
+          }
+        },
+        {
+          "seq": "<seq>",
+          "time": "<ms>",
+          "action": "signing.reveal",
+          "outcome": "attempt",
+          "status": null,
+          "count": 1,
+          "actor": {
+            "type": "user",
+            "id": "u_admin",
+            "name": "admin",
+            "via": "session",
+            "sessionId": "<id>",
+            "client": "192.0.2.10",
+            "userAgent": "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+          },
+          "requestId": "<id>",
+          "target": {
+            "type": "secret",
+            "id": "env-webhook",
+            "name": null
+          },
+          "ref": null,
+          "result": null,
+          "configRevision": null,
+          "detail": null
+        },
+        {
+          "seq": "<seq>",
+          "time": "<ms>",
+          "action": "settings.update",
+          "outcome": "unknown",
+          "status": null,
+          "count": 1,
+          "actor": {
+            "type": "user",
+            "id": "u_admin",
+            "name": "admin",
+            "via": "session",
+            "sessionId": "<id>",
+            "client": "192.0.2.10",
+            "userAgent": "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+          },
+          "requestId": "<id>",
+          "target": {
+            "type": "settings",
+            "id": "workspace",
+            "name": null
+          },
+          "ref": null,
+          "result": null,
+          "configRevision": 41,
+          "detail": {
+            "ifMatch": true
+          }
+        },
+        {
+          "seq": "<seq>",
+          "time": "<ms>",
+          "action": "source.update",
+          "outcome": "conflict",
+          "status": 409,
+          "count": 1,
+          "actor": {
+            "type": "user",
+            "id": "u_admin",
+            "name": "admin",
+            "via": "session",
+            "sessionId": "<id>",
+            "client": "192.0.2.10",
+            "userAgent": "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+          },
+          "requestId": "<id>",
+          "target": {
+            "type": "source",
+            "id": "website-2",
+            "name": "Blog"
+          },
+          "ref": "<seq>",
+          "result": null,
+          "configRevision": 41,
+          "detail": {
+            "ifMatch": true
+          }
+        },
+        {
+          "seq": "<seq>",
+          "time": "<ms>",
+          "action": "delivery.retry",
+          "outcome": "denied",
+          "status": 409,
+          "count": 1,
+          "actor": {
+            "type": "user",
+            "id": "u_admin",
+            "name": "admin",
+            "via": "basic",
+            "sessionId": null,
+            "client": "192.0.2.10",
+            "userAgent": "python-requests/2.32.3"
+          },
+          "requestId": "<id>",
+          "target": {
+            "type": "delivery",
+            "id": "<id>",
+            "name": null
+          },
+          "ref": "<seq>",
+          "result": null,
+          "configRevision": null,
+          "detail": {
+            "code": "delivery_not_retryable"
+          }
+        },
+        {
+          "seq": "<seq>",
+          "time": "<ms>",
+          "action": "settings.update",
+          "outcome": "ok",
+          "status": 200,
+          "count": 1,
+          "actor": {
+            "type": "user",
+            "id": "u_admin",
+            "name": "admin",
+            "via": "session",
+            "sessionId": "<id>",
+            "client": "192.0.2.10",
+            "userAgent": "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+          },
+          "requestId": "<id>",
+          "target": {
+            "type": "settings",
+            "id": "workspace",
+            "name": null
+          },
+          "ref": "<seq>",
+          "result": null,
+          "configRevision": 41,
+          "detail": {
+            "ifMatch": true,
+            "diff": [
+              {
+                "path": "email.host",
+                "from": "smtp.example.com",
+                "to": "mail.example.com"
+              },
+              {
+                "path": "email.password",
+                "change": "changed"
+              }
+            ],
+            "truncated": true,
+            "changes": 41
+          }
+        },
+        {
+          "seq": "<seq>",
+          "time": "<ms>",
+          "action": "session.login",
+          "outcome": "ok",
+          "status": null,
+          "count": 1,
+          "actor": {
+            "type": "user",
+            "id": "u_admin",
+            "name": "admin",
+            "via": "session",
+            "sessionId": "<id>",
+            "client": "192.0.2.10",
+            "userAgent": "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+          },
+          "requestId": "<id>",
+          "target": {
+            "type": "session",
+            "id": "<id>",
+            "name": null
+          },
+          "ref": null,
+          "result": null,
+          "configRevision": null,
+          "detail": {
+            "persistent": false,
+            "transport": "https",
+            "ended": 0
+          }
+        }
+      ],
+      "nextCursor": null,
+      "unwritten": null,
+      "retention": {
+        "days": 90,
+        "maxRows": 250000,
+        "rows": 14,
+        "oldest": {
+          "seq": "<seq>",
+          "time": "<ms>"
+        }
+      }
+    },
+    "more": {
+      "entries": [
+        {
+          "seq": "<seq>",
+          "time": "<ms>",
+          "action": "session.logout",
+          "outcome": "ok",
+          "status": null,
+          "count": 1,
+          "actor": {
+            "type": "user",
+            "id": "u_admin",
+            "name": "admin",
+            "via": "session",
+            "sessionId": "<id>",
+            "client": "192.0.2.10",
+            "userAgent": "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+          },
+          "requestId": "<id>",
+          "target": {
+            "type": "session",
+            "id": "<id>",
+            "name": null
+          },
+          "ref": null,
+          "result": null,
+          "configRevision": null,
+          "detail": {
+            "cause": "signout"
+          }
+        },
+        {
+          "seq": "<seq>",
+          "time": "<ms>",
+          "action": "config.export",
+          "outcome": "ok",
+          "status": 200,
+          "count": 1,
+          "actor": {
+            "type": "user",
+            "id": "u_admin",
+            "name": "admin",
+            "via": "session",
+            "sessionId": "<id>",
+            "client": "192.0.2.10",
+            "userAgent": "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+          },
+          "requestId": "<id>",
+          "target": {
+            "type": "config",
+            "id": null,
+            "name": null
+          },
+          "ref": null,
+          "result": null,
+          "configRevision": null,
+          "detail": {
+            "sources": 3,
+            "bytes": 2048
+          }
+        }
+      ],
+      "nextCursor": "<seq>",
+      "unwritten": null,
+      "retention": {
+        "days": 90,
+        "maxRows": 250000,
+        "rows": 120,
+        "oldest": {
+          "seq": "<seq>",
+          "time": "<ms>"
+        }
+      }
+    },
+    "unwritten": {
+      "entries": [
+        {
+          "seq": "<seq>",
+          "time": "<ms>",
+          "action": "settings.update",
+          "outcome": "unknown",
+          "status": null,
+          "count": 1,
+          "actor": {
+            "type": "user",
+            "id": "u_admin",
+            "name": "admin",
+            "via": "session",
+            "sessionId": "<id>",
+            "client": "192.0.2.10",
+            "userAgent": "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+          },
+          "requestId": "<id>",
+          "target": {
+            "type": "settings",
+            "id": "workspace",
+            "name": null
+          },
+          "ref": null,
+          "result": null,
+          "configRevision": 42,
+          "detail": {
+            "ifMatch": false
+          }
+        }
+      ],
+      "nextCursor": null,
+      "unwritten": {
+        "since": "<ms>",
+        "count": 1
+      },
+      "retention": {
+        "days": 90,
+        "maxRows": 250000,
+        "rows": 1,
+        "oldest": {
+          "seq": "<seq>",
+          "time": "<ms>"
+        }
+      }
+    }
+  },
+  "export": {
+    "csv": {
+      "status": 200,
+      "headers": {
+        "content-type": "text/csv; charset=utf-8",
+        "content-disposition": "attachment; filename=\"uptime-goblin-audit-<stamp>Z.csv\"",
+        "x-goblin-export-rows": "2",
+        "x-goblin-export-more": "false",
+        "cache-control": "no-store"
+      },
+      "body": "\ufeffseq,time,actor_type,actor_id,actor_name,via,session_id,client,user_agent,request_id,action,target_type,target_id,target_name,outcome,status,count,ref,config_revision,detail,v,key_id,prev_hash,hash\r\n\"<seq>\",\"<iso>\",\"user\",\"u_admin\",\"admin\",\"session\",\"<id>\",\"192.0.2.10\",\"Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0\",\"<id>\",\"session.login\",\"session\",\"<id>\",\"\",\"ok\",\"\",\"1\",\"\",\"\",\"{\"\"ended\"\":0,\"\"persistent\"\":false,\"\"transport\"\":\"\"https\"\"}\",\"1\",\"<id>\",\"<hash>\",\"<hash>\"\r\n\"<seq>\",\"<iso>\",\"user\",\"u_admin\",\"admin\",\"session\",\"<id>\",\"192.0.2.10\",\"Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0\",\"<id>\",\"source.create\",\"source\",\"website-3\",\"'=SUM(A1:A2)\",\"ok\",\"201\",\"1\",\"<seq>\",\"43\",\"{\"\"ifMatch\"\":false}\",\"1\",\"<id>\",\"<hash>\",\"<hash>\"\r\n",
+      "rows": 2,
+      "more": false,
+      "filename": "uptime-goblin-audit-<stamp>Z.csv",
+      "contentType": "text/csv; charset=utf-8"
+    },
+    "ndjson": {
+      "status": 200,
+      "headers": {
+        "content-type": "application/x-ndjson; charset=utf-8",
+        "content-disposition": "attachment; filename=\"uptime-goblin-audit-<stamp>Z.ndjson\"",
+        "x-goblin-export-rows": "2",
+        "x-goblin-export-more": "false",
+        "cache-control": "no-store"
+      },
+      "body": "{\"orbit\":\"audit.export\",\"v\":1,\"instance\":\"<id>\",\"exportedAt\":\"<ms>\",\"rows\":2,\"more\":false}\n{\"seq\":\"<seq>\",\"v\":1,\"time\":\"<ms>\",\"ref\":null,\"actor_type\":\"user\",\"actor_id\":\"u_admin\",\"actor_name\":\"admin\",\"via\":\"session\",\"session_id\":\"<id>\",\"client_key\":\"192.0.2.10\",\"user_agent\":\"Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0\",\"request_id\":\"<id>\",\"action\":\"session.login\",\"target_type\":\"session\",\"target_id\":\"<id>\",\"target_name\":null,\"outcome\":\"ok\",\"status\":null,\"count\":1,\"detail\":{\"ended\":0,\"persistent\":false,\"transport\":\"https\"},\"config_revision\":null,\"key_id\":\"<id>\",\"prev_hash\":\"<hash>\",\"hash\":\"<hash>\"}\n{\"seq\":\"<seq>\",\"v\":1,\"time\":\"<ms>\",\"ref\":\"<seq>\",\"actor_type\":\"user\",\"actor_id\":\"u_admin\",\"actor_name\":\"admin\",\"via\":\"session\",\"session_id\":\"<id>\",\"client_key\":\"192.0.2.10\",\"user_agent\":\"Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0\",\"request_id\":\"<id>\",\"action\":\"source.create\",\"target_type\":\"source\",\"target_id\":\"website-3\",\"target_name\":\"=SUM(A1:A2)\",\"outcome\":\"ok\",\"status\":201,\"count\":1,\"detail\":{\"ifMatch\":false},\"config_revision\":43,\"key_id\":\"<id>\",\"prev_hash\":\"<hash>\",\"hash\":\"<hash>\"}\n",
+      "rows": 2,
+      "more": false,
+      "filename": "uptime-goblin-audit-<stamp>Z.ndjson",
+      "contentType": "application/x-ndjson; charset=utf-8"
+    }
+  },
+  "verify": {
+    "empty": {
+      "result": "intact",
+      "checkedAt": "<ms>",
+      "durationMs": "<ms>",
+      "keyChecked": true,
+      "rows": {
+        "checked": 0,
+        "first": null,
+        "last": null
+      },
+      "checkpoints": {
+        "checked": 0,
+        "matched": 0
+      },
+      "anchors": [],
+      "unverifiable": [],
+      "journal": null,
+      "problem": null
+    },
+    "intact": {
+      "result": "intact",
+      "checkedAt": "<ms>",
+      "durationMs": "<ms>",
+      "keyChecked": true,
+      "rows": {
+        "checked": 12,
+        "first": {
+          "seq": "<seq>",
+          "time": "<ms>"
+        },
+        "last": {
+          "seq": "<seq>",
+          "time": "<ms>"
+        }
+      },
+      "checkpoints": {
+        "checked": 1,
+        "matched": 1
+      },
+      "anchors": [],
+      "unverifiable": [],
+      "journal": null,
+      "problem": null
+    },
+    "anchors": {
+      "result": "intact",
+      "checkedAt": "<ms>",
+      "durationMs": "<ms>",
+      "keyChecked": true,
+      "rows": {
+        "checked": 40,
+        "first": {
+          "seq": "<seq>",
+          "time": "<ms>"
+        },
+        "last": {
+          "seq": "<seq>",
+          "time": "<ms>"
+        }
+      },
+      "checkpoints": {
+        "checked": 0,
+        "matched": 0
+      },
+      "anchors": [
+        {
+          "seq": "<seq>",
+          "time": "<ms>",
+          "action": "key.reset",
+          "lostKeyIds": ["<id>"],
+          "head": null
+        },
+        {
+          "seq": "<seq>",
+          "time": "<ms>",
+          "action": "system.upgrade",
+          "release": "1.5.0-dev.2",
+          "entries": [
+            {
+              "from": "1.5.0-dev.0",
+              "to": "1.5.0-dev.1",
+              "at": "<ms>"
+            },
+            {
+              "from": "1.5.0-dev.1",
+              "to": "1.5.0-dev.2",
+              "at": "<ms>"
+            }
+          ],
+          "markerLost": true
+        },
+        {
+          "seq": "<seq>",
+          "time": "<ms>",
+          "action": "audit.gap",
+          "reason": "inbox-discarded",
+          "head": null,
+          "lastSeq": null,
+          "count": 2
+        },
+        {
+          "seq": "<seq>",
+          "time": "<ms>",
+          "action": "system.restore",
+          "cause": "snapshot",
+          "snapshot": "manual-1.5.0-dev.2-20260920T081200Z",
+          "at": "<ms>",
+          "restoredHead": {
+            "seq": "<seq>",
+            "hash": "<hash>"
+          }
+        },
+        {
+          "seq": "<seq>",
+          "time": "<ms>",
+          "action": "system.upgrade",
+          "release": "1.5.0-dev.2",
+          "entries": [
+            {
+              "from": "1.5.0-dev.2",
+              "to": "1.5.0-dev.1",
+              "at": "<ms>"
+            },
+            {
+              "from": "1.5.0-dev.1",
+              "to": "1.5.0-dev.2",
+              "at": "<ms>"
+            }
+          ],
+          "markerLost": false
+        },
+        {
+          "seq": "<seq>",
+          "time": "<ms>",
+          "action": "system.restore",
+          "cause": "control_file",
+          "snapshot": null,
+          "at": null,
+          "restoredHead": {
+            "seq": "<seq>",
+            "hash": "<hash>"
+          }
+        }
+      ],
+      "unverifiable": [],
+      "journal": null,
+      "problem": null
+    },
+    "incomplete": {
+      "key_reset": {
+        "result": "incomplete",
+        "checkedAt": "<ms>",
+        "durationMs": "<ms>",
+        "keyChecked": true,
+        "rows": {
+          "checked": 12,
+          "first": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          },
+          "last": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          }
+        },
+        "checkpoints": {
+          "checked": 0,
+          "matched": 0
+        },
+        "anchors": [
+          {
+            "seq": "<seq>",
+            "time": "<ms>",
+            "action": "key.reset",
+            "lostKeyIds": ["<id>"],
+            "head": {
+              "seq": "<seq>",
+              "hash": "<hash>"
+            }
+          }
+        ],
+        "unverifiable": [
+          {
+            "reason": "key_reset",
+            "from": "<seq>",
+            "to": "<seq>",
+            "keyIds": ["<id>"],
+            "anchorSeq": "<seq>",
+            "at": "<ms>"
+          }
+        ],
+        "journal": null,
+        "problem": null
+      },
+      "newer_format": {
+        "result": "incomplete",
+        "checkedAt": "<ms>",
+        "durationMs": "<ms>",
+        "keyChecked": true,
+        "rows": {
+          "checked": 12,
+          "first": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          },
+          "last": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          }
+        },
+        "checkpoints": {
+          "checked": 0,
+          "matched": 0
+        },
+        "anchors": [],
+        "unverifiable": [
+          {
+            "reason": "newer_format",
+            "from": "<seq>",
+            "to": "<seq>",
+            "v": 2
+          }
+        ],
+        "journal": null,
+        "problem": null
+      },
+      "restore_unchecked": {
+        "result": "incomplete",
+        "checkedAt": "<ms>",
+        "durationMs": "<ms>",
+        "keyChecked": true,
+        "rows": {
+          "checked": 12,
+          "first": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          },
+          "last": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          }
+        },
+        "checkpoints": {
+          "checked": 0,
+          "matched": 0
+        },
+        "anchors": [
+          {
+            "seq": "<seq>",
+            "time": "<ms>",
+            "action": "system.restore",
+            "cause": "snapshot",
+            "snapshot": "manual-1.5.0-dev.2-20260920T081200Z",
+            "at": "<ms>",
+            "restoredHead": {
+              "seq": "<seq>",
+              "hash": "<hash>"
+            }
+          }
+        ],
+        "unverifiable": [
+          {
+            "reason": "restore_unchecked",
+            "lines": 3,
+            "anchorSeq": "<seq>",
+            "at": "<ms>",
+            "cause": "snapshot",
+            "snapshot": "manual-1.5.0-dev.2-20260920T081200Z"
+          }
+        ],
+        "journal": {
+          "lines": 9,
+          "matched": 6,
+          "unchecked": 3,
+          "foreign": 0,
+          "coveredTo": "<seq>",
+          "foreignLines": []
+        },
+        "problem": null
+      },
+      "no_key": {
+        "result": "incomplete",
+        "checkedAt": "<ms>",
+        "durationMs": "<ms>",
+        "keyChecked": false,
+        "rows": {
+          "checked": 12,
+          "first": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          },
+          "last": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          }
+        },
+        "checkpoints": {
+          "checked": 0,
+          "matched": 0
+        },
+        "anchors": [],
+        "unverifiable": [
+          {
+            "reason": "no_key"
+          }
+        ],
+        "journal": null,
+        "problem": null
+      },
+      "unknown_key": {
+        "result": "incomplete",
+        "checkedAt": "<ms>",
+        "durationMs": "<ms>",
+        "keyChecked": true,
+        "rows": {
+          "checked": 12,
+          "first": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          },
+          "last": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          }
+        },
+        "checkpoints": {
+          "checked": 0,
+          "matched": 0
+        },
+        "anchors": [],
+        "unverifiable": [
+          {
+            "reason": "unknown_key",
+            "lines": 3,
+            "keyIds": ["<id>"]
+          }
+        ],
+        "journal": {
+          "lines": 15,
+          "matched": 12,
+          "unchecked": 0,
+          "foreign": 3,
+          "coveredTo": "<seq>",
+          "foreignLines": [
+            {
+              "seq": "<seq>",
+              "time": "<ms>"
+            },
+            {
+              "seq": "<seq>",
+              "time": "<ms>"
+            },
+            {
+              "seq": "<seq>",
+              "time": "<ms>"
+            }
+          ]
+        },
+        "problem": null
+      }
+    },
+    "broken": {
+      "start_missing": {
+        "result": "broken",
+        "checkedAt": "<ms>",
+        "durationMs": "<ms>",
+        "keyChecked": true,
+        "rows": {
+          "checked": 12,
+          "first": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          },
+          "last": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          }
+        },
+        "checkpoints": {
+          "checked": 0,
+          "matched": 0
+        },
+        "anchors": [],
+        "unverifiable": [],
+        "journal": null,
+        "problem": {
+          "code": "start_missing",
+          "seq": "<seq>",
+          "time": "<ms>",
+          "message": "Entries before #<seq> are missing, and no prune recorded their removal.",
+          "consequence": "The entries that remain were checked; the removed ones cannot be."
+        }
+      },
+      "link_broken": {
+        "result": "broken",
+        "checkedAt": "<ms>",
+        "durationMs": "<ms>",
+        "keyChecked": true,
+        "rows": {
+          "checked": 12,
+          "first": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          },
+          "last": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          }
+        },
+        "checkpoints": {
+          "checked": 0,
+          "matched": 0
+        },
+        "anchors": [],
+        "unverifiable": [],
+        "journal": null,
+        "problem": {
+          "code": "link_broken",
+          "seq": "<seq>",
+          "time": "<ms>",
+          "message": "Entry #<seq> does not follow the entry before it: an entry was changed, inserted or removed.",
+          "consequence": "Entries from #<seq> on cannot be trusted."
+        }
+      },
+      "seq_gap": {
+        "result": "broken",
+        "checkedAt": "<ms>",
+        "durationMs": "<ms>",
+        "keyChecked": true,
+        "rows": {
+          "checked": 12,
+          "first": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          },
+          "last": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          }
+        },
+        "checkpoints": {
+          "checked": 0,
+          "matched": 0
+        },
+        "anchors": [],
+        "unverifiable": [],
+        "journal": null,
+        "problem": {
+          "code": "seq_gap",
+          "seq": "<seq>",
+          "time": "<ms>",
+          "message": "Entries #<seq>–#<seq> are missing.",
+          "consequence": "The entries around them were checked; the removed ones cannot be.",
+          "from": "<seq>",
+          "to": "<seq>"
+        }
+      },
+      "hash_mismatch": {
+        "result": "broken",
+        "checkedAt": "<ms>",
+        "durationMs": "<ms>",
+        "keyChecked": true,
+        "rows": {
+          "checked": 12,
+          "first": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          },
+          "last": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          }
+        },
+        "checkpoints": {
+          "checked": 0,
+          "matched": 0
+        },
+        "anchors": [],
+        "unverifiable": [],
+        "journal": null,
+        "problem": {
+          "code": "hash_mismatch",
+          "seq": "<seq>",
+          "time": "<ms>",
+          "message": "Entry #<seq> does not match its signature: it was changed.",
+          "consequence": "Entry #<seq> cannot be trusted; the others were checked."
+        }
+      },
+      "head_mismatch": {
+        "result": "broken",
+        "checkedAt": "<ms>",
+        "durationMs": "<ms>",
+        "keyChecked": true,
+        "rows": {
+          "checked": 12,
+          "first": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          },
+          "last": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          }
+        },
+        "checkpoints": {
+          "checked": 0,
+          "matched": 0
+        },
+        "anchors": [],
+        "unverifiable": [],
+        "journal": null,
+        "problem": {
+          "code": "head_mismatch",
+          "seq": "<seq>",
+          "time": "<ms>",
+          "message": "The log ends at entry #<seq>, but Uptime Goblin last wrote entry #<seq>: entries were removed from the end.",
+          "consequence": "Entries after #<seq> are gone; the rest were checked.",
+          "head": "<seq>"
+        }
+      },
+      "checkpoint_mismatch": {
+        "result": "broken",
+        "checkedAt": "<ms>",
+        "durationMs": "<ms>",
+        "keyChecked": true,
+        "rows": {
+          "checked": 12,
+          "first": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          },
+          "last": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          }
+        },
+        "checkpoints": {
+          "checked": 1,
+          "matched": 0
+        },
+        "anchors": [],
+        "unverifiable": [],
+        "journal": null,
+        "problem": {
+          "code": "checkpoint_mismatch",
+          "seq": "<seq>",
+          "time": "<ms>",
+          "message": "Checkpoint #<seq> does not match the entry it names.",
+          "consequence": "The checkpoint or entry #<seq> was changed."
+        }
+      },
+      "checkpoint_mac": {
+        "result": "broken",
+        "checkedAt": "<ms>",
+        "durationMs": "<ms>",
+        "keyChecked": true,
+        "rows": {
+          "checked": 12,
+          "first": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          },
+          "last": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          }
+        },
+        "checkpoints": {
+          "checked": 1,
+          "matched": 0
+        },
+        "anchors": [],
+        "unverifiable": [],
+        "journal": null,
+        "problem": {
+          "code": "checkpoint_mac",
+          "seq": "<seq>",
+          "time": "<ms>",
+          "message": "Checkpoint #<seq> is not signed by this Uptime Goblin.",
+          "consequence": "A checkpoint was changed, or the key that signed it was removed without a recorded reset."
+        }
+      },
+      "journal_mismatch": {
+        "result": "broken",
+        "checkedAt": "<ms>",
+        "durationMs": "<ms>",
+        "keyChecked": true,
+        "rows": {
+          "checked": 12,
+          "first": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          },
+          "last": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          }
+        },
+        "checkpoints": {
+          "checked": 0,
+          "matched": 0
+        },
+        "anchors": [],
+        "unverifiable": [],
+        "journal": {
+          "lines": 9,
+          "matched": 8,
+          "unchecked": 0,
+          "foreign": 0,
+          "coveredTo": "<seq>",
+          "foreignLines": []
+        },
+        "problem": {
+          "code": "journal_mismatch",
+          "seq": "<seq>",
+          "time": "<ms>",
+          "message": "Entry #<seq> differs from the checkpoint Uptime Goblin printed on <time>.",
+          "consequence": "Entry #<seq> or an entry before it was changed after Uptime Goblin printed the checkpoint.",
+          "lineTime": "<ms>"
+        }
+      },
+      "journal_ahead": {
+        "result": "broken",
+        "checkedAt": "<ms>",
+        "durationMs": "<ms>",
+        "keyChecked": true,
+        "rows": {
+          "checked": 12,
+          "first": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          },
+          "last": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          }
+        },
+        "checkpoints": {
+          "checked": 0,
+          "matched": 0
+        },
+        "anchors": [],
+        "unverifiable": [],
+        "journal": {
+          "lines": 9,
+          "matched": 8,
+          "unchecked": 0,
+          "foreign": 0,
+          "coveredTo": "<seq>",
+          "foreignLines": []
+        },
+        "problem": {
+          "code": "journal_ahead",
+          "seq": "<seq>",
+          "time": null,
+          "message": "Uptime Goblin printed checkpoint #<seq> on <time>, but the log ends at #<seq>.",
+          "consequence": "Entries after #<seq> were removed from the end, or this is an older copy of the data.",
+          "head": "<seq>",
+          "lineTime": "<ms>"
+        }
+      },
+      "log_truncated": {
+        "result": "broken",
+        "checkedAt": "<ms>",
+        "durationMs": "<ms>",
+        "keyChecked": true,
+        "rows": {
+          "checked": 12,
+          "first": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          },
+          "last": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          }
+        },
+        "checkpoints": {
+          "checked": 0,
+          "matched": 0
+        },
+        "anchors": [
+          {
+            "seq": "<seq>",
+            "time": "<ms>",
+            "action": "audit.gap",
+            "reason": "head-mismatch",
+            "head": {
+              "seq": "<seq>",
+              "hash": "<hash>"
+            },
+            "lastSeq": "<seq>",
+            "count": null
+          }
+        ],
+        "unverifiable": [],
+        "journal": null,
+        "problem": {
+          "code": "log_truncated",
+          "seq": "<seq>",
+          "time": "<ms>",
+          "message": "On <time> Uptime Goblin found its audit log cut or changed at the end: it had last written entry #<seq>, and the log ended at entry #<seq>.",
+          "consequence": "Entries Uptime Goblin wrote after #<seq> are missing or were changed; the entries before were checked.",
+          "head": "<seq>",
+          "lastSeq": "<seq>"
+        }
+      },
+      "key_lost": {
+        "result": "broken",
+        "checkedAt": "<ms>",
+        "durationMs": "<ms>",
+        "keyChecked": true,
+        "rows": {
+          "checked": 12,
+          "first": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          },
+          "last": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          }
+        },
+        "checkpoints": {
+          "checked": 0,
+          "matched": 0
+        },
+        "anchors": [],
+        "unverifiable": [],
+        "journal": null,
+        "problem": {
+          "code": "key_lost",
+          "seq": "<seq>",
+          "time": "<ms>",
+          "message": "Entry #<seq> is signed with a key that is not in the keyring, and no key reset recorded its loss.",
+          "consequence": "Entries signed with that key cannot be trusted."
+        }
+      },
+      "unreadable": {
+        "result": "broken",
+        "checkedAt": "<ms>",
+        "durationMs": "<ms>",
+        "keyChecked": true,
+        "rows": {
+          "checked": 5,
+          "first": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          },
+          "last": {
+            "seq": "<seq>",
+            "time": "<ms>"
+          }
+        },
+        "checkpoints": {
+          "checked": 0,
+          "matched": 0
+        },
+        "anchors": [],
+        "unverifiable": [],
+        "journal": null,
+        "problem": {
+          "code": "unreadable",
+          "seq": "<seq>",
+          "time": null,
+          "message": "Entries from #<seq> could not be read: a stored value is out of range.",
+          "consequence": "They were not checked; the entries before them were."
+        }
+      }
+    }
+  },
+  "error": {
+    "audit_unavailable": {
+      "status": 503,
+      "headers": {
+        "retry-after": "30"
+      },
+      "body": {
+        "error": "Uptime Goblin cannot write its audit log, so nothing was changed. Try again in a moment; if this continues, free up space or increase the disk size of the Uptime Goblin host.",
+        "code": "audit_unavailable"
+      }
+    },
+    "audit_read_unavailable": {
+      "status": 503,
+      "headers": {
+        "retry-after": "15"
+      },
+      "body": {
+        "error": "Uptime Goblin could not read its audit log. Try again in a moment.",
+        "code": "audit_read_unavailable"
+      }
+    },
+    "audit_query_invalid": {
+      "from": {
+        "status": 400,
+        "headers": {},
+        "body": {
+          "error": "from must be a time in milliseconds since 1970.",
+          "code": "audit_query_invalid",
+          "parameter": "from"
+        }
+      },
+      "to": {
+        "status": 400,
+        "headers": {},
+        "body": {
+          "error": "to must be a time in milliseconds since 1970.",
+          "code": "audit_query_invalid",
+          "parameter": "to"
+        }
+      },
+      "to/order": {
+        "status": 400,
+        "headers": {},
+        "body": {
+          "error": "to must not be before from.",
+          "code": "audit_query_invalid",
+          "parameter": "to"
+        }
+      },
+      "limit": {
+        "status": 400,
+        "headers": {},
+        "body": {
+          "error": "limit must be a whole number from 1 to 500.",
+          "code": "audit_query_invalid",
+          "parameter": "limit"
+        }
+      },
+      "cursor": {
+        "status": 400,
+        "headers": {},
+        "body": {
+          "error": "cursor must be the nextCursor of an earlier page.",
+          "code": "audit_query_invalid",
+          "parameter": "cursor"
+        }
+      },
+      "action": {
+        "status": 400,
+        "headers": {},
+        "body": {
+          "error": "action must be up to 8 action names, or starts of them ending in a dot, separated by commas.",
+          "code": "audit_query_invalid",
+          "parameter": "action"
+        }
+      },
+      "actor": {
+        "status": 400,
+        "headers": {},
+        "body": {
+          "error": "actor must be user, system, cli, anonymous or a name of at most 200 characters.",
+          "code": "audit_query_invalid",
+          "parameter": "actor"
+        }
+      },
+      "target": {
+        "status": 400,
+        "headers": {},
+        "body": {
+          "error": "target must be a target type, or type:id.",
+          "code": "audit_query_invalid",
+          "parameter": "target"
+        }
+      },
+      "outcome": {
+        "status": 400,
+        "headers": {},
+        "body": {
+          "error": "outcome must be one of ok, denied, failed, conflict, info, unknown, attempt.",
+          "code": "audit_query_invalid",
+          "parameter": "outcome"
+        }
+      },
+      "format": {
+        "status": 400,
+        "headers": {},
+        "body": {
+          "error": "format must be csv or ndjson.",
+          "code": "audit_query_invalid",
+          "parameter": "format"
+        }
+      },
+      "repeated": {
+        "status": 400,
+        "headers": {},
+        "body": {
+          "error": "action may be given only once.",
+          "code": "audit_query_invalid",
+          "parameter": "action"
+        }
+      }
+    },
+    "cross_origin": {
+      "read": {
+        "status": 403,
+        "headers": {},
+        "body": {
+          "error": "Requests from other sites cannot use your Uptime Goblin session.",
+          "code": "cross_origin"
+        }
+      }
+    }
+  }
+}

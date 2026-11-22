@@ -1,0 +1,3 @@
+#!/bin/sh
+# The installer requires Linux; the tests also run on macOS.
+if [ "$1" = -s ]; then echo Linux; else exec /usr/bin/uname "$@"; fi

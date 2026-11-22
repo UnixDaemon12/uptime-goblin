@@ -1,0 +1,3 @@
+#!/bin/sh
+# Installer tests run unprivileged and cannot give files to root or uptime-goblin.
+exit 0

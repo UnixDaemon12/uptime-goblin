@@ -1,0 +1,3 @@
+#!/bin/sh
+# Fake systemctl for installer tests; see systemctl.cjs.
+exec node "$(dirname "$0")/systemctl.cjs" "$@"

@@ -1,0 +1,18 @@
+#!/bin/sh
+# Model a failed atomic unit publication, leaving the existing destination unchanged.
+# FAKE_UNIT_RENAME_FAIL=1 fails every move onto the unit; =publish fails only the move of this
+# release's staged unit (uptime-goblin.service), so a later move of rollback.service would succeed.
+first=
+last=
+for argument do
+  case $argument in -*) ;; *) [ -n "$first" ] || first=$argument ;; esac
+  last=$argument
+done
+if [ "$last" = "${GOBLIN_INSTALL_ROOT:-$ORBIT_INSTALL_ROOT}/etc/systemd/system/uptime-goblin.service" ]; then
+  if [ "${FAKE_UNIT_RENAME_FAIL:-}" = 1 ] ||
+    { [ "${FAKE_UNIT_RENAME_FAIL:-}" = publish ] && [ "${first##*/}" = uptime-goblin.service ]; }; then
+    echo 'fake mv: simulated service-unit publication failure' >&2
+    exit 1
+  fi
+fi
+exec /bin/mv "$@"

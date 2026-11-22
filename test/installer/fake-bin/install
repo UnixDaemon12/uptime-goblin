@@ -1,0 +1,16 @@
+#!/bin/sh
+# Drops the -o/-g ownership options (the tests run unprivileged), then runs the real install.
+n=$#
+while [ "$n" -gt 0 ]; do
+  arg=$1
+  shift
+  n=$((n - 1))
+  case "$arg" in
+    -o | -g)
+      shift
+      n=$((n - 1))
+      ;;
+    *) set -- "$@" "$arg" ;;
+  esac
+done
+exec /usr/bin/install "$@"

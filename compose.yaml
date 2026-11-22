@@ -1,0 +1,134 @@
+# Settings come from .env under their GOBLIN_ names; the ORBIT_ names from before the rename to
+# Uptime Goblin are read where the GOBLIN_ one is unset, until 1.7. A GOBLIN_ line with an empty
+# value counts as set (empty is the default, or off), except for GOBLIN_BIND_ADDRESS and
+# GOBLIN_ALLOWED_HOSTS, where an empty line of either name counts as unset. Each ORBIT_ line also
+# reaches Uptime Goblin as GOBLIN_COMPOSE_LEGACY_<name> (compose-unset without one), which it only
+# compares: both names set to different values refuse the start (exit status 78), and an old
+# name is named in a notice at every start (docs/installation.md, Renamed from Orbit).
+services:
+  uptime-goblin:
+    build: .
+    image: uptime-goblin:local
+    # The image's node account (uid and gid 1000), named here as well: whatever image carries the
+    # uptime-goblin:local tag (rebuilt, re-tagged for a rollback), Uptime Goblin never runs as root.
+    user: '1000:1000'
+    # Restarted after any exit but a stop, a refusal to start (exit status 78) included: unlike
+    # the systemd unit's RestartPreventExitStatus=78, Compose retries it, so a refusal repeats in
+    # docker compose logs, with growing delays, until you stop the service (docker compose stop)
+    # and correct what it names (docs/installation.md).
+    restart: unless-stopped
+    init: true
+    # Uptime Goblin sends waiting notifications (up to 8 s) and finishes open requests before it
+    # stops, up to about 36 s in all; Docker's default of 10 s would kill it part way.
+    stop_grace_period: 40s
+    # Limits, so a runaway collection or a flood of requests cannot take the whole host: memory
+    # (with no swap on top, on a kernel that accounts swap), CPUs and processes (threads count).
+    # 1 GiB holds the largest setup docs/architecture.md describes (512 MiB is the least it
+    # suggests). One CPU, because Docker refuses to create a container allowed more CPUs than its
+    # host has. Written here, not read from .env: Docker reads 0 as no limit at all (and, for
+    # processes, a negative number too), and Compose cannot check what .env gives. To change one,
+    # set it in compose.override.yaml (docs/installation.md). A kernel without CPU bandwidth
+    # control (some NAS systems) makes Docker refuse any cpus; a CPU set takes its place there
+    # (docs/troubleshooting.md). At every start Uptime Goblin reads all three back from its own cgroup
+    # (cgroup v2) and refuses to start (exit status 78) unless each is in force or
+    # GOBLIN_ALLOW_UNLIMITED (below) names it; on a host with swap it also says when it cannot
+    # read the swap limit.
+    mem_limit: 1g
+    memswap_limit: 1g
+    cpus: 1
+    pids_limit: 256
+    # Open files: Uptime Goblin uses about 30 and accepts at most 256 connections. No core dumps: one would
+    # write the encryption key and passwords from Uptime Goblin's memory to the Docker host's disk.
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 4096
+      core: 0
+    # Plain-HTTP sign-in (GOBLIN_INSECURE_HTTP_SESSIONS): the password at each sign-in and the
+    # sign-in cookie travel unencrypted. While .env does not set it, Compose passes
+    # compose-default, which Uptime Goblin reads by where this port is published: on while that is the
+    # Docker host's loopback (the default), off when GOBLIN_BIND_ADDRESS is another address and
+    # GOBLIN_TRUST_PROXY names your HTTPS proxy, and otherwise a refusal to start (exit status
+    # 78) that says what to set in .env: GOBLIN_TRUST_PROXY behind an HTTPS proxy, or
+    # GOBLIN_INSECURE_HTTP_SESSIONS=1 (plain HTTP on that network) or =0.
+    ports:
+      - '${GOBLIN_BIND_ADDRESS:-${ORBIT_BIND_ADDRESS:-127.0.0.1}}:4317:4317'
+    environment:
+      HOST: 0.0.0.0
+      GOBLIN_PASSWORD: ${GOBLIN_PASSWORD-${ORBIT_PASSWORD:?Set GOBLIN_PASSWORD in .env first}}
+      GOBLIN_ALLOWED_HOSTS: ${GOBLIN_ALLOWED_HOSTS:-${ORBIT_ALLOWED_HOSTS:-localhost:4317}}
+      GOBLIN_WEBHOOK_URL: ${GOBLIN_WEBHOOK_URL-${ORBIT_WEBHOOK_URL-}}
+      GOBLIN_TRUST_PROXY: ${GOBLIN_TRUST_PROXY-${ORBIT_TRUST_PROXY-}}
+      # Connections one client may hold open at once (8 to 256; 32 when empty). Every browser
+      # on the published port connects from the Docker gateway, so they share it.
+      GOBLIN_MAX_CONNECTIONS_PER_CLIENT: ${GOBLIN_MAX_CONNECTIONS_PER_CLIENT-${ORBIT_MAX_CONNECTIONS_PER_CLIENT-}}
+      GOBLIN_ALLOW_LOOPBACK: ${GOBLIN_ALLOW_LOOPBACK-${ORBIT_ALLOW_LOOPBACK-}}
+      # Inside the container the browser's peer is the Docker gateway, not loopback, so sign-in
+      # uses the plain-HTTP transport; see the ports comment above. compose-default only while
+      # it is unset (no line in .env, or the line commented out); an empty value is off, as with
+      # npm start, and 1 or 0 decides as written.
+      GOBLIN_INSECURE_HTTP_SESSIONS: ${GOBLIN_INSECURE_HTTP_SESSIONS-${ORBIT_INSECURE_HTTP_SESSIONS-compose-default}}
+      # Where the port above is published: inside the container Uptime Goblin cannot see it. It decides
+      # compose-default (above), and Uptime Goblin warns at every start while plain-HTTP sign-in is on
+      # and this is not a loopback address.
+      GOBLIN_PUBLISHED_ADDRESS: ${GOBLIN_BIND_ADDRESS:-${ORBIT_BIND_ADDRESS:-127.0.0.1}}
+      GOBLIN_LEGACY_BASIC: ${GOBLIN_LEGACY_BASIC-${ORBIT_LEGACY_BASIC-}}
+      # A wall display's limits, in days (docs/authentication.md, Wall displays; empty is the
+      # default: 30 and 7).
+      GOBLIN_DISPLAY_SESSION_DAYS: ${GOBLIN_DISPLAY_SESSION_DAYS-${ORBIT_DISPLAY_SESSION_DAYS-}}
+      GOBLIN_DISPLAY_IDLE_DAYS: ${GOBLIN_DISPLAY_IDLE_DAYS-${ORBIT_DISPLAY_IDLE_DAYS-}}
+      # The audit log (Configure → Audit log): GOBLIN_AUDIT_LOG copies each entry, with client
+      # addresses, browser names and session ids, to this container's log too (off, stdout or
+      # stdout-full; off when empty), and
+      # GOBLIN_AUDIT_RETENTION_DAYS keeps entries that many days (30 to 3650; 90 when empty).
+      GOBLIN_AUDIT_LOG: ${GOBLIN_AUDIT_LOG-${ORBIT_AUDIT_LOG-}}
+      GOBLIN_AUDIT_RETENTION_DAYS: ${GOBLIN_AUDIT_RETENTION_DAYS-${ORBIT_AUDIT_RETENTION_DAYS-}}
+      # The limits above that this host cannot apply, which Uptime Goblin then runs without (memory, cpu
+      # and pids, comma-separated; empty is none): it says so at every start, and Configure →
+      # System shows it. Set it in .env only after Uptime Goblin refused to start for want of that
+      # limit (docs/installation.md, Resource limits). The image starts Uptime Goblin with --supervised,
+      # which no environment setting here or in an override turns off.
+      GOBLIN_ALLOW_UNLIMITED: ${GOBLIN_ALLOW_UNLIMITED-${ORBIT_ALLOW_UNLIMITED-}}
+      # The ORBIT_ names of .env, which Uptime Goblin compares with the settings above (see the start
+      # of this file) and then drops; compose-unset where .env has no such line.
+      GOBLIN_COMPOSE_LEGACY_PASSWORD: ${ORBIT_PASSWORD-compose-unset}
+      GOBLIN_COMPOSE_LEGACY_ALLOWED_HOSTS: ${ORBIT_ALLOWED_HOSTS-compose-unset}
+      GOBLIN_COMPOSE_LEGACY_WEBHOOK_URL: ${ORBIT_WEBHOOK_URL-compose-unset}
+      GOBLIN_COMPOSE_LEGACY_TRUST_PROXY: ${ORBIT_TRUST_PROXY-compose-unset}
+      GOBLIN_COMPOSE_LEGACY_MAX_CONNECTIONS_PER_CLIENT: ${ORBIT_MAX_CONNECTIONS_PER_CLIENT-compose-unset}
+      GOBLIN_COMPOSE_LEGACY_ALLOW_LOOPBACK: ${ORBIT_ALLOW_LOOPBACK-compose-unset}
+      GOBLIN_COMPOSE_LEGACY_INSECURE_HTTP_SESSIONS: ${ORBIT_INSECURE_HTTP_SESSIONS-compose-unset}
+      GOBLIN_COMPOSE_LEGACY_BIND_ADDRESS: ${ORBIT_BIND_ADDRESS-compose-unset}
+      GOBLIN_COMPOSE_LEGACY_LEGACY_BASIC: ${ORBIT_LEGACY_BASIC-compose-unset}
+      GOBLIN_COMPOSE_LEGACY_DISPLAY_SESSION_DAYS: ${ORBIT_DISPLAY_SESSION_DAYS-compose-unset}
+      GOBLIN_COMPOSE_LEGACY_DISPLAY_IDLE_DAYS: ${ORBIT_DISPLAY_IDLE_DAYS-compose-unset}
+      GOBLIN_COMPOSE_LEGACY_AUDIT_LOG: ${ORBIT_AUDIT_LOG-compose-unset}
+      GOBLIN_COMPOSE_LEGACY_AUDIT_RETENTION_DAYS: ${ORBIT_AUDIT_RETENTION_DAYS-compose-unset}
+      GOBLIN_COMPOSE_LEGACY_ALLOW_UNLIMITED: ${ORBIT_ALLOW_UNLIMITED-compose-unset}
+    # Uptime Goblin keeps an encryption key. Without compose.secret.yaml it generates
+    # /var/lib/uptime-goblin/secret.key inside this volume (with a warning), so every copy of the volume
+    # carries the key. See 'Encryption key' in docs/installation.md.
+    # The volume keeps its name from before the rename to Uptime Goblin (orbit-data), so its data
+    # stays; its path in the container was /app/data, which the image still uses while a volume
+    # is mounted there alone (with a notice at every start). The service was called orbit: the
+    # first docker compose up -d --remove-orphans after the rename removes that container, which
+    # otherwise keeps port 4317 (docs/installation.md, Renamed from Orbit).
+    volumes:
+      - orbit-data:/var/lib/uptime-goblin
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    # This log holds the audit log's checkpoint lines, and Docker discards it when the container
+    # is recreated: append it to a file outside the volume before each docker compose up -d
+    # (docs/installation.md, Keeping Uptime Goblin's log).
+    logging:
+      driver: json-file
+      options:
+        max-size: '5m'
+        max-file: '2'
+volumes:
+  orbit-data:

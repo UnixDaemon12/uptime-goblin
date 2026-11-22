@@ -1,0 +1,8 @@
+{
+  "gitleaks": "8.30.1",
+  "trivy": "0.74.0",
+  "actionlint": "1.7.12",
+  "semgrepImage": "semgrep/semgrep:1.176.0@sha256:12672acdb0949e19f9f6a4c2b288edd0b404f268f0ca7738a2c06f372f50362e",
+  "semgrepRulesCommit": "a84ff9cc2453ca91d581380de4b8b3f272f6f4be",
+  "semgrepRulesSha256": "b227c2d234ffd9c84c4dbd6619a5897a7192637c141baeace3bfc37b0715a887"
+}

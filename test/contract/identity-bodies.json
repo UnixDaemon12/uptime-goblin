@@ -1,0 +1,360 @@
+{
+  "401": {
+    "signin_required": {
+      "https": {
+        "error": "Sign in to Uptime Goblin.",
+        "code": "signin_required",
+        "transport": {
+          "kind": "https",
+          "insecureAllowed": false
+        }
+      },
+      "loopback": {
+        "error": "Sign in to Uptime Goblin.",
+        "code": "signin_required",
+        "transport": {
+          "kind": "loopback",
+          "insecureAllowed": false
+        }
+      },
+      "http": {
+        "error": "Sign in to Uptime Goblin.",
+        "code": "signin_required",
+        "transport": {
+          "kind": "http",
+          "insecureAllowed": false
+        }
+      }
+    },
+    "session_expired": {
+      "https": {
+        "error": "Your session has ended. Sign in again.",
+        "code": "session_expired",
+        "transport": {
+          "kind": "https",
+          "insecureAllowed": false
+        }
+      },
+      "loopback": {
+        "error": "Your session has ended. Sign in again.",
+        "code": "session_expired",
+        "transport": {
+          "kind": "loopback",
+          "insecureAllowed": false
+        }
+      },
+      "http": {
+        "error": "Your session has ended. Sign in again.",
+        "code": "session_expired",
+        "transport": {
+          "kind": "http",
+          "insecureAllowed": true
+        }
+      }
+    },
+    "invalid_credentials": {
+      "https": {
+        "error": "The login name or password is incorrect.",
+        "code": "invalid_credentials",
+        "transport": {
+          "kind": "https",
+          "insecureAllowed": false
+        }
+      },
+      "loopback": {
+        "error": "The login name or password is incorrect.",
+        "code": "invalid_credentials",
+        "transport": {
+          "kind": "loopback",
+          "insecureAllowed": false
+        }
+      },
+      "http": {
+        "error": "The login name or password is incorrect.",
+        "code": "invalid_credentials",
+        "transport": {
+          "kind": "http",
+          "insecureAllowed": true
+        }
+      }
+    },
+    "invalid_credentials/basic": {
+      "https": {
+        "error": "Sign in to Uptime Goblin.",
+        "code": "invalid_credentials",
+        "transport": {
+          "kind": "https",
+          "insecureAllowed": false
+        }
+      },
+      "loopback": {
+        "error": "Sign in to Uptime Goblin.",
+        "code": "invalid_credentials",
+        "transport": {
+          "kind": "loopback",
+          "insecureAllowed": false
+        }
+      },
+      "http": {
+        "error": "Sign in to Uptime Goblin.",
+        "code": "invalid_credentials",
+        "transport": {
+          "kind": "http",
+          "insecureAllowed": true
+        }
+      }
+    },
+    "multiple_credentials": {
+      "https": {
+        "error": "Send one credential per request.",
+        "code": "multiple_credentials",
+        "transport": {
+          "kind": "https",
+          "insecureAllowed": false
+        }
+      },
+      "loopback": {
+        "error": "Send one credential per request.",
+        "code": "multiple_credentials",
+        "transport": {
+          "kind": "loopback",
+          "insecureAllowed": false
+        }
+      },
+      "http": {
+        "error": "Send one credential per request.",
+        "code": "multiple_credentials",
+        "transport": {
+          "kind": "http",
+          "insecureAllowed": false
+        }
+      }
+    },
+    "basic_disabled": {
+      "https": {
+        "error": "HTTP Basic sign-in is turned off (GOBLIN_LEGACY_BASIC=0).",
+        "code": "basic_disabled",
+        "transport": {
+          "kind": "https",
+          "insecureAllowed": false
+        }
+      },
+      "loopback": {
+        "error": "HTTP Basic sign-in is turned off (GOBLIN_LEGACY_BASIC=0).",
+        "code": "basic_disabled",
+        "transport": {
+          "kind": "loopback",
+          "insecureAllowed": false
+        }
+      },
+      "http": {
+        "error": "HTTP Basic sign-in is turned off (GOBLIN_LEGACY_BASIC=0).",
+        "code": "basic_disabled",
+        "transport": {
+          "kind": "http",
+          "insecureAllowed": false
+        }
+      }
+    }
+  },
+  "403": {
+    "https_required": {
+      "http": {
+        "error": "Sign-in needs HTTPS, or a browser on this computer. Open Uptime Goblin through its HTTPS address. GOBLIN_INSECURE_HTTP_SESSIONS=1 allows sign-in over plain HTTP, but the password and the sign-in cookie then cross the network unencrypted: set it only on a network you trust.",
+        "code": "https_required"
+      }
+    },
+    "proxy_proto_missing": {
+      "http": {
+        "error": "Your browser uses HTTPS, but the reverse proxy does not tell Uptime Goblin so. Make the proxy send X-Forwarded-Proto: https (nginx: proxy_set_header X-Forwarded-Proto $scheme;) and make sure GOBLIN_TRUST_PROXY names it, or set GOBLIN_INSECURE_HTTP_SESSIONS=1 until it is fixed.",
+        "code": "proxy_proto_missing"
+      }
+    },
+    "proxy_proto_mismatch": {
+      "https": {
+        "error": "Your browser uses plain HTTP (http://), but the reverse proxy tells Uptime Goblin the connection is HTTPS, so the browser would drop Uptime Goblin's secure sign-in cookie. Make the proxy send the real scheme (nginx: proxy_set_header X-Forwarded-Proto $scheme;), or open Uptime Goblin at its https:// address.",
+        "code": "proxy_proto_mismatch"
+      }
+    },
+    "cross_origin": {
+      "https": {
+        "error": "Cross-origin changes are not allowed",
+        "code": "cross_origin"
+      },
+      "loopback": {
+        "error": "Cross-origin changes are not allowed",
+        "code": "cross_origin"
+      },
+      "http": {
+        "error": "Cross-origin changes are not allowed",
+        "code": "cross_origin"
+      }
+    },
+    "forbidden": {
+      "https": {
+        "error": "You do not have permission to do this.",
+        "code": "forbidden"
+      },
+      "loopback": {
+        "error": "You do not have permission to do this.",
+        "code": "forbidden"
+      },
+      "http": {
+        "error": "You do not have permission to do this.",
+        "code": "forbidden"
+      }
+    },
+    "current_password_incorrect": {
+      "https": {
+        "error": "The current password is incorrect.",
+        "code": "current_password_incorrect"
+      },
+      "loopback": {
+        "error": "The current password is incorrect.",
+        "code": "current_password_incorrect"
+      },
+      "http": {
+        "error": "The current password is incorrect.",
+        "code": "current_password_incorrect"
+      }
+    }
+  },
+  "comment": [
+    "Every 401 and 403 body of sessions spec \u00a76.6 by code (a \"/variant\" suffix names the second message of a code) and transport kind where the code can occur, and GET /api/session by via (\u00a76.11).",
+    "Volatile values are written as \"<id>\" (a session id), \"<ms>\" (a time) and \"<build>\". On http a session (and so session_expired, or a login that reaches the password check) and a Basic credential that reaches the password check need GOBLIN_INSECURE_HTTP_SESSIONS=1, hence insecureAllowed true there; without it, Basic there gets 403 https_required.",
+    "Phase 0 contract (frozen): changed only through the integrator, with the agreement of every lane that uses it."
+  ],
+  "session": {
+    "session": {
+      "kind": "interactive",
+      "user": {
+        "id": "u_admin",
+        "login": "admin",
+        "display": "Administrator",
+        "role": "admin",
+        "kind": "person",
+        "builtin": true
+      },
+      "via": "session",
+      "permissions": [
+        "account:self",
+        "agent:ingest",
+        "agents:manage",
+        "alerts:ack",
+        "alerts:silence",
+        "audit:read",
+        "backup:manage",
+        "backup:read",
+        "channels:write",
+        "cluster:manage",
+        "config:export",
+        "config:export-secrets",
+        "config:import",
+        "config:read",
+        "dashboard:read",
+        "dashboards:own",
+        "dashboards:shared",
+        "history:export",
+        "identity:write",
+        "kiosk:manage",
+        "maintenance:write",
+        "metrics:read",
+        "notifications:operate",
+        "notifications:read",
+        "reports:read",
+        "reports:write",
+        "restore",
+        "session:self",
+        "settings:write",
+        "sources:operate",
+        "sources:test",
+        "sources:write",
+        "statuspage:admin",
+        "statuspage:notes",
+        "system:read",
+        "tokens:manage",
+        "tokens:own",
+        "users:read",
+        "users:write"
+      ],
+      "session": {
+        "id": "<id>",
+        "createdAt": "<ms>",
+        "lastSeenAt": "<ms>",
+        "expiresAt": "<ms>",
+        "idleExpiresAt": "<ms>",
+        "persistent": false
+      },
+      "transport": {
+        "kind": "https",
+        "https": true,
+        "insecure": false,
+        "insecureAllowed": false
+      },
+      "legacyBasic": true,
+      "mirrorPending": false,
+      "build": "<build>"
+    },
+    "basic": {
+      "kind": "basic",
+      "user": {
+        "id": "u_admin",
+        "login": "admin",
+        "display": "Administrator",
+        "role": "admin",
+        "kind": "person",
+        "builtin": true
+      },
+      "via": "basic",
+      "permissions": [
+        "account:self",
+        "agent:ingest",
+        "agents:manage",
+        "alerts:ack",
+        "alerts:silence",
+        "audit:read",
+        "backup:manage",
+        "backup:read",
+        "channels:write",
+        "cluster:manage",
+        "config:export",
+        "config:export-secrets",
+        "config:import",
+        "config:read",
+        "dashboard:read",
+        "dashboards:own",
+        "dashboards:shared",
+        "history:export",
+        "identity:write",
+        "kiosk:manage",
+        "maintenance:write",
+        "metrics:read",
+        "notifications:operate",
+        "notifications:read",
+        "reports:read",
+        "reports:write",
+        "restore",
+        "session:self",
+        "settings:write",
+        "sources:operate",
+        "sources:test",
+        "sources:write",
+        "statuspage:admin",
+        "statuspage:notes",
+        "system:read",
+        "users:read",
+        "users:write"
+      ],
+      "session": null,
+      "transport": {
+        "kind": "loopback",
+        "https": false,
+        "insecure": false,
+        "insecureAllowed": false
+      },
+      "legacyBasic": true,
+      "mirrorPending": false,
+      "build": "<build>"
+    }
+  }
+}

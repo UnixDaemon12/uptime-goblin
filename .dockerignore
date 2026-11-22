@@ -1,0 +1,38 @@
+# Explicit build-context allowlist. Never send live data or local credentials.
+# Every path in deploy/manifest.txt must be allowed here (test/packaging.test.mjs checks it).
+**
+!Dockerfile
+!package.json
+!package-lock.json
+!server.mjs
+# Reopening a directory also reopens its descendants. Exclude them again before allowing
+# specific files, so a local backup or credential file cannot inherit the directory allow.
+!lib/
+lib/**
+!lib/*.mjs
+!lib/**/*.mjs
+!public/
+public/**
+!public/index.html
+!public/app.js
+!public/boot.js
+!public/style.css
+!public/favicon.svg
+!public/modules/
+public/modules/**
+!public/modules/**/*.js
+!public/shared/
+public/shared/**
+!public/shared/*.js
+!deploy/
+deploy/**
+!deploy/allowed_signers
+!deploy/manifest.txt
+!README.md
+!LICENSE
+!docs/
+docs/**
+!docs/*.md
+# Never in an image, even if a broader allow rule is added above: the encryption key file of
+# compose.secret.yaml is mounted as a Compose secret at run time.
+orbit_secret_key

@@ -1,0 +1,13 @@
+{
+  "type": "linux",
+  "name": "Example Linux host",
+  "group": "Infrastructure",
+  "url": "https://host.example.com",
+  "apiUrl": "https://metrics.example.com",
+  "metricPath": "/metrics",
+  "enabled": false,
+  "showOnDashboard": true,
+  "pollSeconds": 60,
+  "collector": "native",
+  "rules": [{ "key": "cpu", "operator": "gt", "threshold": 90, "forSeconds": 120 }]
+}

@@ -1,0 +1,16 @@
+#!/bin/sh
+# Offline stand-in for `npm ci --prefix <dir> …`: copies the runtime dependency the repository
+# already has installed (FAKE_NPM_MODULES is its node_modules directory).
+prefix=
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --prefix)
+      prefix=$2
+      shift 2
+      ;;
+    *) shift ;;
+  esac
+done
+[ -n "$prefix" ] && [ -d "$FAKE_NPM_MODULES/nodemailer" ] || exit 1
+mkdir -p "$prefix/node_modules"
+cp -R "$FAKE_NPM_MODULES/nodemailer" "$prefix/node_modules/"

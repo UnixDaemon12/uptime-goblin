@@ -1,0 +1,37 @@
+{
+  "name": "uptime-goblin",
+  "version": "1.5.0-dev.2",
+  "private": true,
+  "type": "module",
+  "description": "A private homelab dashboard with expandable metrics, history and alerts.",
+  "license": "AGPL-3.0-only",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.mjs",
+    "test": "node --test --import ./test/setup.mjs \"test/**/*.test.mjs\"",
+    "test:fast": "node --test --import ./test/setup.mjs \"test/!(ui|update|stall|signin|delivery-ui|audit-ui).test.mjs\" \"test/{admin,alerting,audit,contract,db,dialect,http-pipeline,identity,notify,repo,series}/**/*.test.mjs\"",
+    "test:browser": "node --test --import ./test/setup.mjs \"test/{ui,update,stall,signin,delivery-ui,audit-ui}.test.mjs\"",
+    "test:upgrade": "node --test --import ./test/setup.mjs \"test/upgrade/**/*.test.mjs\"",
+    "test:installer": "node --test --import ./test/setup.mjs \"test/installer/!(docker).test.mjs\"",
+    "test:docker": "node --test --import ./test/setup.mjs test/installer/docker.test.mjs",
+    "check": "node scripts/check.mjs",
+    "lint:sql": "node scripts/sql-lint.mjs",
+    "lint:imports": "node scripts/import-graph.mjs",
+    "docs:check": "node scripts/check-documentation.mjs",
+    "security:scan": "node scripts/security-gate.mjs scan",
+    "security:commit": "node scripts/security-gate.mjs commit",
+    "security:release": "node scripts/security-gate.mjs release",
+    "security:sonarqube": "node scripts/check-sonarqube.mjs",
+    "package": "node scripts/package-release.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "nodemailer": "10.6.1"
+  },
+  "devDependencies": {
+    "prettier": "3.6.2"
+  }
+}

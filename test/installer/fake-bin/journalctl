@@ -1,0 +1,65 @@
+#!/bin/sh
+# Prints the fake service log that test/installer/fake-bin/systemctl keeps (journal.log): a model
+# of the journal for the installer tests, not journald (test/installer/systemd.test.mjs runs the
+# real one). systemctl.cjs notes in journal.times the time (ms) and the length of journal.log
+# before each line it logs and before each start of the service. Each call's arguments are added
+# to journalctl.calls, one line each, so that a test sees which reads were made (the installer
+# makes one, the last 50 lines after a failed start).
+#   no --since           the last 50 lines, as the installer shows them after a failed start.
+#   --since=@SECONDS     what was logged from that second on: journal.log from the first note at
+#                        or after it. Whole seconds: two starts noted in one second (a test can fix
+#                        the time, FAKE_JOURNAL_MS in systemctl.cjs) are not told apart.
+# A test can make a read return what a real journal could also give (this is not evidence of
+# what journald does):
+#   FAKE_JOURNALCTL_FAULT=fail     the lines, then an error, exit 1.
+#   FAKE_JOURNALCTL_FAULT=missing  "-- No entries --" and nothing else, exit 0.
+#   FAKE_JOURNALCTL_FAULT=stale    all of journal.log from its first line, exit 0: an older window
+#                                  than the one asked for, without an error, as a reader may go on
+#                                  from an older entry where the one it looked for is gone.
+#   FAKE_JOURNALCTL_LATE=TEXT      TEXT as the newest line of a read that succeeds: an earlier
+#                                  start's entry that the journal stored after this start's lines.
+# A fault this model does not know exits 2.
+log=$FAKE_SYSTEMD_DIR/journal.log
+printf '%s\n' "$*" >>"$FAKE_SYSTEMD_DIR/journalctl.calls"
+fault=${FAKE_JOURNALCTL_FAULT:-}
+case $fault in
+  '' | fail | missing | stale) ;;
+  *)
+    printf 'fake journalctl: FAKE_JOURNALCTL_FAULT "%s" is not one this model knows\n' "$fault" >&2
+    exit 2
+    ;;
+esac
+given=
+since=
+for arg; do
+  case $arg in
+    --since=@*)
+      given=1
+      since=${arg#--since=@}
+      ;;
+  esac
+done
+if [ "$fault" = missing ]; then
+  printf '%s\n' '-- No entries --'
+  exit 0
+fi
+if [ "$fault" = stale ]; then
+  cat "$log" 2>/dev/null || true
+elif [ -z "$given" ]; then
+  tail -n 50 "$log" 2>/dev/null || true
+else
+  case $since in
+    '' | *[!0-9]*)
+      printf 'fake journalctl: --since=@ takes whole seconds, not "%s"\n' "$since" >&2
+      exit 1
+      ;;
+  esac
+  offset=$(awk -v at="${since}000" '$1 + 0 >= at + 0 { print $2; exit }' "$FAKE_SYSTEMD_DIR/journal.times" 2>/dev/null)
+  [ -z "$offset" ] || tail -c +"$((offset + 1))" "$log" 2>/dev/null || true
+fi
+if [ "$fault" = fail ]; then
+  printf '%s\n' 'fake journalctl: Failed to iterate through journal: Bad message' >&2
+  exit 1
+fi
+[ -z "${FAKE_JOURNALCTL_LATE:-}" ] || printf '%s\n' "$FAKE_JOURNALCTL_LATE"
+exit 0

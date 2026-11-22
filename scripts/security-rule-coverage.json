@@ -1,0 +1,53 @@
+{
+  "schema": "orbit.security-guidance-documentation.v1",
+  "purpose": "Accepted R3 guidance index and separate current documentation assertions; not candidate compliance or release acceptance.",
+  "guidance": {
+    "file": "scripts/security-rule-coverage.rules.jsonl",
+    "schema": "orbit.netxeo-guidance-rule.v2",
+    "bytes": 1259548,
+    "sha256": "f85b7c9ef93acaa7ef8f3454ef288d2abe8f7e72fb8c29afb0b31f4e1a792c2c",
+    "rules": 1228,
+    "occurrences": 1414,
+    "dispositions": {
+      "EXTRACTED_UNASSESSED": 850,
+      "ADAPTED_DOCUMENTARY": 298,
+      "CONFLICT_RETAINED_NOT_AUTHORIZED": 74,
+      "SOURCE_CONTRADICTION_RECORDED": 6
+    },
+    "statusHolds": {
+      "candidateApplicability": "UNASSESSED",
+      "candidateCompliance": "UNASSESSED",
+      "canonicalMapping": "PENDING",
+      "runtimeStatus": "UNASSESSED"
+    },
+    "acceptedSource": {
+      "manifestSha256": "28c8260877fad75fbcd5e4631be4dbfd7f7070c5688290aa4e288a0bff43c79b",
+      "crosswalkSha256": "36b0a68d3ae88f45a1a6d3687cdf8f85e63fb2aee6336a2cc5958a471bb6f1a0",
+      "intakeSha256": "d483695fae42562b84c042a580f7bb072164a79b498b6bb14a2eb7baf2584826"
+    }
+  },
+  "documentationAssertions": {
+    "fileSha256": {
+      "scripts/security-rule-coverage.rules.jsonl": "f85b7c9ef93acaa7ef8f3454ef288d2abe8f7e72fb8c29afb0b31f4e1a792c2c",
+      "docs/security-rule-matrix.md": "b2f26e31cac9a735170c776b73413ad295e0e301ab6f477d5674d098810d2055",
+      "compose.yaml": "da641ed0e521b81ec57bd5d0e595b2ac2aeb54141709cc8e1faa7a36ffa87375",
+      ".github/dependabot.yml": "b26baa9f70ced9a67da3672e7f4ed71a68ee62b7d382a8d3ecb3748dbc13df4e"
+    },
+    "evidenceDrift": "In this tree 2 of the 4 hash-bound documentary evidence files differ from their recorded SHA-256. These are current documentation bindings, not reconstructed historical maintenance evidence.",
+    "compose": {
+      "current": "In this tree `compose.yaml` sets memory=1g with no swap, CPU=1 and PID=256 and runs as `1000:1000`",
+      "maintenance": "the maintenance Compose this inventory recorded declared memory=1g, CPU=2 and PID=256"
+    },
+    "dependencyUpdates": {
+      "current": "This tree has automated dependency-update configuration, `.github/dependabot.yml` (npm, GitHub Actions and the Docker base image, weekly, with cooldowns)",
+      "maintenance": "The maintenance column's Dependabot items say no configuration was present in the maintenance candidate inspected; that disposition is maintenance's and is not changed here.",
+      "qualification": "The maintenance sentence is a retained historical claim from the matrix, not a verified current-candidate state."
+    }
+  },
+  "holds": [
+    "Prospective documentary guidance only; not a candidate audit, compliance assessment, score, certification, runtime test, or release PASS.",
+    "Scoring, automatic fixing/install, report publication, memory actions, operational incident response, provider/cloud actions, and production changes remain inert unless separately authorized.",
+    "Logging-Off, contextual transport, private-homelab destinations, license/readable-JS, security, and release holds remain controlling.",
+    "Root must perform separate intake and an independent delta review before canonical or product use."
+  ]
+}

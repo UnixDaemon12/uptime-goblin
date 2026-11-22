@@ -1,0 +1,25 @@
+# A stand-in for tar, for image-layers.test.mjs: /bin/sh stand-in-tar <real tar> <how> <arguments>.
+# It is run with /bin/sh, never found on PATH, so it needs no executable bit: a release archive
+# keeps none on test files. Given the layer on standard input (its last argument is "-"), it runs
+# the real tar, but
+#   lossy         leaves the test's private file out of what tar extracts, and exits 0, as a tar
+#                 that reads an entry as something else can;
+#   stops-at=<n>  gives tar only the first <n> bytes, then exits with tar's status without reading
+#                 the rest, as tar itself does once it has read the end-of-archive headers.
+# Anything else (the saved image, --version) goes to the real tar unchanged.
+real=$1 how=$2
+shift 2
+last=
+for argument do last=$argument; done
+[ "$last" = - ] || exec "$real" "$@"
+case $how in
+  lossy)
+    "$real" "$@" | sed s/synthetic-private-file//
+    exit 0
+    ;;
+  stops-at=*) head -c "${how#stops-at=}" | "$real" "$@" ;;
+  *)
+    echo "stand-in-tar: unknown behaviour $how" >&2
+    exit 2
+    ;;
+esac

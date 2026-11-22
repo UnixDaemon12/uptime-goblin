@@ -1,0 +1,608 @@
+{
+  "$comment": "Delivery spec §6.5 and §6.6: the exact JSON of every answer of the delivery routes and every error body, for the route tests (test/http-pipeline/notifications.test.mjs) and the web app's mocked tests. Volatile values are written as \"<ms>\" (epoch milliseconds), \"<uid>\" (a d_ delivery id), \"<id>\" (an outbox row id, as text), \"<seconds>\", \"<keyId>\" (16 hexadecimal digits), \"<publicKey>\" (an Ed25519 public key as PEM) and \"<publicKeyRaw>\" (its 32 bytes in base64). The webhook signing key's answer holds public material only, and the ntfy and Gotify settings answer tokens and passwords only as {\"set\": true|false} (no route answers a secret). Frozen: change it only together with every lane that reads it.",
+  "answers": {
+    "status": {
+      "available": true,
+      "saving": true,
+      "unsavedSince": null,
+      "unsavedReason": null,
+      "updatedAt": "<ms>",
+      "totals": { "waiting": 0, "retrying": 1, "sending": 0, "paused": 0, "failed": 1 },
+      "oldestWaitingAt": "<ms>",
+      "notQueued": 0,
+      "channels": [
+        {
+          "id": "email",
+          "name": "Email",
+          "configured": true,
+          "enabled": true,
+          "state": "ok",
+          "pausedReason": null,
+          "pausedSince": null,
+          "nextAttemptAt": null,
+          "consecutiveFailures": 0,
+          "consecutiveRefusals": 0,
+          "deliveredTotal": 4,
+          "failedTotal": 0,
+          "lastAttempt": "<ms>",
+          "lastSuccess": "<ms>",
+          "lastFailure": null,
+          "lastError": null,
+          "counts": { "waiting": 0, "retrying": 0, "sending": 0, "paused": 0, "failed": 0 },
+          "failedSince": "<ms>",
+          "oldestWaitingAt": null,
+          "host": null,
+          "notQueued": 0,
+          "notQueuedAt": null
+        },
+        {
+          "id": "env-webhook",
+          "name": "Webhook",
+          "configured": true,
+          "enabled": true,
+          "state": "retrying",
+          "pausedReason": null,
+          "pausedSince": null,
+          "nextAttemptAt": "<ms>",
+          "consecutiveFailures": 2,
+          "consecutiveRefusals": 1,
+          "deliveredTotal": 3,
+          "failedTotal": 1,
+          "lastAttempt": "<ms>",
+          "lastSuccess": "<ms>",
+          "lastFailure": "<ms>",
+          "lastError": { "time": "<ms>", "message": "The webhook answered 500." },
+          "counts": { "waiting": 0, "retrying": 1, "sending": 0, "paused": 0, "failed": 1 },
+          "failedSince": "<ms>",
+          "oldestWaitingAt": "<ms>",
+          "host": "hooks.example.test",
+          "notQueued": 0,
+          "notQueuedAt": null
+        },
+        {
+          "id": "ntfy",
+          "name": "ntfy",
+          "configured": false,
+          "enabled": false,
+          "state": "not-configured",
+          "pausedReason": null,
+          "pausedSince": null,
+          "nextAttemptAt": null,
+          "consecutiveFailures": 0,
+          "consecutiveRefusals": 0,
+          "deliveredTotal": 0,
+          "failedTotal": 0,
+          "lastAttempt": null,
+          "lastSuccess": null,
+          "lastFailure": null,
+          "lastError": null,
+          "counts": { "waiting": 0, "retrying": 0, "sending": 0, "paused": 0, "failed": 0 },
+          "failedSince": "<ms>",
+          "oldestWaitingAt": null,
+          "host": null,
+          "notQueued": 0,
+          "notQueuedAt": null
+        },
+        {
+          "id": "gotify",
+          "name": "Gotify",
+          "configured": false,
+          "enabled": false,
+          "state": "not-configured",
+          "pausedReason": null,
+          "pausedSince": null,
+          "nextAttemptAt": null,
+          "consecutiveFailures": 0,
+          "consecutiveRefusals": 0,
+          "deliveredTotal": 0,
+          "failedTotal": 0,
+          "lastAttempt": null,
+          "lastSuccess": null,
+          "lastFailure": null,
+          "lastError": null,
+          "counts": { "waiting": 0, "retrying": 0, "sending": 0, "paused": 0, "failed": 0 },
+          "failedSince": "<ms>",
+          "oldestWaitingAt": null,
+          "host": null,
+          "notQueued": 0,
+          "notQueuedAt": null
+        }
+      ],
+      "signing": { "configured": true, "saved": true, "createdAt": "<ms>", "previousUntil": null }
+    },
+    "deliveries": {
+      "deliveries": [
+        {
+          "uid": "<uid>",
+          "channel": "env-webhook",
+          "kind": "resolved",
+          "status": "retrying",
+          "state": "queued",
+          "alert": {
+            "service": "plex",
+            "name": "Plex",
+            "category": "availability",
+            "rule": "__availability",
+            "message": "Source is available again",
+            "time": "<ms>"
+          },
+          "createdAt": "<ms>",
+          "updatedAt": "<ms>",
+          "attempts": 2,
+          "nextAttemptAt": "<ms>",
+          "sentAt": null,
+          "lastStatus": 500,
+          "lastError": "The webhook answered 500.",
+          "batch": null,
+          "saved": true,
+          "retryable": true
+        },
+        {
+          "uid": "<uid>",
+          "channel": "email",
+          "kind": "resolved",
+          "status": "delivered",
+          "state": "delivered",
+          "alert": {
+            "service": "plex",
+            "name": "Plex",
+            "category": "availability",
+            "rule": "__availability",
+            "message": "Source is available again",
+            "time": "<ms>"
+          },
+          "createdAt": "<ms>",
+          "updatedAt": "<ms>",
+          "attempts": 1,
+          "nextAttemptAt": null,
+          "sentAt": "<ms>",
+          "lastStatus": 250,
+          "lastError": null,
+          "batch": "g_abcdefghijklmnopqrstuvwxyz",
+          "saved": true,
+          "retryable": false
+        },
+        {
+          "uid": "<uid>",
+          "channel": "env-webhook",
+          "kind": "firing",
+          "status": "failed",
+          "state": "dead",
+          "alert": {
+            "service": "sonarr",
+            "name": "Sonarr",
+            "category": "measurement",
+            "rule": "queue",
+            "message": "Queue is above 50",
+            "time": "<ms>"
+          },
+          "createdAt": "<ms>",
+          "updatedAt": "<ms>",
+          "attempts": 1,
+          "nextAttemptAt": null,
+          "sentAt": null,
+          "lastStatus": 422,
+          "lastError": "The webhook refused the alert (422).",
+          "batch": null,
+          "saved": true,
+          "retryable": true
+        }
+      ],
+      "nextCursor": "<id>",
+      "unsaved": 0
+    },
+    "retry": {
+      "retried": 1,
+      "delivery": {
+        "uid": "<uid>",
+        "channel": "env-webhook",
+        "kind": "firing",
+        "status": "retrying",
+        "state": "queued",
+        "alert": {
+          "service": "sonarr",
+          "name": "Sonarr",
+          "category": "measurement",
+          "rule": "queue",
+          "message": "Queue is above 50",
+          "time": "<ms>"
+        },
+        "createdAt": "<ms>",
+        "updatedAt": "<ms>",
+        "attempts": 1,
+        "nextAttemptAt": "<ms>",
+        "sentAt": null,
+        "lastStatus": 422,
+        "lastError": "The webhook refused the alert (422).",
+        "batch": null,
+        "saved": true,
+        "retryable": true
+      }
+    },
+    "resume": {
+      "released": 2,
+      "channel": {
+        "id": "env-webhook",
+        "name": "Webhook",
+        "configured": true,
+        "enabled": true,
+        "state": "ok",
+        "pausedReason": null,
+        "pausedSince": null,
+        "nextAttemptAt": null,
+        "consecutiveFailures": 0,
+        "consecutiveRefusals": 0,
+        "deliveredTotal": 3,
+        "failedTotal": 0,
+        "lastAttempt": "<ms>",
+        "lastSuccess": "<ms>",
+        "lastFailure": "<ms>",
+        "lastError": null,
+        "counts": { "waiting": 2, "retrying": 0, "sending": 0, "paused": 0, "failed": 0 },
+        "failedSince": "<ms>",
+        "oldestWaitingAt": "<ms>",
+        "host": "hooks.example.test",
+        "notQueued": 0,
+        "notQueuedAt": null
+      }
+    },
+    "publicKey": {
+      "algorithm": "Ed25519",
+      "keyId": "<keyId>",
+      "publicKey": "<publicKey>",
+      "publicKeyRaw": "<publicKeyRaw>",
+      "createdAt": "<ms>",
+      "previousUntil": "<ms>",
+      "previous": {
+        "keyId": "<keyId>",
+        "publicKey": "<publicKey>",
+        "publicKeyRaw": "<publicKeyRaw>"
+      }
+    },
+    "rotate": { "createdAt": "<ms>", "previousUntil": "<ms>" },
+    "pushSettings": {
+      "channel": "ntfy",
+      "version": 1,
+      "readOnly": false,
+      "unreadable": [],
+      "settings": {
+        "enabled": true,
+        "server": "https://ntfy.example.test",
+        "topic": "orbit-alerts",
+        "username": "",
+        "password": { "set": false },
+        "token": { "set": true },
+        "priorityFiring": 4,
+        "priorityResolved": 3,
+        "tags": ["homelab"],
+        "dashboardUrl": "https://orbit.example.test/",
+        "allowPlainHttp": false
+      },
+      "updatedAt": "<ms>"
+    },
+    "pushSettingsGotify": {
+      "channel": "gotify",
+      "version": 1,
+      "readOnly": false,
+      "unreadable": [],
+      "settings": {
+        "enabled": true,
+        "server": "https://gotify.example.test",
+        "token": { "set": true },
+        "priorityFiring": 8,
+        "priorityResolved": 4,
+        "dashboardUrl": "",
+        "allowPlainHttp": false
+      },
+      "updatedAt": "<ms>"
+    },
+    "pushTest": { "ok": true, "accepted": true, "message": "ntfy accepted the test notification." },
+    "dashboard": {
+      "notifications": {
+        "configured": true,
+        "lastError": "<ms>",
+        "webhook": { "configured": true, "lastError": "<ms>" },
+        "email": {
+          "enabled": true,
+          "configured": true,
+          "state": "accepted",
+          "pending": 0,
+          "lastAttempt": "<ms>",
+          "lastAccepted": "<ms>",
+          "lastError": null,
+          "failedCount": 0,
+          "channelState": "ok",
+          "pausedReason": null,
+          "nextAttemptAt": null,
+          "waiting": 0,
+          "retrying": 0,
+          "failed": 0
+        },
+        "available": true,
+        "updatedAt": "<ms>",
+        "saving": true,
+        "unsavedSince": null,
+        "attention": {
+          "waiting": 0,
+          "retrying": 1,
+          "failed": 1,
+          "paused": [],
+          "refusing": [],
+          "notQueued": []
+        },
+        "channels": [
+          {
+            "id": "email",
+            "state": "ok",
+            "pausedReason": null,
+            "nextAttemptAt": null,
+            "lastAttempt": "<ms>",
+            "notQueued": 0,
+            "notQueuedAt": null
+          },
+          {
+            "id": "env-webhook",
+            "state": "retrying",
+            "pausedReason": null,
+            "nextAttemptAt": "<ms>",
+            "lastAttempt": "<ms>",
+            "notQueued": 0,
+            "notQueuedAt": null
+          },
+          {
+            "id": "ntfy",
+            "state": "not-configured",
+            "pausedReason": null,
+            "nextAttemptAt": null,
+            "lastAttempt": null,
+            "notQueued": 0,
+            "notQueuedAt": null
+          },
+          {
+            "id": "gotify",
+            "state": "not-configured",
+            "pausedReason": null,
+            "nextAttemptAt": null,
+            "lastAttempt": null,
+            "notQueued": 0,
+            "notQueuedAt": null
+          }
+        ]
+      },
+      "disk": null,
+      "diskFull": {
+        "full": true,
+        "since": "<ms>",
+        "freeBytes": 0,
+        "reserveReleased": true,
+        "freed": true
+      }
+    }
+  },
+  "errors": {
+    "invalid_request": {
+      "status": 400,
+      "headers": {},
+      "body": {
+        "error": "This request is not valid: cursor must be the nextCursor of an earlier page.",
+        "code": "invalid_request"
+      }
+    },
+    "delivery_not_found": {
+      "status": 404,
+      "headers": {},
+      "body": {
+        "error": "That notification is no longer in Uptime Goblin's delivery history.",
+        "code": "delivery_not_found"
+      }
+    },
+    "delivery_not_retryable/sending": {
+      "status": 409,
+      "headers": {},
+      "body": {
+        "error": "This notification is being sent right now.",
+        "code": "delivery_not_retryable"
+      }
+    },
+    "delivery_not_retryable/waiting": {
+      "status": 409,
+      "headers": {},
+      "body": {
+        "error": "This notification has not had its first attempt yet.",
+        "code": "delivery_not_retryable"
+      }
+    },
+    "delivery_not_retryable/finished": {
+      "status": 409,
+      "headers": {},
+      "body": {
+        "error": "Only failed notifications and notifications waiting to retry can be retried.",
+        "code": "delivery_not_retryable"
+      }
+    },
+    "delivery_not_retryable/source_deleted": {
+      "status": 409,
+      "headers": {},
+      "body": {
+        "error": "The source of this notification was deleted, so Uptime Goblin does not send it.",
+        "code": "delivery_not_retryable"
+      }
+    },
+    "delivery_not_retryable/switched_off": {
+      "status": 409,
+      "headers": {},
+      "body": {
+        "error": "Alerts of this kind are switched off, so Uptime Goblin does not send this notification.",
+        "code": "delivery_not_retryable"
+      }
+    },
+    "delivery_not_retryable/digest_source_deleted": {
+      "status": 409,
+      "headers": {},
+      "body": {
+        "error": "This notification was sent in one email with another whose source was deleted, so Uptime Goblin does not send that email again.",
+        "code": "delivery_not_retryable"
+      }
+    },
+    "delivery_not_retryable/digest_switched_off": {
+      "status": 409,
+      "headers": {},
+      "body": {
+        "error": "This notification was sent in one email with another of a kind of alert that is switched off, so Uptime Goblin does not send that email again.",
+        "code": "delivery_not_retryable"
+      }
+    },
+    "delivery_not_retryable/digest_other": {
+      "status": 409,
+      "headers": {},
+      "body": {
+        "error": "This notification was sent in one email with another that cannot be retried now, so Retry cannot send that email again.",
+        "code": "delivery_not_retryable"
+      }
+    },
+    "delivery_outdated": {
+      "status": 409,
+      "headers": {},
+      "body": {
+        "error": "A later notification for the same alert was already delivered or is being sent on this channel, so sending this one now would arrive out of order.",
+        "code": "delivery_outdated"
+      }
+    },
+    "delivery_outdated/digest": {
+      "status": 409,
+      "headers": {},
+      "body": {
+        "error": "This notification was sent in one email with another whose alert already had a later notification delivered or being sent on this channel, so sending that email again would arrive out of order.",
+        "code": "delivery_outdated"
+      }
+    },
+    "channel_paused": {
+      "status": 409,
+      "headers": {},
+      "body": {
+        "error": "Webhook notifications are paused: The webhook answered 401. Check GOBLIN_WEBHOOK_URL and the receiver; queued alerts wait until it is fixed. Resume the channel to send them.",
+        "code": "channel_paused"
+      }
+    },
+    "channel_unknown": {
+      "status": 404,
+      "headers": {},
+      "body": {
+        "error": "There is no notification channel with that name.",
+        "code": "channel_unknown"
+      }
+    },
+    "channel_not_set_up/env-webhook": {
+      "status": 409,
+      "headers": {},
+      "body": {
+        "error": "Webhook is not set up, so Uptime Goblin cannot send this notification: set GOBLIN_WEBHOOK_URL on the Uptime Goblin server and restart Uptime Goblin.",
+        "code": "channel_not_set_up"
+      }
+    },
+    "channel_not_set_up/email": {
+      "status": 409,
+      "headers": {},
+      "body": {
+        "error": "Email is not set up, so Uptime Goblin cannot send this notification: complete the email settings under Configure → Email.",
+        "code": "channel_not_set_up"
+      }
+    },
+    "channel_not_set_up/email-off": {
+      "status": 409,
+      "headers": {},
+      "body": {
+        "error": "Email alerts are switched off, so Uptime Goblin cannot send this notification: switch them on under Configure → Email.",
+        "code": "channel_not_set_up"
+      }
+    },
+    "webhook_not_configured": {
+      "status": 404,
+      "headers": {},
+      "body": {
+        "error": "The alert webhook is not set up: set GOBLIN_WEBHOOK_URL on the Uptime Goblin server and restart Uptime Goblin.",
+        "code": "webhook_not_configured"
+      }
+    },
+    "signing_unavailable": {
+      "status": 503,
+      "headers": { "retry-after": "60" },
+      "body": {
+        "error": "The webhook signing key cannot be read right now. Uptime Goblin replaces it at its next start if the encryption key changed.",
+        "code": "signing_unavailable"
+      }
+    },
+    "signing_compatibility": {
+      "status": 409,
+      "headers": {},
+      "body": {
+        "error": "A newer Uptime Goblin saved these signing settings. Upgrade Uptime Goblin or restore a compatible backup before changing them.",
+        "code": "signing_compatibility"
+      }
+    },
+    "signing_conflict": {
+      "status": 409,
+      "headers": {},
+      "body": {
+        "error": "The signing key was just replaced elsewhere. Reload to see the current one.",
+        "code": "signing_conflict"
+      }
+    },
+    "delivery_status_unavailable": {
+      "status": 503,
+      "headers": { "retry-after": "15" },
+      "body": {
+        "error": "Delivery status is unavailable: Uptime Goblin could not read its control database.",
+        "code": "delivery_status_unavailable"
+      }
+    },
+    "storage_full": {
+      "status": 503,
+      "headers": { "retry-after": "60" },
+      "body": {
+        "error": "Uptime Goblin's disk is full, so this change was not saved. Free some space on the Uptime Goblin host, then try again. Sign-in and alert delivery keep working on space Uptime Goblin keeps in reserve.",
+        "code": "storage_full"
+      }
+    },
+    "channel_not_set_up/ntfy-test": {
+      "status": 409,
+      "headers": {},
+      "body": {
+        "error": "Save an ntfy server and topic before sending a test notification.",
+        "code": "channel_not_set_up"
+      }
+    },
+    "channel_not_set_up/gotify-test": {
+      "status": 409,
+      "headers": {},
+      "body": {
+        "error": "Save a Gotify server and application token before sending a test notification.",
+        "code": "channel_not_set_up"
+      }
+    },
+    "channel_settings_invalid": {
+      "status": 400,
+      "headers": {},
+      "body": {
+        "error": "These settings were not saved: Enter the ntfy topic to send to.",
+        "code": "channel_settings_invalid"
+      }
+    },
+    "channel_settings_conflict": {
+      "status": 409,
+      "headers": {},
+      "body": {
+        "error": "These settings were changed elsewhere meanwhile. Reload to see the current ones.",
+        "code": "channel_settings_conflict"
+      }
+    },
+    "test_rate_limited": {
+      "status": 429,
+      "headers": { "retry-after": "<seconds>" },
+      "body": {
+        "error": "Please wait 30 seconds between test notifications on one channel.",
+        "code": "test_rate_limited"
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+#!/bin/sh
+# Installer tests: records each `sync` with its arguments and what had happened by then (whether
+# /etc/uptime-goblin/secret.key exists, and whether /etc/uptime-goblin.env names it; before the
+# migration from the Orbit layout, /etc/orbit/secret.key and /etc/orbit.env), one line per call in
+# $FAKE_SYSTEMD_DIR/sync.log, so a test can tell a sync came before the rename and the env line.
+# No test can cut the power: only the calls can be checked.
+root=${GOBLIN_INSTALL_ROOT:-$ORBIT_INSTALL_ROOT}
+key=no
+{ [ -e "$root/etc/uptime-goblin/secret.key" ] || [ -e "$root/etc/orbit/secret.key" ]; } && key=yes
+envline=no
+grep -qs '^GOBLIN_SECRET_KEY_FILE=' "$root/etc/uptime-goblin.env" && envline=yes
+grep -qs '^ORBIT_SECRET_KEY_FILE=' "$root/etc/orbit.env" && envline=yes
+printf '%s key=%s env=%s\n' "$*" "$key" "$envline" >>"$FAKE_SYSTEMD_DIR/sync.log"
+exit 0

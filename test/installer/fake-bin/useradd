@@ -1,0 +1,3 @@
+#!/bin/sh
+# Installer tests: the account tools; see accounts.cjs.
+exec node "$(dirname "$0")/accounts.cjs" useradd "$@"

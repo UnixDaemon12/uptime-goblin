@@ -1,0 +1,3 @@
+#!/bin/sh
+# Fake runuser for installer tests; see runuser.cjs.
+exec node "$(dirname "$0")/runuser.cjs" "$@"
