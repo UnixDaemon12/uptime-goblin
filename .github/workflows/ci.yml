@@ -93,7 +93,9 @@ jobs:
   installer:
     name: Installer with a fake systemctl and real systemd
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    # Measured on GitHub-hosted runners: 22m50s to 24m56s for this job (runs 45047270335,
+    # 45050291190, 45053488924), so 25 minutes left no margin. 40 keeps a hung test bounded.
+    timeout-minutes: 40
     env:
       TEST_REQUIRE: systemd
     steps:
