@@ -24,6 +24,8 @@ jobs:
   checks:
     name: Format, syntax, unit and integration tests
     runs-on: ubuntu-latest
+    # Measured on a GitHub-hosted runner (4 CPUs): npm run test:fast took 18 min 8 s of a 18 min
+    # 39 s job (run 45050291190); 10 minutes stopped it two-thirds through. 30 leaves headroom.
     timeout-minutes: 30
     env:
       TEST_REQUIRE: git
