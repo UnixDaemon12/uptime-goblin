@@ -206,7 +206,7 @@ Without a credential (a session cookie, or a script's [legacy Basic](#scripts-an
 
 ## Wall displays
 
-A wall display signs in with a one-time **display code**, not the admin password. It then reads the dashboard and nothing else: no **Configure**, no Add source, pause or Refresh, no Account page, and no way to sign other sessions out or change the password. It stays signed in for up to 30 days, as long as it reads Uptime Goblin at least once every 7 days: a display that refreshes is in use, whether anyone looks at it or not.
+A wall display signs in with a one-time **display code**, not the admin password. It then reads the dashboard and nothing else: no **Configure**, no Add source, pause or Refresh, no Account page, and no way to sign other sessions out or change the password. It stays signed in for up to 30 days, as long as it reads Uptime Goblin at least once every 7 days: a display that refreshes is in use, whether anyone looks at it or not. Each display's history charts may take at most 2 seconds of Uptime Goblin's work at once and then 100 ms for every second, so a stolen display cookie that keeps asking for 30-day charts cannot slow every other request: beyond that it is answered 429 `history_limited` with `Retry-After`, and the display keeps the chart it drew and asks again at its next refresh. A display asks for one chart at a time, at most every 15 seconds, well inside that limit.
 
 1. On the Uptime Goblin host, create a code and name the display (the name shows in the sessions list and the audit log). It needs the key Uptime Goblin uses, as the [key commands](installation.md#goblin-admin) do:
 
