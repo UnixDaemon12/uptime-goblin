@@ -1,10 +1,10 @@
 // What the gate (scripts/security-gate.mjs) may start, decided before it starts it.
 //
-// Daybreak's review of gate-draft-r4 (GDR4-01, P1) found that a prerequisite the gate recorded as
+// The security review of gate-draft-r4 (GDR4-01, P1) found that a prerequisite the gate recorded as
 // failed or pending did not stop what came after it: candidate-policy and platform-manifest were
 // recorded, and the gate went on to run the candidate's lint sources, `npm ci` and later stages
 // whatever their status. A record that says a check failed does not undo code that already ran.
-// Codex's answers of 20261016T014104832374Z apply the same rule to every operation whose authority
+// The maintainer's answers of 20261016T014104832374Z apply the same rule to every operation whose authority
 // is missing: nothing is dispatched first and judged later (GATE-CONTRACT v5 C3, C4, C5, C6, C14).
 //
 // This module holds the two decisions the gate makes before it dispatches anything, and the table
@@ -20,13 +20,13 @@
 //   authority for the builds the candidate's tests start) is dispatched only when that authority is
 //   given. scripts/security-authority.mjs is its one source, and in this draft it gives none: no
 //   producer of any of these authorities exists, so each such stage is withheld.
-// - The test stages' own prerequisites (testStagePrerequisiteProblems; Daybreak's GD5-CARRY-01 on
-//   gate-draft-r5, Codex's decision 3 of 20261017T061149194320Z, v5 C3): gate-draft-r5 recorded
+// - The test stages' own prerequisites (testStagePrerequisiteProblems; the security review's GD5-CARRY-01 on
+//   gate-draft-r5, the maintainer's decision 3 of 20261017T061149194320Z, v5 C3): gate-draft-r5 recorded
 //   test-host and runtime-identity before the test stages but did not consult them, so given an
 //   authority a test stage started while either was blocked. A test stage now starts only once
 //   each is recorded exactly once in this run, passed, ended by the decision and applies to it,
 //   as the barrier judges its two prerequisites. That holds in a maintenance (B35) run too
-//   (GDR6-REQ-01, Daybreak's review of gate-draft-r6, under Codex's B35 decision of
+//   (GDR6-REQ-01, the security review of gate-draft-r6, under the maintainer's B35 decision of
 //   20261017T140102522864Z: B35 decides which candidates are judged as maintenance, not that a
 //   runtime nobody identified may run): gate-draft-r6 let a maintenance run that recorded no
 //   runtime-identity start its test stages on test-host alone, and nothing now does.
@@ -46,7 +46,7 @@ import { isTime } from './security-platform.mjs';
 const isObject = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const show = value => JSON.stringify(value)?.slice(0, 120);
 
-/** The prerequisites of every candidate-controlled dispatch (v5 C3, C4, change 19; Codex 014104 item 4). */
+/** The prerequisites of every candidate-controlled dispatch (v5 C3, C4, change 19; maintainer note 014104 item 4). */
 export const PRE_DISPATCH_PREREQUISITES = Object.freeze(['candidate-policy', 'platform-manifest']);
 const STAGE_STATUSES = new Set(['pass', 'fail', 'blocked', 'pending', 'not-run']);
 
@@ -120,8 +120,8 @@ export function preDispatchBarrier(stages, { runStarted, now } = {}) {
 
 /**
  * The stages every test stage needs first (v5 C3: test-host before the full-test stages, and
- * runtime-identity before any test stage uses a runtime; Codex 20261017T061149194320Z decision 3;
- * Daybreak GD5-CARRY-01). They are the four test-stage rules' `prerequisites` (DISPATCH_RULES).
+ * runtime-identity before any test stage uses a runtime; maintainer note 20261017T061149194320Z decision 3;
+ * security review GD5-CARRY-01). They are the four test-stage rules' `prerequisites` (DISPATCH_RULES).
  */
 export const TEST_STAGE_PREREQUISITES = Object.freeze(['test-host', 'runtime-identity']);
 const HEX64 = /^[0-9a-f]{64}$/;
@@ -250,15 +250,15 @@ export function testStagePrerequisiteProblems(name, run, prerequisites = TEST_ST
  */
 export const DISPATCH_AUTHORITIES = Object.freeze({
   'host-listener':
-    'no qualified host listener serves this run from a frozen, authenticated prefetch plan and verified cache, and direct registry or download access is no fallback (v5 C3, C6, C14 change 10; Codex 014104, carried item on the five listener stages); the listener and its preconditions belong to gate-network and int-d',
+    'no qualified host listener serves this run from a frozen, authenticated prefetch plan and verified cache, and direct registry or download access is no fallback (v5 C3, C6, C14 change 10; maintainer note 014104, carried item on the five listener stages); the listener and its preconditions belong to gate-network and int-d',
   'test-image-builds':
-    "the candidate's tests build images (TEST_REQUIRE includes docker; test/installer/docker.test.mjs builds the candidate's own image and a FROM scratch context), and no reviewed pre-build authority record, Docker stage policy, qualified builder and endpoint, or containment of nested Docker clients and direct endpoints exists (v5 C5 changes 3 and 15, decision 7; Codex 014104 item 1)",
+    "the candidate's tests build images (TEST_REQUIRE includes docker; test/installer/docker.test.mjs builds the candidate's own image and a FROM scratch context), and no reviewed pre-build authority record, Docker stage policy, qualified builder and endpoint, or containment of nested Docker clients and direct endpoints exists (v5 C5 changes 3 and 15, decision 7; maintainer note 014104 item 1)",
   'scan-image-build':
-    'no reviewed pre-build authority record (approved staged base images, build context, Dockerfile, arguments, platform, qualified builder and endpoint, stage policy and boundaries) exists for the image build of the scan, so nothing is built or pulled and no cached image stands in (v5 C5 change 3; Codex 014104 item 2)',
+    'no reviewed pre-build authority record (approved staged base images, build context, Dockerfile, arguments, platform, qualified builder and endpoint, stage policy and boundaries) exists for the image build of the scan, so nothing is built or pulled and no cached image stands in (v5 C5 change 3; maintainer note 014104 item 2)',
   'semgrep-image':
-    'image-approval is pending: no reviewed activation record approves the Semgrep image for this purpose, consumer and runner, so it is neither inspected nor run, and no host binary stands in (v5 C5; Codex 014104 item 3)',
+    'image-approval is pending: no reviewed activation record approves the Semgrep image for this purpose, consumer and runner, so it is neither inspected nor run, and no host binary stands in (v5 C5; maintainer note 014104 item 3)',
   't8-image-inspect':
-    'the reviewed Docker stage policy for docker image inspect and the qualified endpoint are pending, and the T8 operational hold is active, so no docker image inspect is dispatched (v5 C5 decision 7, C17 item 12; Codex 014104, carried item on the T8 inspect)',
+    'the reviewed Docker stage policy for docker image inspect and the qualified endpoint are pending, and the T8 operational hold is active, so no docker image inspect is dispatched (v5 C5 decision 7, C17 item 12; maintainer note 014104, carried item on the T8 inspect)',
   'docker-version-query':
     'no reviewed Docker stage policy for docker version and no qualified endpoint exist, so the gate dispatches no Docker command for it (v5 C5 decision 7: an operation is permitted only by a reviewed stage policy on a qualified endpoint)',
 });

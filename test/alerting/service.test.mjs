@@ -1413,7 +1413,7 @@ test('D26 for a row an earlier run left sending waits while its resolution canno
   assert.deepEqual(hook.kinds(), ['nas:firing']);
 });
 
-// A63 (Codex's review of 9a7d6e5): the check read only the 1,000 alerts 1.4.x changed last, so a
+// A63 (an independent review of 9a7d6e5): the check read only the 1,000 alerts 1.4.x changed last, so a
 // waiting firing whose recovery 1.4.x sent before 1,000 changes of other alerts was sent after
 // that recovery, and the receiver showed plex down for good. 999 is the control that passed
 // then; 1,000 and 2,500 failed. Every change here fits the supported 200 sources and 30 rules.

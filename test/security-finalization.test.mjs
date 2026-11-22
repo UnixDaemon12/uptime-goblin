@@ -237,7 +237,7 @@ function fixture(t, change = () => {}) {
       NextUpdate: new Date(now + 3600000).toISOString(),
     },
   });
-  // The pinned Actionlint of a reviewed golden-tool record (Daybreak GD-R2): synthetic.
+  // The pinned Actionlint of a reviewed golden-tool record (security review GD-R2): synthetic.
   Object.assign(logs, pinActionlint(record, run, now));
   // The maintenance run's host and runtime evidence (GDR6-REQ-01): synthetic.
   Object.assign(logs, maintenanceRuntime(record, now));
@@ -303,7 +303,7 @@ test('an exact reviewed finding finalizes without rewriting raw results; hook ch
   assert.equal(f.inventory.eligible, true, f.inventory.blockers.join('; '));
   const before = fs.readFileSync(path.join(f.run, 'result.json'));
   // This module's finalization of a maintenance (B35) candidate is pending: the qualified binding
-  // of its pinned Actionlint is an F obligation (actionlint-pin; Codex decision 8).
+  // of its pinned Actionlint is an F obligation (actionlint-pin; maintainer decision 8).
   const finalized = finalizeRun(f.run, f.reviewFile, f.current, f.now);
   assert.equal(finalized.status, 'pending');
   assert.deepEqual(finalized.obligations, { 'actionlint-pin': 'pending' });
@@ -324,7 +324,7 @@ test('an exact reviewed finding finalizes without rewriting raw results; hook ch
     });
   const refused = hook();
   assert.equal(refused.status, 1);
-  assert.match(refused.stderr, /maintenance candidate .*actionlint-pin; Codex decision 8/);
+  assert.match(refused.stderr, /maintenance candidate .*actionlint-pin; maintainer decision 8/);
   // As F would write it once the qualified manifest bound the pin (a stand-in: no F exists).
   asIfFinalizedByF(f.run);
   assert.equal(validateFinalization(f.run, f.current, f.now).findings, 1);
@@ -625,7 +625,7 @@ test('each mandatory stage, the lint stages included, is required and must pass'
 });
 
 // One installed commit guard serves the maintenance and 1.5 worktrees only if both carry the
-// same helper modules, this one among them, and the maintenance finalizer (Codex's
+// same helper modules, this one among them, and the maintenance finalizer (the maintenance
 // scripts/finalize-security.mjs) passes currentCandidate() as it is, naming no lint stages. So a
 // caller that names none requires none, and every other mandatory stage as before: the
 // maintenance finalizer still finalizes its own runs, which record no lint stage, with this
@@ -687,7 +687,7 @@ test('a caller that names no lint stages, as the maintenance finalizer, requires
     }),
     { mode: 0o600 }
   );
-  // This module's finalization is pending (actionlint-pin is F's; Codex decision 8), and the guard
+  // This module's finalization is pending (actionlint-pin is F's; maintainer decision 8), and the guard
   // refuses it; as F would write it, the guard accepts it.
   assert.equal(finalizeRun(maintenance, review, current, now).status, 'pending');
   assert.throws(
@@ -698,7 +698,7 @@ test('a caller that names no lint stages, as the maintenance finalizer, requires
   assert.equal(validateFinalization(maintenance, current, now).status, 'pass');
 });
 
-// gate-draft-r7, GDR6-REQ-01 (Daybreak's review of gate-draft-r6; a required correction under Codex's
+// gate-draft-r7, GDR6-REQ-01 (the security review of gate-draft-r6; a required correction under the maintainer's
 // explicit B35 clarification of 20261017T140102522864Z, not a newly introduced r6 regression): the
 // maintenance (B35) finalizer kept the earlier gate's stage list, without test-host or
 // runtime-identity, and the platform evidence check returned early for maintenance without
@@ -1028,8 +1028,8 @@ test('GDR6-REQ-01: maintenance finalization refuses legacy evidence without test
   ]);
 });
 
-// gate-draft-r8, GDR7-FIN-01 (Daybreak's review of gate-draft-r7: a carried downstream-consumer
-// defect, not a regression of GDR6-REQ-01's closure; Codex's decision 1 of
+// gate-draft-r8, GDR7-FIN-01 (the security review of gate-draft-r7: a carried downstream-consumer
+// defect, not a regression of GDR6-REQ-01's closure; the maintainer's decision 1 of
 // 20261018T051017695655Z): the maintenance consumer required the plan's names but did not enforce
 // the plan itself, and bound a runtime only to stages named full-tests-*. An extra executed
 // platform-tests-current-runtime on an unidentified binary, any other unique executed stage, and a
@@ -1280,7 +1280,7 @@ test('GDR7-FIN-01: one approved B35 plan binds each stage to its execution class
   };
   const recordOnly = R7_REQUIRED_STAGES.filter(name => requirements.has(name));
   const cases = [
-    // Daybreak's probe: an executed platform-tests-* stage on a binary runtime-identity does not list.
+    // The security review's probe: an executed platform-tests-* stage on a binary runtime-identity does not list.
     [
       'an executed platform-tests-current-runtime on an unidentified binary',
       requiredStages,
@@ -1347,7 +1347,7 @@ test('GDR7-FIN-01: one approved B35 plan binds each stage to its execution class
       },
       /format is not a test stage of a maintenance run|format is of the execution class execute in the approved B35 plan, not a test slot/,
     ],
-    // Daybreak's inline probe, and each other record-only stage: a command under its name.
+    // The security review's inline probe, and each other record-only stage: a command under its name.
     ...recordOnly.map(name => [
       `a command on the record-only ${name}`,
       requiredStages,
@@ -1647,8 +1647,8 @@ test('GDR7-FIN-01, round 2: a maintenance stage record holds only its record for
   );
 });
 
-// gate-draft-r8, GDR7-AUTH-01 (Daybreak's review of gate-draft-r7: a carried downstream-consumer
-// defect; Codex's decision 2 of 20261018T051017695655Z): recordedApproval(), the reader behind
+// gate-draft-r8, GDR7-AUTH-01 (the security review of gate-draft-r7: a carried downstream-consumer
+// defect; the maintainer's decision 2 of 20261018T051017695655Z): recordedApproval(), the reader behind
 // --verify-commit and the reference-transaction hook, accepted a recorded maintenance (B35)
 // approval of a run that validateFinalization refuses, such as a legacy run without test-host or
 // runtime-identity. Now it applies the same moment-independent B35 plan and host and runtime
@@ -2048,7 +2048,7 @@ test('GDR7-AUTH-01, round 2: recordedApproval gives no authority to a recorded m
   }
 });
 
-// gate-draft-r9, GDR8-AUTH-SCAN-01 (Daybreak's review of gate-draft-r8, probe P2): the
+// gate-draft-r9, GDR8-AUTH-SCAN-01 (the security review of gate-draft-r8, probe P2): the
 // recorded-approval reader judged a scanner stage by its exit alone (0 or the finding exit) and
 // trusted the approval's and the review's finding count, so a recorded maintenance approval of a
 // run whose empty report contradicts a finding exit, which the finalizer refuses, gave authority.
@@ -2087,7 +2087,7 @@ test("GDR8-AUTH-SCAN-01: recordedApproval applies the finalizer's sealed scanner
   // [label, writeRun options, recordedFinalization options, the reader's problem]
   const cases = [
     [
-      "P2 (Daybreak's probe, and gate-draft-r8's former positive): an empty report, the stage blocked with exit 10, no finding or disposition",
+      "P2 (the security review's probe, and gate-draft-r8's former positive): an empty report, the stage blocked with exit 10, no finding or disposition",
       { record: blocked('secrets-history') },
       {},
       /scanner results: secrets-history: Scanner exit and findings disagree/,
@@ -2275,8 +2275,8 @@ test("GDR8-AUTH-SCAN-01: recordedApproval applies the finalizer's sealed scanner
   }
 });
 
-// gate-draft-r9, GDR8-SCHEMA-01 (Daybreak's review of gate-draft-r8, probe P3; Codex's decision 3
-// of hourly-0918): the record forms closed only a maintenance stage record's own members, and what
+// gate-draft-r9, GDR8-SCHEMA-01 (the security review of gate-draft-r8, probe P3; the maintainer's decision 3):
+// the record forms closed only a maintenance stage record's own members, and what
 // a permitted member held stayed open, so `test-host.host.probe = { argv, exitCode }` was accepted
 // by every check (the probe showed invalid schema acceptance, not an execution of that object).
 // Now each member's value has a closed schema at every depth (MAINTENANCE_MEMBER_SCHEMAS,
@@ -2380,7 +2380,7 @@ test('GDR8-SCHEMA-01: every structured member of a maintenance stage record has 
   const alias = { argv: ['node', '--test'], exitCode: 0 };
   const cases = [
     [
-      "P3 (Daybreak's probe): test-host.host.probe = { argv, exitCode }",
+      "P3 (the security review's probe): test-host.host.probe = { argv, exitCode }",
       { record: r => (stage(r, 'test-host').host.probe = alias) },
       /test-host\.host holds "probe", which its closed schema does not have \(GDR8-SCHEMA-01\)/,
     ],
@@ -2768,7 +2768,7 @@ test('a vulnerability database published and downloaded during the run is fresh'
     x.logs['scanner-database.log'] = JSON.stringify(database);
   });
   assert.equal(f.inventory.eligible, true, f.inventory.blockers.join('; '));
-  // Pending only for the F obligation of its pinned Actionlint (Codex decision 8).
+  // Pending only for the F obligation of its pinned Actionlint (maintainer decision 8).
   const finalized = finalizeRun(f.run, f.reviewFile, f.current, f.now);
   assert.equal(finalized.status, 'pending');
   assert.deepEqual(finalized.obligations, { 'actionlint-pin': 'pending' });
@@ -2855,7 +2855,7 @@ for (const flags of [[], ['--preserve-symlinks-main']]) {
     assert.equal(blocked.status, 1, 'an alias cannot silently skip the checker');
     assert.match(blocked.stderr, /No fresh verified finalization/);
     finalizeRun(f.run, f.reviewFile, f.current, f.now);
-    // This module's finalization is pending (actionlint-pin; Codex decision 8): still blocked.
+    // This module's finalization is pending (actionlint-pin; maintainer decision 8): still blocked.
     assert.equal(run().status, 1, 'a pending finalization does not approve through the alias');
     asIfFinalizedByF(f.run);
     const approved = run();
@@ -2880,7 +2880,7 @@ for (const flags of [[], ['--preserve-symlinks-main']]) {
     const inspected = run('inspect', f.run);
     assert.equal(inspected.status, 0, inspected.stderr);
     assert.equal(JSON.parse(inspected.stdout).tree, f.current.tree);
-    // The finalizer writes a pending finalization (its F obligation actionlint-pin; Codex
+    // The finalizer writes a pending finalization (its F obligation actionlint-pin; maintainer
     // decision 8), says so and exits 1.
     const finalized = run('finalize', f.run, f.reviewFile);
     assert.equal(finalized.status, 1, finalized.stderr);
@@ -3018,15 +3018,15 @@ test("Finalizer and reader parity (a carried obligation), round 2 (check-1 SCHEM
   }
 });
 
-// gate-draft-r10, GDR9-HOST-SCHEMA-01 (review finding, Low/P3, integration-blocking; Codex's GATE
+// gate-draft-r10, GDR9-HOST-SCHEMA-01 (review finding, Low/P3, integration-blocking; the maintainer's GATE
 // decision 5; a PROPOSED shared interface, not an accepted one): parseRunRecord closed the run
 // record's top-level members but checked only that `host` was an object, so host.probe = { argv,
-// exitCode } (check-1's SCHEMA-INFO, Daybreak's P5) was accepted. The host is now one of two
+// exitCode } (check-1's SCHEMA-INFO, the security review's P5) was accepted. The host is now one of two
 // closed, typed variants, told apart by their exact member sets: the 1.5 gate's five members
 // { platform, arch, release, node, uid } and the maintenance form; every member of a variant is
 // required with its type, and anything else is refused, at the record reader every consumer uses
 // (the finalizer, the commit guard and the recorded-approval reader read a sealed run through it).
-// gate-draft-r11, GDR10-HOST-PRODUCER-01 (changed, following Codex's decision 073253 item 2): the
+// gate-draft-r11, GDR10-HOST-PRODUCER-01 (changed, following the maintainer's decision 073253 item 2): the
 // maintenance form is the maintenance producer's own four members { platform, arch, release, node }
 // (blob 40bc87be), not the three-member { node, platform, arch } that only synthetic fixtures
 // wrote; those three are now refused like any other member set.
@@ -3057,7 +3057,7 @@ test('GDR9-HOST-SCHEMA-01: the run record host is one of two closed, typed produ
     /run record's host is not one of its closed producer forms \(GDR9-HOST-SCHEMA-01\): /;
   for (const [label, host, problem] of [
     [
-      "Daybreak's P5: host.probe = { argv, exitCode }",
+      "The security review's P5: host.probe = { argv, exitCode }",
       { ...four, probe: { argv: ['node', '--test'], exitCode: 0 } },
       /the host has the members \["arch", "node", "platform", "probe", "release"\], which are neither/,
     ],
@@ -3145,7 +3145,7 @@ test('GDR9-HOST-SCHEMA-01: the run record host is one of two closed, typed produ
   assert.throws(() => recordedApproval(f.run, noLint), closed);
 });
 
-// gate-draft-r10 round 2, GDR9-HOST-SCHEMA-01 (check-1: a mixed variant; Codex's GATE decision 5:
+// gate-draft-r10 round 2, GDR9-HOST-SCHEMA-01 (check-1: a mixed variant; the maintainer's GATE decision 5:
 // each producer form "with their required fields"; a PROPOSED shared interface): the variant was
 // chosen by its member set alone, so a contract record whose host had the maintenance form's three
 // members was read, and the 1.5 form's release and uid were in effect optional for 1.5 records.
@@ -3153,7 +3153,7 @@ test('GDR9-HOST-SCHEMA-01: the run record host is one of two closed, typed produ
 // contract commit record and a companion record, which only the 1.5 gate writes, carry its five
 // members; a maintenance commit record, which the 1.5 gate (for a B35 candidate) and the
 // maintenance producer write, either form. gate-draft-r11 (GDR10-HOST-PRODUCER-01; changed,
-// following Codex's decision 073253 item 2): the maintenance form is the maintenance gate's four
+// following the maintainer's decision 073253 item 2): the maintenance form is the maintenance gate's four
 // members { platform, arch, release, node }.
 test('GDR9-HOST-SCHEMA-01, round 2: the host form follows the record kind; a contract or companion record carries the 1.5 gate five members, a maintenance record either form', async t => {
   if (gitSkip) return t.skip(gitSkip);

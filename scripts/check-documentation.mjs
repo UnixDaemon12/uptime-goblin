@@ -190,7 +190,7 @@ export function checkDocumentation(root = rootDirectory) {
   return { problems, documents: contents.size, releaseTags: releaseTags.length };
 }
 
-// The entry check of the commit guard and finalizer (Codex's 66605f10): started through a
+// The entry check of the commit guard and finalizer (the maintenance tree 66605f10): started through a
 // symlinked directory (/tmp on macOS, for example) or a symlinked file, the checker must run,
 // not exit 0 without checking; imported, also through stdin or --eval with an argument that is
 // not a file, it must do nothing rather than fail.

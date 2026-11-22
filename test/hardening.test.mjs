@@ -505,7 +505,7 @@ test('collection addresses, metric paths and launch links cannot carry credentia
     'https://nas.example.test/?authorization=Basic%20abc',
     'https://nas.example.test/?user=admin&adminpass=abc',
     'https://nas.example.test/#access_token=abc&state=/home?tab=1',
-    // Codex review A2: an empty or valueless neighbour no longer hides the pair.
+    // Independent review A2: an empty or valueless neighbour no longer hides the pair.
     'https://nas.example.test/#access_token=abc&',
     'https://nas.example.test/#access_token=abc&state',
     'https://nas.example.test/#&access_token=abc',
@@ -675,7 +675,7 @@ test('settings saved by older releases that newer validation refuses are repaire
   assert.equal(repairs().length, 6);
 });
 
-// Codex review A4: the six synthetic cases of maintenance 27f81dd, as they are there.
+// Independent review A4: the six synthetic cases of maintenance 27f81dd, as they are there.
 test('legacy collection address repairs never log URL contents', async t => {
   const canary = 'fixture-repair-secret';
   const address = `https://node.example.test/${canary}`;
@@ -1076,7 +1076,7 @@ test('launch links keep SPA routes, anchors and harmless parameters', async t =>
     'https://app.example.test/#tokens?page=2',
     'https://docs.example.test/page#authentication:~:text=Basic%20auth',
     'https://app.example.test/#page=2&view=list',
-    // Codex review A2: empty or valueless members beside routes, anchors and harmless pairs.
+    // Independent review A2: empty or valueless members beside routes, anchors and harmless pairs.
     'https://app.example.test/#page=2&view=list&',
     'https://app.example.test/#state&page=2',
     'https://app.example.test/#/callback?x=1&',
@@ -1092,7 +1092,7 @@ test('launch links keep SPA routes, anchors and harmless parameters', async t =>
     );
 });
 
-// Codex review A2: settings saved by a release whose check missed a fragment token beside an
+// Independent review A2: settings saved by a release whose check missed a fragment token beside an
 // empty, valueless or route-like member are repaired on start like an ordinary
 // #access_token=…: only the pair goes, the warning and the saved file keep nothing of it, and a
 // route stays as it was.

@@ -63,11 +63,11 @@ export function goldenActionlint(platform, now, arch = 'arm64') {
 
 /**
  * Makes the passing Actionlint stages of `record`, a run to be sealed in the folder `run`, those of
- * a run that ran a pinned Actionlint (Daybreak GD-R2, for every candidate, maintenance included):
+ * a run that ran a pinned Actionlint (security review GD-R2, for every candidate, maintenance included):
  * actionlint-version names the pinned synthetic binary and its sealed golden-tool record (for the
  * record's host), and workflow-analysis ran it with the gate-owned configuration and saw the pinned
  * sha256 immediately before and after it ran. Returns the evidence files that needs, by name.
- * Synthetic: no Actionlint ran, and the gate of this draft runs none (Codex decision 8: it has no
+ * Synthetic: no Actionlint ran, and the gate of this draft runs none (maintainer decision 8: it has no
  * qualified golden-tool manifest). The finalizer checks such a run for consistency, and leaves the
  * qualified binding to F (actionlint-pin): the record is a local claim, not authority.
  */
@@ -105,7 +105,7 @@ export function pinActionlint(record, run, now) {
 // the platform manifest (maintenance, B35) is judged by.
 export const allStages = [...requiredStages, ...lintStageNames];
 
-// gate-draft-r7 (GDR6-REQ-01, under Codex's B35 decision of 20261017T140102522864Z): a maintenance
+// gate-draft-r7 (GDR6-REQ-01, under the maintainer's B35 decision of 20261017T140102522864Z): a maintenance
 // run records test-host and runtime-identity before its test stages, and each test stage the Node
 // binary it ran, which runtime-identity lists with its sealed identity record. The synthetic
 // binaries, their records and the release keys are made up: no binary was hashed and no signature
@@ -608,7 +608,7 @@ export function writeRun(run, current, stages, now = Date.now(), options = {}) {
  * finalization of `run` as F would write it once every F obligation passed. This module's own
  * finalization is pending for every candidate: the catalog's F obligations for a candidate with a
  * platform contract, and for maintenance (B35) the qualified binding of its pinned Actionlint
- * (actionlint-pin; Codex decision 8). Only this test input lets the commit guard's checks of a
+ * (actionlint-pin; maintainer decision 8). Only this test input lets the commit guard's checks of a
  * passing finalization be tested. Synthetic: no F ran, and no qualified manifest bound anything.
  */
 export function asIfFinalizedByF(run) {
@@ -634,7 +634,7 @@ export function reviewBinding(inventory) {
 // finalized with the judgment's inputs of such a candidate and only the lint stages it has (the
 // maintenance gate records none), so the commit guard alone decides whether the candidate needs
 // more. `options.platform` gives other judgment inputs. The finalization this module writes is
-// pending (its F obligation actionlint-pin; Codex decision 8), and that is what this returns;
+// pending (its F obligation actionlint-pin; maintainer decision 8), and that is what this returns;
 // unless `options.byF` is false, the folder then holds the finalization as the stand-in for F
 // writes it (asIfFinalizedByF), so the commit guard's other checks of a passing one can be tested.
 // With `options.dispose`, a run whose reports give findings (with its scanners' finding exits) is

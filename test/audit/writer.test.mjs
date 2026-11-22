@@ -147,7 +147,7 @@ test('head check: every disagreement writes one audit.gap and continues after th
     }
 });
 
-// Codex review A1: Uptime Goblin numbers its entries from 1 (D27). With the newest stored row moved to seq
+// Independent review A1: Uptime Goblin numbers its entries from 1 (D27). With the newest stored row moved to seq
 // 0 or below by someone with the database, the next seq was that seq + 1: Uptime Goblin signed its own
 // entries at -2, -1 and 0, rows verification now reads as never numbered by Uptime Goblin, and linked its
 // rows to the moved one. The unit now starts the chain at seq 1 from GENESIS, as in an empty log
@@ -164,7 +164,7 @@ const rowsFromAll = db =>
       .all(sql`SELECT * FROM ${sql.id('audit_log')} ORDER BY ${sql.id('seq')}`)
       .map(raw => rowOf(raw))
   );
-test('Codex review A1: head check: with the newest stored row at seq 0 or below, the unit starts the chain at seq 1 from GENESIS; Uptime Goblin never signs a row numbered 0 or below', async t => {
+test('Independent review A1: head check: with the newest stored row at seq 0 or below, the unit starts the chain at seq 1 from GENESIS; Uptime Goblin never signs a row numbered 0 or below', async t => {
   const cases = {
     'the head and the newest row agree at seq -3': async (db, rows) => {
       await db.write(tx =>
@@ -1128,7 +1128,7 @@ test('config meta after a lost result: a later change recorded in the same run l
   );
 });
 
-// Codex review A3: the keys were held back only once an earlier result had failed. A later
+// Independent review A3: the keys were held back only once an earlier result had failed. A later
 // result written while the earlier one was still unsettled (its unit sleeping between SQLite
 // retries, or its settle not reached yet: exclusive() releases its turn before settle writes
 // the result) moved them to its after-snapshot, which already held the earlier change; when
@@ -1173,7 +1173,7 @@ const nextStartDrift = async (t, f) => {
 };
 const pathsOf = row => row.detail.diff.map(item => item.path).sort();
 
-test('Codex review A3: a result still retrying when a later one is written keeps the configuration keys; lost, its change is in the config.changed-outside of the next start; written, the keys follow the later one', async t => {
+test('Independent review A3: a result still retrying when a later one is written keeps the configuration keys; lost, its change is in the config.changed-outside of the next start; written, the keys follow the later one', async t => {
   for (const [name, times] of [
     ['lost after its retries', 4],
     ['written at its third attempt', 2],
@@ -1237,7 +1237,7 @@ test('Codex review A3: a result still retrying when a later one is written keeps
     });
 });
 
-test('Codex review A3: a change noted but not yet ended holds the keys below it; the result that settles it publishes the newest snapshot below the next unsettled change, and a lost one is drift at the next start', async t => {
+test('Independent review A3: a change noted but not yet ended holds the keys below it; the result that settles it publishes the newest snapshot below the next unsettled change, and a lost one is drift at the next start', async t => {
   const fail = new Set();
   const f = await auditFixture(t, { wrapDb: countingWrap({ fail }) });
   const config = new ConfigStore(f.directory);
@@ -1798,11 +1798,11 @@ test('prune: entries that do not check are never pruned: nothing signed or delet
   );
 });
 
-// Codex review A1: the prune's check read the rows after seq 0 only, so a row someone with the
+// Independent review A1: the prune's check read the rows after seq 0 only, so a row someone with the
 // database put at seq 0 or below was never checked, and the prune signed a checkpoint and deleted
 // it with the expired rows; what remained read intact. The check now reads from the lowest stored
 // row, and such a row stops the prune like any entry that does not check.
-test('Codex review A1: prune: a row at seq 0 or below stops the prune: nothing signed or deleted, the warning names it, and the log reads changed', async t => {
+test('Independent review A1: prune: a row at seq 0 or below stops the prune: nothing signed or deleted, the warning names it, and the log reads changed', async t => {
   for (const seq of [0, -1]) {
     await t.test(`at seq ${seq}`, async t => {
       const clock = manualClock(Date.UTC(2026, 0, 1));

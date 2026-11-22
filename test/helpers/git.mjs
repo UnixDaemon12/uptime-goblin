@@ -188,7 +188,7 @@ export function gitCheckout(directory) {
       };
 }
 
-// The regressions of these decisions (Codex's TOOLING-GIT-REQUIRED-P3) run a test file as its own
+// The regressions of these decisions (the maintainer's TOOLING-GIT-REQUIRED-P3) run a test file as its own
 // runner reports it, under each kind of Git, with the helpers below.
 
 /**

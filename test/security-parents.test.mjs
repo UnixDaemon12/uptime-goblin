@@ -1,4 +1,4 @@
-// The complete ordered parent vector of GATE-CONTRACT v3 C18 (a draft, not reviewed), and Daybreak's
+// The complete ordered parent vector of GATE-CONTRACT v3 C18 (a draft, not reviewed), and the security review's
 // gate-draft findings GD-01 and GD-R1: a candidate is its tree with every parent in order (HEAD,
 // then each MERGE_HEAD), bound and compared everywhere, never by tree and first parent; nothing is
 // approved for an incomplete vector; and after a commit exists its vector is recomputed from its
@@ -917,8 +917,8 @@ test('--verify-commit accepts only a recorded approval that still verifies: its 
   assert.throws(() => m.finalization.recordedApproval(run, noLint), /retained review is not bound/);
 });
 
-// gate-draft-r8, GDR7-AUTH-01 at the entry points that give a recorded approval authority (Daybreak's
-// review of gate-draft-r7: a carried downstream-consumer defect; Codex's decision 2 of
+// gate-draft-r8, GDR7-AUTH-01 at the entry points that give a recorded approval authority (the security review's
+// review of gate-draft-r7: a carried downstream-consumer defect; the maintainer's decision 2 of
 // 20261018T051017695655Z): `--verify-commit` and the reference-transaction hook both reach
 // recordedApproval() through verifyCommit(), which accepted a recorded maintenance (B35) approval
 // of a run that validateFinalization refuses. Each case below is its own staged tree on C0, with a
@@ -1459,7 +1459,7 @@ function refusedAtEntryPoints(label, outcome, pattern) {
   assert.equal(outcome.intentLeft, false, label);
 }
 
-// gate-draft-r9, GDR8-AUTH-LINT-01 (a carried obligation; Codex's decision 1 of hourly-0918): the
+// gate-draft-r9, GDR8-AUTH-LINT-01 (a carried obligation; the maintainer's decision 1): the
 // pre-commit guard derives the lint stages a candidate requires from its package.json and its
 // parents' history, but verifyCommit, behind `--verify-commit` and the reference-transaction hook,
 // derived none, so a recorded maintenance approval of a run without `sql-lint` gave authority to a
@@ -1718,7 +1718,7 @@ test('GDR8-AUTH-LINT-01: verifyCommit, --verify-commit and the reference-transac
   );
 });
 
-// gate-draft-r9, GDR8-AUTH-SCAN-01 and GDR8-SCHEMA-01 at the authority entry points (Daybreak's
+// gate-draft-r9, GDR8-AUTH-SCAN-01 and GDR8-SCHEMA-01 at the authority entry points (the security review's
 // probes P2 and P3 on gate-draft-r8): a recorded maintenance approval of a run whose sealed scanner
 // results the finalizer refuses (an empty report under a finding exit, a missing or malformed
 // report, a real finding the approval does not count), or whose stage record holds a member its
@@ -1742,7 +1742,7 @@ test('GDR8-AUTH-SCAN-01 and GDR8-SCHEMA-01: verifyCommit, --verify-commit and th
     /^The recorded maintenance \(B35\) approval is of a run the current B35 rules refuse, so it gives no authority now \(GDR7-AUTH-01\): /;
   for (const [label, options, problem] of [
     [
-      "P2 (Daybreak's probe): an empty report, the stage blocked with exit 10",
+      "P2 (the security review's probe): an empty report, the stage blocked with exit 10",
       earlier({ record: blocked }),
       /scanner results: secrets-history: Scanner exit and findings disagree/,
     ],
@@ -1781,7 +1781,7 @@ test('GDR8-AUTH-SCAN-01 and GDR8-SCHEMA-01: verifyCommit, --verify-commit and th
       /The retained review does not dispose of exactly the findings the sealed scanner reports give/,
     ],
     [
-      "P3 (Daybreak's probe): test-host.host.probe = { argv, exitCode }",
+      "P3 (the security review's probe): test-host.host.probe = { argv, exitCode }",
       earlier({
         record: x => (stage(x, 'test-host').host.probe = { argv: ['node', '--test'], exitCode: 0 }),
       }),
@@ -2011,7 +2011,7 @@ test('GDR8-AUTH-LINT-01, round 2 (check-1 LINT-U1): a history version whose pack
 });
 
 // ---------------------------------------------------------------------------------------------
-// gate-draft-r10: Daybreak's review of gate-draft-r9 (GDR9-AUTH-ROOT-01, GDR9-AUTH-OBJECT-01,
+// gate-draft-r10: the security review of gate-draft-r9 (GDR9-AUTH-ROOT-01, GDR9-AUTH-OBJECT-01,
 // GDR9-AUTH-SCAN-02 and GDR9-HOST-SCHEMA-01, review findings) at the authority entry points.
 
 /**
@@ -2105,7 +2105,7 @@ function moveObject(gitDir, id, to) {
 
 // GDR9-AUTH-ROOT-01 (review finding): verifyCommit(commit, root) copied process.env and ran Git
 // with cwd: root, so an inherited GIT_DIR and GIT_WORK_TREE selected another repository, whose
-// approved commit it accepted (Daybreak's P1), and checkReferenceTransaction found its common
+// approved commit it accepted (the security review's P1), and checkReferenceTransaction found its common
 // folder with the ambient Git. Every authority read now goes through one runner bound to the
 // canonical root (bindRepository): an inherited selector naming another repository, working tree
 // or common directory, an object source other than the repository's own quarantine and a
@@ -2138,7 +2138,7 @@ test('GDR9-AUTH-ROOT-01: one runner bound to the explicit root reads every autho
     /cannot be bound: the inherited (?:GIT_DIR|GIT_WORK_TREE|GIT_COMMON_DIR) names .*an inherited selector cannot choose another repository, working tree or common directory for the authority \(GDR9-AUTH-ROOT-01\)/;
   for (const [label, env] of [
     [
-      "Daybreak's P1: root A, inherited GIT_DIR and GIT_WORK_TREE select B",
+      "The security review's P1: root A, inherited GIT_DIR and GIT_WORK_TREE select B",
       { GIT_DIR: bGit, GIT_WORK_TREE: b.root },
     ],
     ['root A, an inherited GIT_DIR alone selects B', { GIT_DIR: bGit }],
@@ -2559,7 +2559,7 @@ test('GDR9-AUTH-ROOT-01: the bound runner treats every repository-selecting, ref
 // GDR9-AUTH-OBJECT-01 (review finding): readPackageWith() read <tree>:package.json as a blob and
 // turned every failure into absence, and the history parser skipped every non-blob answer. So a
 // finalized subject whose own package.json blob was missing was accepted with both lint stages
-// (Daybreak's P2), and a history version whose package.json was a gitlink to a readable commit
+// (the security review's P2), and a history version whose package.json was a gitlink to a readable commit
 // defined nothing (P3). Each version is now read entry first and typed (packageVersions): only a
 // tree with no package.json entry is absence; a missing or unreadable object, a directory, a
 // submodule (readable or not), a symbolic link, an oversized file and any lookup error refuse, at
@@ -2589,7 +2589,7 @@ test('GDR9-AUTH-OBJECT-01: package.json is read entry first and typed for the su
     );
   const notRegular = kind =>
     `the package\\.json of [0-9a-f]+ is ${kind}, not a regular file, so the lint scripts that version defines cannot be judged`;
-  // Daybreak's P2: the subject's own package.json blob is missing; the run has both lint stages.
+  // The security review's P2: the subject's own package.json blob is missing; the run has both lint stages.
   const p2 = await subject(
     [C0],
     { 'package.json': canonicalPackage({ ...both, note: 'the subject alone' }) },
@@ -2601,12 +2601,12 @@ test('GDR9-AUTH-OBJECT-01: package.json is read entry first and typed for the su
   const back = moveObject(path.join(r.root, '.git'), blob, path.join(r.root, '.git', 'aside'));
   assert.throws(() => derive(p2), new RegExp(missing));
   refusedAtEntryPoints(
-    "Daybreak's P2: the subject's package.json blob is missing",
+    "The security review's P2: the subject's package.json blob is missing",
     await authorityEntryPoints(r, p2),
     derived(missing)
   );
   back();
-  // Daybreak's P3: a history version's package.json is a gitlink to a readable commit.
+  // The security review's P3: a history version's package.json is a gitlink to a readable commit.
   const gitlinked = commitOn(r, [C0], { 'package.json': { gitlink: C0 } }, 'H: a gitlink to C0');
   const after = commitOn(
     r,
@@ -2618,7 +2618,7 @@ test('GDR9-AUTH-OBJECT-01: package.json is read entry first and typed for the su
   const p3 = await subject([after.commit], {}, requiredStages);
   assert.throws(() => derive(p3), new RegExp(submodule));
   refusedAtEntryPoints(
-    "Daybreak's P3: a history version's package.json is a readable gitlink",
+    "The security review's P3: a history version's package.json is a readable gitlink",
     p3,
     derived(submodule)
   );
@@ -2921,7 +2921,7 @@ test('GDR9-AUTH-ROOT-01: the gate refuses an inherited GIT_DIR naming another re
 });
 
 // GDR9-AUTH-SCAN-02 (review finding) at the authority entry points: a contract approval of a real
-// commit whose run withholds a scanner and seals its fixed report anyway (Daybreak's P4,
+// commit whose run withholds a scanner and seals its fixed report anyway (the security review's P4,
 // CONTRACT-R2-6, a finding in it; or an empty, empty-list or malformed report), or seals a report
 // with no scanner stage at all, was accepted with no finding at verifyCommit, --verify-commit and
 // the reference-transaction hook, as by the finalizer and recordedApproval. Each twin below is a
@@ -3022,7 +3022,7 @@ test('GDR9-AUTH-SCAN-02: a contract approval whose run seals a report beside a w
     /secrets-source\.json is sealed with the run, but no secrets-source stage is recorded: a report that belongs to no scanner stage gives no result/;
   for (const [label, change, pattern, finalizerPattern] of [
     [
-      "Daybreak's P4 (CONTRACT-R2-6): withheld, its sealed report holds one finding",
+      "The security review's P4 (CONTRACT-R2-6): withheld, its sealed report holds one finding",
       (result, files) => {
         withheld(result);
         files['secrets-source.json'] = finding;
@@ -3079,11 +3079,11 @@ test('GDR9-AUTH-SCAN-02: a contract approval whose run seals a report beside a w
 
 // GDR9-HOST-SCHEMA-01 (review finding, Low/P3, integration-blocking) at the authority entry points:
 // a recorded maintenance approval whose run's own host is not one of its closed producer forms
-// (Daybreak's P5: host.probe = { argv, exitCode }; an unknown scalar or list; the three-member form
+// (the security review's P5: host.probe = { argv, exitCode }; an unknown scalar or list; the three-member form
 // no producer writes; a member of the wrong type) gives no authority at the finalizer,
 // recordedApproval, verifyCommit, --verify-commit or the reference-transaction hook; the
 // maintenance gate's four-member form and the 1.5 gate's five-member form are accepted.
-// gate-draft-r11, GDR10-HOST-PRODUCER-01 (changed, following Codex's decision 073253 item 2): the
+// gate-draft-r11, GDR10-HOST-PRODUCER-01 (changed, following the maintainer's decision 073253 item 2): the
 // maintenance form is the maintenance producer's four members { platform, arch, release, node }
 // (blob 40bc87be), which this test refused before; the synthetic three-member form is refused.
 test('GDR9-HOST-SCHEMA-01: a recorded approval whose run host is not one of the closed producer forms gives no authority at the finalizer, recordedApproval, verifyCommit, --verify-commit or the reference-transaction hook; the maintenance gate four-member and the 1.5 gate five-member forms are accepted', async t => {
@@ -3153,7 +3153,7 @@ test('GDR9-HOST-SCHEMA-01: a recorded approval whose run host is not one of the 
     /run record's host is not one of its closed producer forms \(GDR9-HOST-SCHEMA-01\)/;
   for (const [label, host] of [
     [
-      "Daybreak's P5: host.probe = { argv, exitCode }",
+      "The security review's P5: host.probe = { argv, exitCode }",
       {
         platform: 'linux',
         arch: 'arm64',
@@ -3204,7 +3204,7 @@ test('GDR9-HOST-SCHEMA-01: a recorded approval whose run host is not one of the 
 // GDR9-AUTH-OBJECT-01, GDR9-HOST-SCHEMA-01 and GDR9-AUTH-ROOT-01, review findings) at the
 // authority entry points.
 
-// GDR9-AUTH-OBJECT-01, round 2 (check-1: malformed package.json content; Codex 153201 criterion 2
+// GDR9-AUTH-OBJECT-01, round 2 (check-1: malformed package.json content; maintainer note 153201 criterion 2
 // lists "malformed content" among what refuses authority). A readable package.json whose content
 // is not well formed still gave authority: the subject's or a parent's was read as unknown, which
 // both lint stages satisfy, and a history version that did not parse defined nothing, so one that
@@ -3389,7 +3389,7 @@ test('GDR9-AUTH-OBJECT-01, round 2: a package.json that can be read but is not w
 // in effect optional. The form a record may carry now follows from its kind
 // (RUN_HOST_FORMS_BY_RECORD): a contract or companion run carries the 1.5 gate's five members; a
 // maintenance run, which both gates write, either form (test GDR9-HOST-SCHEMA-01 above).
-// gate-draft-r11, GDR10-HOST-PRODUCER-01 (changed, following Codex's decision 073253 item 2):
+// gate-draft-r11, GDR10-HOST-PRODUCER-01 (changed, following the maintainer's decision 073253 item 2):
 // the maintenance form is the maintenance gate's four members { platform, arch, release, node }.
 test('GDR9-HOST-SCHEMA-01, round 2: a contract run, or a companion run, whose host is the four-member maintenance form gives no authority at the finalizer, recordedApproval, verifyCommit, --verify-commit or the reference-transaction hook; the five-member form stays accepted', async t => {
   if (gitSkip) return t.skip(gitSkip);
@@ -3614,14 +3614,14 @@ test('GDR9-AUTH-ROOT-01, round 2: an alternates file naming another object store
 });
 
 // ---------------------------------------------------------------------------------------------
-// gate-draft-r11: Daybreak's review of the tenth round (REVISE BEFORE INTEGRATION), at the
+// gate-draft-r11: the security review of the tenth round (REVISE BEFORE INTEGRATION), at the
 // authority entry points.
 
-// GDR10-ALT-PARSE-01 (review finding, Medium/P2; Codex 20261019T083721636234Z item 1). The tenth
+// GDR10-ALT-PARSE-01 (review finding, Medium/P2; maintainer note 20261019T083721636234Z item 1). The tenth
 // round read an objects/info/alternates file with trim() before it looked for comments, so the
 // record ` #foreign` (a leading blank), which Git reads as the relative path ` #foreign`, was
 // discarded as a comment: the binding accepted the repository and its bound runner read an object
-// only the foreign store held (Daybreak's two isolated reproductions). Records are now read byte
+// only the foreign store held (the security review's two isolated reproductions). Records are now read byte
 // for byte as Git reads them (activeAlternateRecords): only an empty record and one whose first
 // byte is `#` name no store, and every other record refuses, before any bound read can resolve an
 // object through it. Each case below first shows that plain Git reads B's approved commit object,
@@ -3743,11 +3743,11 @@ test('GDR10-ALT-PARSE-01: an alternates file is read byte for byte as Git reads 
     }
   };
   const to = (from, target) => path.relative(path.dirname(from), target);
-  // Daybreak's exact reproducer: the bytes 20 23 66 6f 72 65 69 67 6e 0a, with the relative path
+  // The security review's exact reproducer: the bytes 20 23 66 6f 72 65 69 67 6e 0a, with the relative path
   // ` #foreign` a link to the foreign store.
   assert.equal(Buffer.from(' #foreign\n').toString('hex'), '2023666f726569676e0a');
   for (const [label, record] of [
-    ["Daybreak's reproducer: ' #foreign' (a leading blank)", ' #foreign'],
+    ["The security review's reproducer: ' #foreign' (a leading blank)", ' #foreign'],
     ["a leading tab: '\\t#foreign'", '\t#foreign'],
     ["a blank-only path: ' '", ' '],
     ["a tab-only path: '\\t'", '\t'],
@@ -3827,10 +3827,10 @@ test('GDR10-ALT-PARSE-01: an alternates file is read byte for byte as Git reads 
 });
 
 // ---------------------------------------------------------------------------------------------
-// gate-draft-r12: Daybreak's review of the eleventh round (REVISE BEFORE INTEGRATION), at the
+// gate-draft-r12: the security review of the eleventh round (REVISE BEFORE INTEGRATION), at the
 // authority entry points.
 
-// GDR11-AUTH-CONFIG-01 (review finding, Medium/P2; Codex's r12 scope items 1 and 4): the repository
+// GDR11-AUTH-CONFIG-01 (review finding, Medium/P2; the maintainer's r12 scope items 1 and 4): the repository
 // binding admitted the caller's Git configuration files (GIT_CONFIG_GLOBAL, GIT_CONFIG_SYSTEM and
 // GIT_CONFIG_NOSYSTEM, with HOME and XDG_CONFIG_HOME passed on), so a setting there reached every
 // bound read of the commit guard, verifyCommit, --verify-commit, the reference-transaction hook and
@@ -4122,7 +4122,7 @@ test("GDR11-AUTH-CONFIG-01: the commit guard through git commit and its hooks, v
   assert.deepEqual(failures, [], `cases that failed:\n${failures.join('\n')}`);
 });
 
-// Round 2 of gate-draft-r12 (check-1 of its first round; Codex's r12 scope items 1 and 4), at every
+// Round 2 of gate-draft-r12 (check-1 of its first round; the maintainer's r12 scope items 1 and 4), at every
 // authority entry point the shared binding serves. R12C1-FILTER-EQ-01: the binding switched each of
 // the repository's filter drivers off in Git's 'key=value' form, which Git splits at the first `=`,
 // so a driver named `a=b` stayed on, and one with an empty name was not listed; their clean program

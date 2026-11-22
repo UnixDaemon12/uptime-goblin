@@ -685,7 +685,7 @@ test('restore-snapshot tells an older key by the key it is given, not by the wra
   assert.match(back.undoStatus.out, opensAll);
   undoneUnsure(back, 'unconfirmed_opens', a, keyA);
 
-  // A to B to A without a key in its environment, as Codex's probe ran it: no claim that Uptime Goblin
+  // A to B to A without a key in its environment, as the independent reviewer's probe ran it: no claim that Uptime Goblin
   // refuses to start, only that the key may have changed, and the line that tells.
   const backUnseen = await restoreAfter(
     [

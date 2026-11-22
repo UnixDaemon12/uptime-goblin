@@ -1,4 +1,4 @@
-// Codex decision 8 of 2026-10-14: a missing reviewed Actionlint pin means pending AND a nonzero,
+// Maintainer decision 8 of 2026-10-14: a missing reviewed Actionlint pin means pending AND a nonzero,
 // blocking result. The gate names the missing pin and its evidence; nothing falls back to PATH, a
 // download (latest or pinned), an observed hash, a local golden-tool record, an optional skip or
 // continue-on-error; no finalization can pass until the qualified golden-tool manifest binds the
@@ -135,7 +135,7 @@ test('decision 8: a pending Actionlint stage must name the missing pin and its e
     const s = await scenario(t, change);
     assert.match(
       s.inspect().blockers.join('\n'),
-      /a pending Actionlint stage does not name the missing pin and its evidence \(Codex decision 8\)/,
+      /a pending Actionlint stage does not name the missing pin and its evidence \(maintainer decision 8\)/,
       label
     );
   }
@@ -171,7 +171,7 @@ test('decision 8: no reviewed pin means no maintenance (B35) pass either: a pend
 });
 
 // verify-1 of gate-draft-r3: a golden-tool record is a local file that nothing authenticates, and
-// with a well-formed one the maintenance (B35) path finalized `pass`. Codex decision 8: no
+// with a well-formed one the maintenance (B35) path finalized `pass`. Maintainer decision 8: no
 // finalization until the qualified golden-tool manifest binds the pin, and no self-authorising
 // observed hash. This module has no qualified manifest, so a consistent pin leaves an F obligation
 // (actionlint-pin) pending: its finalization is pending and the commit guard refuses it. Only a
@@ -210,7 +210,7 @@ test('decision 8: a maintenance (B35) finalization with a well-formed golden-too
   assert.equal(approval.pending.length, 1);
   assert.match(
     approval.pending[0],
-    /^F obligation actionlint-pin: the qualified golden-tool manifest .*local file that nothing here authenticates.*only F can establish the binding \(Codex decision 8; v4 C4, C7\)$/
+    /^F obligation actionlint-pin: the qualified golden-tool manifest .*local file that nothing here authenticates.*only F can establish the binding \(maintainer decision 8; v4 C4, C7\)$/
   );
   const inputs = { ...current, platform: securityRun.maintenanceInputs(current) };
   assert.throws(

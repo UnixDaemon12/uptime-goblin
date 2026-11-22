@@ -10,7 +10,7 @@ Before production: qualify clean install, rerun, upgrade, interrupted upgrade an
 
 Keep Compose loopback publish default. Docker Engine28+ or separately evidenced equivalent isolation fix is necessary for the planned private-path design, not sufficient proof: effective routing/firewall/publish configuration and actual denied LAN/direct-route access must be qualified. This packaging slice does not implement missing coordinated proxy evidence or change credential routes. Preserve existing installer refusal gates. Never silently widen bind addresses, change firewall/VLAN/security settings or overwrite operator secrets.
 
-Private source checkpoint packaging is not a release. Required Daybreak/security scans, Linux/container qualification, recovery, load/soak and independent review remain release gates. No notification/provider/credential activation is implied.
+Private source checkpoint packaging is not a release. Required security-review scans, Linux/container qualification, recovery, load/soak and independent review remain release gates. No notification/provider/credential activation is implied.
 
 
 ## Stable image policy

@@ -1926,7 +1926,7 @@ test(
   'S22 a sign-in view that offers no form looks again when the tab comes back: once plain-HTTP sessions are allowed and Uptime Goblin restarted it offers the form, or gives way to the dashboard another tab signed in',
   { skip },
   async t => {
-    // Codex's checkpoint-2 review (CLIENT-1). The view says to set GOBLIN_INSECURE_HTTP_SESSIONS=1
+    // The independent checkpoint-2 review (CLIENT-1). The view says to set GOBLIN_INSECURE_HTTP_SESSIONS=1
     // and restart Uptime Goblin, and offers no form until then. The admin did, and came back to the tab: it
     // asked Uptime Goblin nothing, so the form never came, and nothing said that only a reload would
     // bring it. The page here is at orbit.localhost, through the proxy of S21, so Uptime Goblin is

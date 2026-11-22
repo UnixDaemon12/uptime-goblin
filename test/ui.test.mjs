@@ -2846,7 +2846,7 @@ test('reopening a dialog while it is leaving keeps it open', { skip }, async () 
   assert.equal(await page.eval(isLeaving('alerts-dialog')), false);
 });
 
-// Regressions from Codex's review of f58a853: a leaving drawer must not accept a second save,
+// Regressions from an independent review of f58a853: a leaving drawer must not accept a second save,
 // and an obsolete fold must not close a card that was opened again.
 test(
   'a second click or Enter during the exit motion after a save cannot add the same source twice',
@@ -3477,7 +3477,7 @@ test('a refusal before sign-in shows Uptime Goblin’s reason and no form', { sk
   assert.equal(await page.eval("document.querySelector('#signin-form').hidden"), true);
   assert.equal(requests('GET', '/api/dashboard').length, 0);
   // The admin adds the host to GOBLIN_ALLOWED_HOSTS and restarts Uptime Goblin, as the reason says: the next
-  // look at the tab finds out and offers the form, in the same page (Codex's checkpoint-2
+  // look at the tab finds out and offers the form, in the same page (the independent checkpoint-2
   // review, CLIENT-1).
   mock.routes.delete('GET /api/session');
   await page.eval("window.__samePage = true; window.dispatchEvent(new Event('focus'))");
@@ -3677,7 +3677,7 @@ test(
   'requests that share one sign-in all learn that Uptime Goblin now refuses any sign-in from this plain-HTTP page: a dashboard load that joined draws no Sign in over the refusal',
   { skip },
   async () => {
-    // Codex's checkpoint-2 review (CLIENT-2). A poll and a Refresh both found the session gone
+    // The independent checkpoint-2 review (CLIENT-2). A poll and a Refresh both found the session gone
     // while Uptime Goblin still allowed plain-HTTP sessions, so they shared one sign-in request. Its
     // GET /api/session answered after plain-HTTP sessions were turned off (=0 and a restart):
     // Uptime Goblin now refuses any sign-in from this page. Only the request that asked first was told.
@@ -4102,7 +4102,7 @@ test(
   }
 );
 
-// B42, a residual of Codex's review of F4. A poll and a Refresh both found the session gone under
+// B42, a residual of an independent review of F4. A poll and a Refresh both found the session gone under
 // 1.5, so they shared one sign-in request. Its GET /api/session was answered by 1.4.x (Uptime Goblin was
 // rolled back meanwhile): nobody was asked, and the page said to reload. The dashboard load,
 // whether it asked first or joined, kept its own 401 from 1.5 (signin_required) and drew "Signed

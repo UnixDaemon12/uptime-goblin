@@ -1,4 +1,4 @@
-// The shared entry validator (scripts/security-entries.mjs; Codex decision 3 of 2026-10-14;
+// The shared entry validator (scripts/security-entries.mjs; maintainer decision 3 of 2026-10-14;
 // GATE-CONTRACT v4 C21 and C24, a draft that has not been reviewed): fixed trusted profiles, the
 // same profile for every producer and consumer of one artifact, unknown profile, version or field
 // failing closed, links and other types refused before anything is written, and each independent

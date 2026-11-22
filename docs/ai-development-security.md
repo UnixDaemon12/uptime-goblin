@@ -28,7 +28,7 @@ Configuration must be validated and protected by admin authorization, persist sa
 
 Before every release, run Semgrep, local SonarQube, Trivy and Clair against their appropriate inputs, plus Snyk Free within its actual entitlements. Trivy and Clair must identify the exact final application-image digest and architecture. Save scanner/database versions, coverage, findings and reviewed dispositions. A quota, missing account, unavailable server, failed scan or unsupported input is a blocker, not a clean result. Scanner disagreement requires analysis; adding their duplicate counts does not improve coverage.
 
-Invoke the pinned Netxeo skill for a fresh full candidate review before every release and reconcile every inventory item. The skill is an AI review workflow, not a standalone executable vulnerability engine. Use the skill and scanners to discover/report issues; Codex and Claude implement fixes through the normal review/test process. Do not run automatic fix commands or silently suppress findings.
+Invoke the pinned Netxeo skill for a fresh full candidate review before every release and reconcile every inventory item. The skill is an AI review workflow, not a standalone executable vulnerability engine. Use the skill and scanners to discover/report issues; the maintainers implement fixes through the normal review/test process. Do not run automatic fix commands or silently suppress findings.
 
 Current status: Trivy and Semgrep have run, and local SonarQube completed an analysis that failed its quality gate. Clair and Snyk integration and final candidate scans are pending. Missing final artifact validation still blocks `security:release` regardless of any individual scan result.
 

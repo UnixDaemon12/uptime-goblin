@@ -1,7 +1,7 @@
 // The trusted gate identity of GATE-CONTRACT v4 C1 (a draft that has not been reviewed), and the
 // one reader every consumer in this tree uses for it.
 //
-// Daybreak's review of v3 found that the eight-part identity reused version 2, the number of the
+// The security review of v3 found that the eight-part identity reused version 2, the number of the
 // seven-part form (GCV3-03). The eight-part form is version 3. Every reader here accepts only
 // version 3 with exactly its eight parts, and refuses versions 1 and 2 before it reads any other
 // part: there is no reader for an older version, no migration, no default version, no

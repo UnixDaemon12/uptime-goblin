@@ -733,7 +733,7 @@ test('a retry that a failing store held is rechecked when the fallback answers i
   }
 });
 
-// Codex's control for the adapter's own await (review of fbc6362): run() checks and resolves,
+// The independent reviewer's control for the adapter's own await (review of fbc6362): run() checks and resolves,
 // but the HTTP adapter resumes one microtask later, and a password change can land there.
 // The stored answer and a conflict must then be refused; an answer this call produced is not.
 function adapterResponse() {

@@ -18,7 +18,7 @@
 // (/proc/thread-self/schedstat) are printed beside the wall times as diagnostics only. Nothing is
 // subtracted from the wall time: time a unit spends blocked (a lock, a disk read, a synchronous
 // wait) or waiting for a core counts. A unit that blocks for 324 ms uses about 0.2 ms of CPU
-// (Codex's review of the CPU-time proposal B38, 2026-10-06), so a CPU-time gate passes it; this
+// (an independent review of the CPU-time proposal B38, 2026-10-06), so a CPU-time gate passes it; this
 // gate fails it, and the three "capacity gate" tests at the end, which run in every test run, hold
 // the gate to that.
 //
@@ -820,7 +820,7 @@ test('capacity gate: wall time decides; CPU and scheduler times never offset it'
     gate([times(30), times(UNIT_MS)], [times(40), times(UNIT_MS)], times(TOTAL_MS - 0.1)),
     []
   );
-  // Codex's probe of the CPU-time proposal: 324.7 ms blocked, counted as 0.196 ms of CPU.
+  // The independent reviewer's probe of the CPU-time proposal: 324.7 ms blocked, counted as 0.196 ms of CPU.
   assert.equal(gate([times(324.7, { cpuMs: 0.196 })]).length, 1);
   assert.equal(gate([times(300.1, { cpuMs: 300.06 })]).length, 1);
   assert.equal(gate([times(UNIT_MS + 0.1, { queuedMs: UNIT_MS, othersMs: 0 })]).length, 1);

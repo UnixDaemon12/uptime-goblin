@@ -52,7 +52,7 @@ import {
 export const manifestFile = 'test/platform-manifest.json';
 /**
  * The record family of this draft's local run record (result.json) and its version within that
- * family (Daybreak GDR4-02; Codex 014104 item 6c): a local diagnostic record, not a C12 phase
+ * family (security review GDR4-02; maintainer note 014104 item 6c): a local diagnostic record, not a C12 phase
  * record. scripts/security-finalization.mjs reads it (recordFamily, parseRunRecord).
  */
 export const LOCAL_RUN_KIND = 'orbit-gate-local-diagnostic-run';
@@ -262,9 +262,9 @@ export function testEnvironment(env, { records, run }, uid = process.getuid?.())
 // The sealed form of a records folder
 
 // The profile of a sealed records pack in the shared entry validator (scripts/security-entries.mjs;
-// Codex decision 3): packRecords, which writes a pack, and validatePack, which every reader of one
+// maintainer decision 3): packRecords, which writes a pack, and validatePack, which every reader of one
 // goes through (unpackRecords, so the finalizer and the commit guard too), name this one constant
-// and nothing a pack says. GATE-CONTRACT v4 C21 (a draft); Daybreak GD-02.
+// and nothing a pack says. GATE-CONTRACT v4 C21 (a draft); security review GD-02.
 const RECORD_PACK = entryProfile('record-pack', 1);
 /** The limits of a sealed records pack: the record-pack profile's (security-entries.mjs). */
 export const packLimits = RECORD_PACK.limits;
@@ -272,7 +272,7 @@ export const packLimits = RECORD_PACK.limits;
 export const recordPackIdentity = () => profileIdentity(RECORD_PACK);
 /**
  * Problems with a catalog's binding of the record-pack profile (its `recordPack`): it must name
- * exactly this validator's profile, its name, version and sha256 (v5 C21, C24 change 11; Codex
+ * exactly this validator's profile, its name, version and sha256 (v5 C21, C24 change 11; maintainer
  * decision 3). The sha256 covers the validator module's own bytes, so a catalog bound to another
  * validator, or a validator changed under an unchanged catalog, is refused by every producer and
  * reader of a pack.
@@ -282,7 +282,7 @@ export function recordPackBindingProblems(catalog) {
   return canonicalJson(bound) === canonicalJson(recordPackIdentity())
     ? []
     : [
-        `the catalog binds the record-pack profile ${show(bound)}, not this validator's ${show(recordPackIdentity())} (v5 C21, C24; Codex decision 3)`,
+        `the catalog binds the record-pack profile ${show(bound)}, not this validator's ${show(recordPackIdentity())} (v5 C21, C24; maintainer decision 3)`,
       ];
 }
 /** Throws unless the installed catalog binds this validator's record-pack profile. */
@@ -332,7 +332,7 @@ const decodedLength = text =>
  * start, holding no more than the profile allows: it stops at the first byte that does not fit,
  * at the first directory or file over its count, at a string longer than a path may be, and at a
  * base64 text longer than the remaining byte limit, so a huge pack is refused without being
- * parsed whole (Codex decision 3: bounded decoder memory). Strings are printable ASCII with no
+ * parsed whole (maintainer decision 3: bounded decoder memory). Strings are printable ASCII with no
  * escape, which every name the harness writes is. Returns { profile, directories, files: [{ path,
  * sha256, base64 }] }; throws on anything else, an unknown member or version included.
  */
@@ -1102,7 +1102,7 @@ export function bindRepository(root, { env = process.env, index = false } = {}) 
 
 /**
  * What the gate's stage environment (stageGitEnvironment) does with each Git environment variable
- * (gate-draft-r11, GDR10-AUTH-STAGE-01; Codex 20261019T073253967039Z item 1). Since gate-draft-r12
+ * (gate-draft-r11, GDR10-AUTH-STAGE-01; maintainer note 20261019T073253967039Z item 1). Since gate-draft-r12
  * (GDR11-AUTH-CONFIG-01) this is the one authority configuration policy: the repository binding
  * (bindRepository, so the gate's own reads, the finalizer, the commit guard, --verify-commit and the
  * reference-transaction hook) follows it too, with only its validated selectors added
@@ -1511,7 +1511,7 @@ export function platformManifestState(judged) {
 
 /**
  * The candidate identity record and its sha256 (v3 C18; the record's form is v3's proposal, and
- * COORDINATOR-DECISIONS accepts candidate identity version 1 as the starting vocabulary): the
+ * the maintainer's decisions accept candidate identity version 1 as the starting vocabulary): the
  * tree, the complete ordered parent vector, the sha256 of the canonical JSON of the candidate's
  * file manifest and the manifest path's state, as canonical JSON. Throws when a part is missing.
  */
@@ -1600,7 +1600,7 @@ export function parentAmbiguityProblems({ git, graphGit, commits }) {
 }
 
 /**
- * After a commit exists (v3 C18, and the C18 clarification in CLAUDE-RESUME.md): recomputes its
+ * After a commit exists (v3 C18, and the maintainer's C18 clarification): recomputes its
  * tree and complete ordered parent vector from its own object and compares them with the
  * `intended` { tree, parents } that were approved before it was made, exactly and in order, and
  * refuses any replace or commit-graph ambiguity. Returns the problems (none when it matches).
@@ -1704,7 +1704,7 @@ export function manifestsAt(git, names) {
  * the manifest sha256 a verified finalization of that candidate judged (security-finalization.mjs
  * finds them, and checks each commit it marks again from its object): only a commit with exactly
  * that tree and that whole parent vector, in order, is reviewed, never one that shares only the
- * tree and the first parent (Daybreak GD-01). A root commit is walked but never reviewed. More
+ * tree and the first parent (security review GD-01). A root commit is walked but never reviewed. More
  * than 100,000 commits throws.
  */
 export function readHistory(git, heads, approvals = new Map()) {
@@ -1755,7 +1755,7 @@ export function readHistory(git, heads, approvals = new Map()) {
  * The reviewed coverage dispositions file (`<git common dir>/orbit-security/coverage/<tree>.json`,
  * read by the caller as a private regular file): { schemaVersion: 2, tree, parents, dispositions },
  * bound to the candidate's tree and its complete ordered parent vector (v3 C18). Version 1, which
- * named a single parent, gives no authority (COORDINATOR-DECISIONS "C18 legacy approvals").
+ * named a single parent, gives no authority (maintainer decision "C18 legacy approvals").
  * Returns the dispositions; throws on anything else.
  */
 export function parseCoverageDispositions(bytes, binding) {
@@ -1787,7 +1787,7 @@ export function parseCoverageDispositions(bytes, binding) {
  * no disposition excuses into problems. `complete` is false while Git runs the guard for an
  * automatic merge (its other parent is not known yet) or MERGE_HEAD cannot be read; `reason` says
  * which. Then the candidate is refused, whatever its kind: its complete parent vector is not
- * known, so nothing can be approved for it (v3 C18; Daybreak GD-R1 found that the earlier
+ * known, so nothing can be approved for it (v3 C18; security review GD-R1 found that the earlier
  * maintenance exception let a two-parent commit through before its unseen parent was judged).
  * Merge with --no-commit, then run git commit. `refused` lists what makes the parents Git shows
  * ambiguous (parentAmbiguityProblems), each a problem too. `binding` is the candidate's
@@ -2080,10 +2080,10 @@ export function runtimeIdentityProblems(record, observed, releaseKeys = null) {
 }
 
 // ---------------------------------------------------------------------------------------------
-// Golden tools: Actionlint (GATE-CONTRACT v4 C4 and C7, drafts; Daybreak GD-R2; Codex decision 8)
+// Golden tools: Actionlint (GATE-CONTRACT v4 C4 and C7, drafts; security review GD-R2; maintainer decision 8)
 
 // The gate-owned Actionlint configuration, written into the evidence and named with -config-file:
-// empty, as Daybreak's control (`-config-file /dev/null`), so no candidate file can ignore a
+// empty, as the security review's control (`-config-file /dev/null`), so no candidate file can ignore a
 // finding. The candidate's own .github/actionlint.yaml and .yml are refused before anything is
 // installed as well (candidate-policy).
 export const actionlintConfig = '';
@@ -2105,7 +2105,7 @@ export const actionlintCandidateConfig = file => /^\.github\/actionlint\.ya?ml$/
 /** The file name of a golden-tool record for `tool` on `platform` and `arch` (a proposed path). */
 export const goldenToolName = (tool, platform, arch) => `${tool}-${platform}-${arch}.json`;
 
-// The golden-tool record's version: 2 binds the dependency closure the tool needs to run (Codex
+// The golden-tool record's version: 2 binds the dependency closure the tool needs to run (maintainer
 // decision 8). A version 1 record binds none, and no reader falls back to it.
 export const GOLDEN_TOOL_SCHEMA = 2;
 const GOLDEN_FIELDS = [
@@ -2133,7 +2133,7 @@ const absoluteToolPath = value =>
 export const closureSha256 = closure => sha256(canonicalJson(closure));
 
 /**
- * What a gate run must name while no qualified pin exists for `tool` (Codex decision 8; v4 C4):
+ * What a gate run must name while no qualified pin exists for `tool` (maintainer decision 8; v4 C4):
  * the tool, its reviewed version, the platform, the proposed name of the pin's golden-tool record,
  * and the evidence the pin needs before the tool can run, ending with its binding in the qualified
  * golden-tool manifest of the trusted gate export, which this draft does not have. The missing
@@ -2166,11 +2166,11 @@ export function missingToolPin({ tool, version, platform, arch }) {
  * 2, tool, platform, arch, path, version, sha256, provenance: { source, archive, archiveSha256,
  * verification }, dependencyClosure: [{ path, sha256 }…], reviewer, reference, reviewedAt }. v4 C7
  * names what the golden-tool manifest holds (exact absolute path, version, digest, package or
- * source provenance, platform), and Codex decision 8 adds the dependency closure needed to run it:
+ * source provenance, platform), and maintainer decision 8 adds the dependency closure needed to run it:
  * every file besides the binary, sorted by path, each once (an empty list states that the binary
  * needs none, which the review has to establish). The form is proposed. A record of this form is
  * only a claim: nothing here authenticates it, so it gives no authority on its own. Only the
- * qualified golden-tool manifest of the trusted gate export can bind a pin (Codex decision 8;
+ * qualified golden-tool manifest of the trusted gate export can bind a pin (maintainer decision 8;
  * v4 C4, C7), and this draft has none: the gate reads no such record and runs no Actionlint, and
  * the finalizer leaves the binding to F. Throws unless the bytes are that, for `tool` on
  * `platform`/`arch` at the reviewed `version`; a version 1 record is refused.
@@ -2180,7 +2180,7 @@ export function parseGoldenTool(bytes, { tool, platform, arch, version }) {
   const value = strictJson(bytes, where, 64 * 1024);
   if (isObject(value) && value.schemaVersion === 1)
     throw new Error(
-      `${where} is version 1, which binds no dependency closure: no reader falls back to it (Codex decision 8)`
+      `${where} is version 1, which binds no dependency closure: no reader falls back to it (maintainer decision 8)`
     );
   const problems = fields(where, value, GOLDEN_FIELDS);
   if (problems.length) throw new Error(problems.join('; '));
@@ -2508,7 +2508,7 @@ export function imageAuthenticityProblems(record, used, observed) {
 /**
  * Why the T8 image check stays pending even when its authenticity record is consistent
  * (imageAuthenticityProblems finds nothing): an authenticity record is identity and evidence, not
- * authority to run the image (Daybreak IP-01; v3 C5). Use needs a reviewed activation record
+ * authority to run the image (security review IP-01; v3 C5). Use needs a reviewed activation record
  * bound to the exact image, platform, purpose, consumer, scan disposition and runner, and none is
  * defined or reviewed yet (v3 C17 item 12). And an image ID that equals the index digest (Docker's
  * containerd image store) is not the same thing as a manifest digest: what that store reports is
@@ -2717,7 +2717,7 @@ function sealedReleaseKeys(identity, get, has) {
 }
 
 // ---------------------------------------------------------------------------------------------
-// The order of a run's stages (GATE-CONTRACT v5 C23 order rules; v5 change 19 as the coordinator
+// The order of a run's stages (GATE-CONTRACT v5 C23 order rules; v5 change 19 as the maintainer
 // confirmed it in GATE-CONTRACT-v5-change19-decision.txt, sha256 aa2d5863…)
 //
 // This draft runs phases N and O as one local run, so one record holds the stages of both. Each
@@ -2772,7 +2772,7 @@ export const imageUseStages = Object.freeze([
 
 const T8_N_STAGES = ['t8-image-identity', 't8-image-authenticity'];
 const CHANGE19 =
-  'platform-manifest ends before every candidate-controlled build starts, so that F takes the companion profiles from a judgment made before any candidate code ran on the VM (v5 C17 item 12, C23 N, change 19: a stricter changed requirement, confirmed by the coordinator decision GATE-CONTRACT-v5-change19-decision.txt)';
+  'platform-manifest ends before every candidate-controlled build starts, so that F takes the companion profiles from a judgment made before any candidate code ran on the VM (v5 C17 item 12, C23 N, change 19: a stricter changed requirement, confirmed by the maintainer decision GATE-CONTRACT-v5-change19-decision.txt)';
 const BEFORE_CANDIDATE_CODE =
   'platform-manifest ends before any stage that executes candidate code starts (sql-lint, import-lint, the npm script stages and the test stages, whose tests also build images), so that F takes the companion profiles from a judgment made before any candidate code ran on the VM (v5 C23 Rules and change 19; in v5 the end of phase N orders it, and this one-record draft has no phase boundary)';
 const POLICY_FIRST =
@@ -2783,7 +2783,7 @@ const POLICY_FIRST =
  * tests may build images, as test/installer/docker.test.mjs does (the candidate's image, and a
  * FROM scratch context), with no pre-build authority record for any of those builds. v5 C5 (changes
  * 3 and 15) makes every stage that builds an image pending and blocking until that record exists,
- * and Codex's answer 014104 item 1 settles that such builds must not start at all: the gate
+ * and the maintainer's answer 014104 item 1 settles that such builds must not start at all: the gate
  * withholds every test stage before dispatch while that authority is missing
  * (scripts/security-dispatch.mjs, `test-image-builds`), and a withheld stage is pending
  * (withheldStage). This reason is for a test stage that did run, which is possible only with an
@@ -3025,7 +3025,7 @@ export function orderProblems(record, { prefix }) {
 // record) under the same run, candidate, gate identity, catalog, platform, consumer and purpose.
 // It is a binding check, not a second authenticity claim. The exact form of its record is pending
 // (v5 C17 item 12) and no producer is qualified, so the stage is always pending and F never passes
-// on it. The form below is gate-draft-r4's proposal, for Codex: the gate writes it and F rebuilds
+// on it. The form below is gate-draft-r4's proposal, for the maintainer: the gate writes it and F rebuilds
 // it from the sealed run and requires the two to be equal.
 
 /** The sealed file of the activation's binding, and the proposal's fixed values. */
@@ -3128,7 +3128,7 @@ export function t8ActivationProblems(run, { manifest, runId, catalogSha256 }) {
   }
   if (typeof activation.binding !== 'string' || !has(activation.binding)) {
     // When t8-image-identity was withheld before dispatch (no docker image inspect while its stage
-    // policy, endpoint or operational hold is unmet; Codex 014104), there is no observation to
+    // policy, endpoint or operational hold is unmet; maintainer note 014104), there is no observation to
     // bind: a pending activation that binds nothing is then all there can be, and it stays pending.
     const identity = (Array.isArray(record?.stages) ? record.stages : []).find(
       stage => stage?.name === 't8-image-identity'
@@ -3224,7 +3224,7 @@ export function checkRunPlatform(run, { manifest, manifestSha256, runId, prefix,
   // Why this run's evidence stays pending although nothing in it is wrong, by stage.
   const pending = [];
   // A test stage withheld before dispatch ran nothing: it is pending (its reason says why), and its
-  // coverage, runtime and network evidence do not exist to be checked (GDR4-01; Codex 014104 item 1).
+  // coverage, runtime and network evidence do not exist to be checked (GDR4-01; maintainer note 014104 item 1).
   const withheld = testStages(record, prefix).filter(withheldStage);
   for (const stage of withheld) {
     pending.push({ stage: stage.name, reason: `${run.name}: ${stage.name}: ${stage.reason}` });
@@ -3351,7 +3351,7 @@ export function checkRunPlatform(run, { manifest, manifestSha256, runId, prefix,
       pending.push({ stage: stage.name, reason: `${run.name}: ${stage.name}: ${testStageBuilds}` });
   const inspection = stages.get('t8-image-identity');
   if (hostsImages(manifest, runId) && withheldStage(inspection)) {
-    // The T8 image inspect was withheld before dispatch (Codex 014104: no real docker image
+    // The T8 image inspect was withheld before dispatch (maintainer note 014104: no real docker image
     // inspect while its stage policy, endpoint or operational hold is unmet): no identity of any T8
     // image was observed, so a T8 container record of this run names an image nobody checked.
     for (const container of containerRecords)
@@ -3433,8 +3433,8 @@ export function checkRunPlatform(run, { manifest, manifestSha256, runId, prefix,
 }
 
 /**
- * What a maintenance (B35) run must record before its test stages (GDR6-REQ-01, Daybreak's review
- * of gate-draft-r6, under Codex's B35 decision of 20261017T140102522864Z): test-host and
+ * What a maintenance (B35) run must record before its test stages (GDR6-REQ-01, the security review
+ * of gate-draft-r6, under the maintainer's B35 decision of 20261017T140102522864Z): test-host and
  * runtime-identity, as every other run must. B35 decides that a candidate whose history never held
  * the manifest is judged as maintenance, by the earlier gate's stage list and its own approved
  * runtimes; it gives no permission to run a runtime nobody identified.
@@ -3442,8 +3442,8 @@ export function checkRunPlatform(run, { manifest, manifestSha256, runId, prefix,
 export const MAINTENANCE_TEST_PREREQUISITES = Object.freeze(['test-host', 'runtime-identity']);
 
 /**
- * The approved B35 maintenance execution plan (GDR7-FIN-01, Daybreak's review of gate-draft-r7,
- * under Codex's decision 1 of 20261018T051017695655Z): every stage a maintenance run may record,
+ * The approved B35 maintenance execution plan (GDR7-FIN-01, the security review of gate-draft-r7,
+ * under the maintainer's decision 1 of 20261018T051017695655Z): every stage a maintenance run may record,
  * each bound to its execution class and to when the run must record it. It is one schema for the
  * finalizer (checkRun), the commit guard (validateFinalization) and the recorded-approval reader
  * behind --verify-commit and the reference-transaction hook (recordedApproval): the earlier gate's
@@ -3570,14 +3570,14 @@ export const MAINTENANCE_STAGE_DATA = Object.freeze({
 });
 
 // The closed schema of every member a maintenance (B35) stage record may hold (GDR8-SCHEMA-01,
-// Daybreak's review of gate-draft-r8; Codex's decision 3 of hourly-0918: unknown fields fail
+// the security review of gate-draft-r8; the maintainer's decision 3: unknown fields fail
 // closed, a field a producer needs takes an explicit schema change with positive and negative
 // evidence, and no open-ended extension object is allowed). The record forms above close each
 // stage record's own members; these close what those members hold, at every depth: an object is
 // exactly its listed members, each present and of its schema (no extension bag), a list holds
 // only items of its item schema, and a scalar is of its type. So an unknown member nested
 // anywhere is refused whatever its spelling, and so is a structured value where a scalar belongs.
-// This is a PROPOSED shared producer/consumer interface (Codex's decision 3), not an accepted one:
+// This is a PROPOSED shared producer/consumer interface (the maintainer's decision 3), not an accepted one:
 // the maintenance branch's own gate must still be shown to write exactly these forms before it is
 // integrated. The forms are those scripts/security-gate.mjs writes (startStage, requirement,
 // withhold, testHost, runtimeOf, runtimeIdentity, unexecutedTests, testTotals, missingToolPin,
@@ -4172,7 +4172,7 @@ const DAY = 24 * 60 * 60 * 1000;
  * Whether the times of a run hold: `started` and `finished` UTC times, finished not before
  * started nor after `now`, and started at most 24 hours before `now` (the ceiling is inclusive,
  * as v3 C14 proposes: a run of exactly 24 hours is inside it). Then every stage's own times lie
- * inside the run's, in a main run as in a companion run (v3 C12; Daybreak GD-R3). Returns the
+ * inside the run's, in a main run as in a companion run (v3 C12; security review GD-R3). Returns the
  * problems.
  */
 export function runTimeProblems(record, now) {
@@ -4196,7 +4196,7 @@ export function runTimeProblems(record, now) {
 }
 
 /**
- * The main profile F selects itself for a candidate (v4 C2, C14; Daybreak's review of v3: F
+ * The main profile F selects itself for a candidate (v4 C2, C14; the security review of v3: F
  * chooses the mode, the profile and the catalog and compares each with what a record names): the
  * one profile of the installed catalog with reviewed N and O arrays that the candidate's judged
  * manifest declares as a full run of every test file. Its platform is F's own
@@ -4326,7 +4326,7 @@ export function checkCompanion(
     );
   // F chooses the companion profiles itself: the runs of the manifest that cover a run the
   // candidate still needs (`profiles`). A companion whose run is not one of them is not judged
-  // against any array (v4 C2, C14, C22; Daybreak's review of v3).
+  // against any array (v4 C2, C14, C22; the security review of v3).
   if (!Array.isArray(profiles) || !profiles.includes(runId))
     fail(
       `its run ${show(runId)} covers no run this candidate still needs: F selected no such companion profile (it selected ${show(profiles)})`
@@ -4488,7 +4488,7 @@ export function checkPlatformEvidence({ main, companions, current, now, catalog 
     );
   if (selected.declared !== selected.platform)
     throw new Error(
-      `The candidate's manifest declares ${selected.profile} on ${show(selected.declared)}, but F binds the profile ${selected.profile} to ${selected.platform} itself (v4 C14; Daybreak's review of v3)`
+      `The candidate's manifest declares ${selected.profile} on ${show(selected.declared)}, but F binds the profile ${selected.profile} to ${selected.platform} itself (v4 C14; the security review of v3)`
     );
   const platform = main.record.host?.platform;
   if (platform !== selected.platform)
@@ -4567,7 +4567,7 @@ export function checkPlatformEvidence({ main, companions, current, now, catalog 
       kind: judged.kind,
       manifestSha256,
       excused: judged.losses.map(loss => loss.key).sort(),
-      // The entry profile every records pack of these runs was read with (Codex decision 3: bind
+      // The entry profile every records pack of these runs was read with (maintainer decision 3: bind
       // the profile to the evidence): the reader's own, so an approval binds the validator that
       // judged its packs, and the commit guard, whose installed validator must name the same.
       recordPack: recordPackIdentity(),

@@ -543,7 +543,7 @@ export function fakeAudit({ clock = Date.now, ready: startReady = true } = {}) {
           outcome,
           at: window.end,
           // As the real one: the first actor named, the first signed-in one when they mix the
-          // admin with refusals made before anyone signed in (Codex review A5).
+          // admin with refusals made before anyone signed in (independent review A5).
           actor: anonymousActions.has(action)
             ? anonymous
             : events

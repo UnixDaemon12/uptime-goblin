@@ -599,7 +599,7 @@ test('ConfigStore#repaired: true when values were repaired at load, false otherw
 });
 
 // A repair warning reaches Uptime Goblin's log (and the audit canary's stderr): an apiUrl is never named
-// in it, as a destination with credentials already is not ("(hidden)"). Codex review A4: naming
+// in it, as a destination with credentials already is not ("(hidden)"). Independent review A4: naming
 // it without its query, fragment and user info still logged a secret in its path.
 test('apiUrl warning: an apiUrl with ?token=… is repaired with a warning that names neither address', t => {
   const directory = temporary(t);

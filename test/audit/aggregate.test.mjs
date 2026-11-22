@@ -191,7 +191,7 @@ test('400 days: continuous refusals on both anonymous actions write at most 96 r
   assert.ok(written >= 94 * days, 'a row each window, immediate and summary');
 });
 
-// Codex review A5: a password change refused before a credential signed in (none sent, an
+// Independent review A5: a password change refused before a credential signed in (none sent, an
 // ended session) is counted as nobody signed in, beside the refusals a signed-in session gets.
 // A summary names its first actor; one that mixes both names the first signed-in session (its
 // `codes` show which refusals came before sign-in), never no one: only a signed-in session can
@@ -211,7 +211,7 @@ const passwordRefusal = (actor, code, client = '192.0.2.60') => ({
   detail: { code },
 });
 
-test('Codex review A5: a summary mixing refusals of nobody signed in with those of a session names that session; each alone keeps its actor', async () => {
+test('Independent review A5: a summary mixing refusals of nobody signed in with those of a session names that session; each alone keeps its actor', async () => {
   let failing = false;
   const h = harness({ fails: (event, kind) => failing && kind === 'summary' });
   const { admin, anonymous } = a5Actors();
@@ -299,7 +299,7 @@ test('Codex review A5: a summary mixing refusals of nobody signed in with those 
 // takes the immediate row, the second puts nobody into the summary), then guessed the current
 // password from the session: no row named the session. The guesses must name it, however the
 // refusals of nobody signed in surround them, written at once or carried past a failed summary.
-test('Codex review A5: refusals before sign-in cannot wipe a guessing session from the log; two of them and four guesses still name it', async () => {
+test('Independent review A5: refusals before sign-in cannot wipe a guessing session from the log; two of them and four guesses still name it', async () => {
   let failing = false;
   const h = harness({ fails: (event, kind) => failing && kind === 'summary' });
   const { stolen, anonymous } = a5Actors();
@@ -377,9 +377,9 @@ test('Codex review A5: refusals before sign-in cannot wipe a guessing session fr
   );
 });
 
-// Codex review A5: a client nobody authenticated now reaches a third aggregated action (the
+// Independent review A5: a client nobody authenticated now reaches a third aggregated action (the
 // password change refused before sign-in), so it can make Uptime Goblin write at most 144 rows a day.
-test('Codex review A5: continuous refusals on the three actions a client nobody authenticated reaches write at most 144 rows a day', async () => {
+test('Independent review A5: continuous refusals on the three actions a client nobody authenticated reaches write at most 144 rows a day', async () => {
   const h = harness();
   const days = 7;
   const anonymous = { type: 'anonymous', id: null, name: null, via: null, sessionId: null };

@@ -1170,10 +1170,10 @@ test('refusals counted: every refused sign-in, password change and Basic request
   );
 });
 
-// Codex review A5: the password change's refusals made before its credential signed in (none
+// Independent review A5: the password change's refusals made before its credential signed in (none
 // sent, an ended session, two cookies, another site's page, a Bearer header) escaped the count
 // spec §5.2 promises: only the refusals of the signed-in part were counted.
-test('Codex review A5: password-change refusals before sign-in are counted once, as nobody signed in; the answers stay as they were', async t => {
+test('Independent review A5: password-change refusals before sign-in are counted once, as nobody signed in; the answers stay as they were', async t => {
   const s = await serveAudited(t);
   const cookie = await s.signIn();
   const pass = {

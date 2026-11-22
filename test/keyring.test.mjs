@@ -500,7 +500,7 @@ test('a key file that fails part way is removed, so no start mistakes it for a k
 // a copy), so it stayed in every copy of the data directory. Each warning now gives the line that
 // deletes the file as what it is: a copy with key remove-data-copy, an older key with --unused,
 // under Docker Compose for the Compose secret, natively with the key file Uptime Goblin reads.
-// The line ends the warning, alone: which install it is for comes before it (P3 of Codex's
+// The line ends the warning, alone: which install it is for comes before it (P3 of the independent
 // 1.5.0-dev.1 milestone review: a note after the command made the whole line fail in sh and zsh).
 const nativeLine = (args, keyFile = '/etc/uptime-goblin/secret.key') =>
   `sudo -u uptime-goblin env GOBLIN_SECRET_KEY_FILE=${keyFile} node /opt/uptime-goblin/lib/cli/goblin-admin.mjs ${args} --data-dir /var/lib/uptime-goblin`;

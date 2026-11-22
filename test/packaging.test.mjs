@@ -283,7 +283,7 @@ test('the Docker image contains every manifest file at its manifest path', () =>
   assert.ok(from.length > 0);
   for (const line of from) assert.match(line, /^FROM\s+[^\s@]+@sha256:[0-9a-f]{64}$/, line);
   // The pinned base predates Debian's libpcre2-8-0 10.42-1+deb12u2 security update, so the image
-  // installs exactly that version on top (the step of Codex's maintenance Dockerfile): a version
+  // installs exactly that version on top (the step of the maintenance Dockerfile): a version
   // Debian no longer offers fails the build instead of leaving the older one, and no package
   // lists stay in the image. Drop the step, and this check, only with a base that carries it.
   const apt = dockerfile.match(/^RUN apt-get update [\s\S]*?(?=\n[A-Z]+\s)/m)?.[0] ?? '';
@@ -398,7 +398,7 @@ function composeInstalled(t) {
   return false;
 }
 
-// The limits are written in compose.yaml itself, as in Codex's maintenance compose.yaml: Docker
+// The limits are written in compose.yaml itself, as in the maintenance compose.yaml: Docker
 // reads 0 (and a negative pids_limit) as no limit, and Compose cannot check what .env gives, so
 // an .env value (GOBLIN_PIDS_LIMIT=0, as this branch had) lifted a limit with no check at all.
 // They change only through an override file, which is what docs/installation.md describes.
@@ -1091,7 +1091,7 @@ test(
   }
 );
 
-// The two tests above as their own runner reports them (Codex's TOOLING-GIT-REQUIRED-P3): a
+// The two tests above as their own runner reports them (the maintainer's TOOLING-GIT-REQUIRED-P3): a
 // copy of the files they load runs in a nested runner, without and with TEST_REQUIRE=git, with
 // no git, a git that exits 23, one that answers --version but exits 23 to the probe, one that
 // exits 1 silently to everything or to everything but --version (exit 1 is no answer to the

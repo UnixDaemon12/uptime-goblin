@@ -368,10 +368,10 @@ test('fakeAudit.count: the login reduced to its class, one immediate row per win
   assert.equal(audit.rows[1].at, Date.UTC(2026, 9, 3, 13), "the window's end");
 });
 
-// Codex review A5 (verification): the route tests see the summaries fakeAudit writes, so its
+// Independent review A5 (verification): the route tests see the summaries fakeAudit writes, so its
 // actor must follow the real aggregator's rule: the first actor counted, the first signed-in
 // session when password changes refused before sign-in are counted beside a session's.
-test('Codex review A5: fakeAudit names the actor of an aggregated row as the real aggregator does', async () => {
+test('Independent review A5: fakeAudit names the actor of an aggregated row as the real aggregator does', async () => {
   const at = Date.UTC(2026, 9, 3, 12, 5);
   const session = sessionId => ({
     type: 'user',

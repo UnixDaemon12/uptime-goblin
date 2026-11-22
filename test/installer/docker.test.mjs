@@ -196,7 +196,7 @@ function filesIn(directory) {
 // /app, but a plain docker run would let the node account rewrite a node-owned file), and a
 // write to it is refused; /var/lib/uptime-goblin and run/ are the runtime user's and private, its files 0600,
 // and a new file there is the runtime user's and private; no package manager is left in the
-// image, and the runtime dependency still loads. As Codex's maintenance image test checks them:
+// image, and the runtime dependency still loads. As the maintenance image test checks them:
 // ownership through a link is that of what it names (stat), and only real directories are
 // walked (lstat), so a link under /app is judged by its target, not refused for being one.
 const imageOwnershipCheck = `import fs from 'node:fs';

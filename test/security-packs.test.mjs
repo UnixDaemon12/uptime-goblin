@@ -1,9 +1,9 @@
-// Sealed records packs (GATE-CONTRACT v4 C21, a draft; Daybreak GD-02; Codex decision 3): packing
+// Sealed records packs (GATE-CONTRACT v4 C21, a draft; security review GD-02; maintainer decision 3): packing
 // and unpacking, and so the finalizer and the commit guard, which read packs only through the same
 // validator (the record-pack profile of scripts/security-entries.mjs), refuse a pack over any
 // limit before anything is written. Files, directories, entries and bytes are decided limits
-// (COORDINATOR-DECISIONS "C21 pack bounds"); the depth of three segments is the starting bound
-// Daybreak's review of v3 accepted. Each limit is tried exactly at its value (accepted) and one
+// (maintainer decision "C21 pack bounds"); the depth of three segments is the starting bound
+// the security review of v3 accepted. Each limit is tried exactly at its value (accepted) and one
 // over (refused); test/security-entries.test.mjs has the shared validator's own cases. The packs
 // are synthetic; nothing here runs a test or a container.
 import test from 'node:test';
@@ -110,7 +110,7 @@ test('the pack limits are the decided ones, with the accepted starting depth', a
 
 test('GD-02: many empty directories in a small pack are refused before anything is written', async t => {
   const platform = await load();
-  // Daybreak's fixture: 8,193 valid empty directories, 204,872 bytes in the schema 1 form, which
+  // The security review's fixture: 8,193 valid empty directories, 204,872 bytes in the schema 1 form, which
   // names no entry profile and is refused for that alone now; in schema 2 it is refused by count.
   const schema1 = Buffer.from(
     `${JSON.stringify({ schemaVersion: 1, directories: Array.from({ length: 8193 }, (_, index) => container(index)).sort(), files: [] })}\n`

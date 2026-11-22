@@ -2869,10 +2869,10 @@ test('verify-audit: intact, CHANGED and not fully checked, as text and JSON, wit
   );
 });
 
-// Codex review A1: the walk started after seq 0, so a copy of an entry that someone with the
+// Independent review A1: the walk started after seq 0, so a copy of an entry that someone with the
 // database put at seq 0 or -1, with another detail and a made-up hash, read intact through the
 // command, also against the whole journal. It reads CHANGED at its own seq now, exit 1.
-test('Codex review A1: verify-audit: a row at seq 0 or below reads CHANGED at its seq (exit 1), also with --checkpoints and without the key', async t => {
+test('Independent review A1: verify-audit: a row at seq 0 or below reads CHANGED at its seq (exit 1), also with --checkpoints and without the key', async t => {
   const directory = await started(t);
   const lines = await auditRows(directory, 3);
   const env = () => ({ GOBLIN_SECRET_KEY: hexKey });

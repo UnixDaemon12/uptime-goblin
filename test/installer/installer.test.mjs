@@ -222,7 +222,7 @@ test('a failed first install says there is nothing to roll back', async t => {
 // last 50 lines of its log as the journal returns them, those lines among them, unchanged, then
 // rolls back, or says there is nothing to restore, as after any failed start. It draws no
 // conclusion from the log and recommends nothing of its own: a line there may be an earlier
-// start's, and the installer does not establish which start wrote it (Codex review F-02-R2; the
+// start's, and the installer does not establish which start wrote it (independent review F-02-R2; the
 // paragraph of its own that named GOBLIN_ALLOW_UNLIMITED is gone). The stand-in (fake-server.mjs,
 // refuse-limits) prints the arguments it was started with and a refusal for a CPU limit alone,
 // then exits 78 before it listens. The fake journalctl is a model of the journal, not journald
@@ -343,7 +343,7 @@ test('a start refused for want of a resource limit: the status, the log as the j
   await t.test(
     'a refusal of an earlier start, in the same second: in the log shown, and still no recommendation',
     async () => {
-      // An earlier start's refusal and this start's generic failure in one second (Codex reviews
+      // An earlier start's refusal and this start's generic failure in one second (independent reviews
       // F-02-R1 and F-02-R2). The fake systemctl notes every entry at one fixed, synthetic time
       // (FAKE_JOURNAL_MS), so a whole-second window holds both, and a rule that took the refusals
       // of this second for this start's would take the earlier one. The installer reads no window:
@@ -414,7 +414,7 @@ test('a start refused for want of a resource limit: the status, the log as the j
   );
 });
 
-// What a journal read can hand the installer besides this start's own lines (Codex review
+// What a journal read can hand the installer besides this start's own lines (independent review
 // F-02-R2): an earlier start's refusal that the journal stored after this start's lines; an
 // older window returned without an error, as a reader may go on from an older entry where the one
 // it looked for is gone; a read that fails after its lines; an empty read. Whatever the log seems

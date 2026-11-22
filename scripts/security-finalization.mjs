@@ -10,7 +10,7 @@
 // `pass`. The commit guard accepts only a finalization whose status is `pass` with every F
 // obligation passed, which only F can write. A candidate whose history never held the platform
 // manifest (maintenance, B35) is checked as before, with the complete parent identity and the
-// pinned Actionlint of Daybreak GD-R2, and now also with its host and runtime evidence: test-host
+// pinned Actionlint of security review GD-R2, and now also with its host and runtime evidence: test-host
 // and runtime-identity passed before its test stages, and the identity of each Node binary they
 // ran (GDR6-REQ-01; a run without them is refused), and against the approved B35 plan, which
 // binds every stage it may record to its execution class and its class's record form
@@ -26,7 +26,7 @@
 // proposed interface), and reads Git only through the runner bound to its repository
 // (bindRepository; GDR9-AUTH-ROOT-01). Its finalization here is
 // `pending` too: its pinned Actionlint counts only once the qualified golden-tool manifest binds
-// it (Codex decision 8), and a golden-tool record is a local file that nothing here
+// it (maintainer decision 8), and a golden-tool record is a local file that nothing here
 // authenticates, so that binding is an obligation only F can pass (`actionlint-pin`). So no
 // finalization this module writes is a pass.
 import fs from 'node:fs';
@@ -86,7 +86,7 @@ const fail = message => {
 // a companion run's. It is a diagnostic record of a local run, NOT a phase record of GATE-CONTRACT
 // v5 C12: it has no run nonce, controller digest, review-file digest, environment allowlists,
 // prepared inputs, grant, per-stage evidence lists or phase, and it is no authority for F. Its
-// record family is its own (Daybreak GDR4-02; Codex 014104 item 6c): `kind` names the family
+// record family is its own (security review GDR4-02; maintainer note 014104 item 6c): `kind` names the family
 // (LOCAL_RUN_KIND) and `kindVersion` its version within that family (LOCAL_RUN_KIND_VERSION, 1).
 // The vocabulary of C12's phase records (`schema`, and its number 3) belongs to the C12 network,
 // offline and platform forms only, and this family does not use it.
@@ -128,7 +128,7 @@ export function recordFamily(value) {
     );
   if (legacy)
     fail(
-      `The record names schemaVersion ${JSON.stringify(value.schemaVersion)?.slice(0, 40)}: that is the frozen gate-draft-r4 local form (schemaVersion 3), a record pack or another form, not a record of the local run family, and it is not migrated, converted or read as one (GDR4-02; Codex 014104 item 6c)`
+      `The record names schemaVersion ${JSON.stringify(value.schemaVersion)?.slice(0, 40)}: that is the frozen gate-draft-r4 local form (schemaVersion 3), a record pack or another form, not a record of the local run family, and it is not migrated, converted or read as one (GDR4-02; maintainer note 014104 item 6c)`
     );
   if (c12) {
     if (value.schema !== C12_PHASE_SCHEMA)
@@ -172,7 +172,7 @@ export function expectRecordFamily(value, family) {
   if (found.family !== family)
     fail(
       found.family === 'local-run'
-        ? `The record is an ${LOCAL_RUN_KIND} record (version ${found.version}), a local diagnostic run record: it is not a C12 phase record, and it is not read as one (GDR4-02; Codex 014104 item 6c)`
+        ? `The record is an ${LOCAL_RUN_KIND} record (version ${found.version}), a local diagnostic run record: it is not a C12 phase record, and it is not read as one (GDR4-02; maintainer note 014104 item 6c)`
         : `The record presents itself as a C12 phase record (schema ${found.schema}, phase ${found.phase}): it is not an ${LOCAL_RUN_KIND} record, and this reader reads no C12 record (GDR4-02; v5 C12)`
     );
   return found;
@@ -217,15 +217,15 @@ const RUN_MEMBERS = Object.freeze({
 });
 
 /**
- * The closed, typed forms of a run record's own `host` (GDR9-HOST-SCHEMA-01; Codex's GATE decision
+ * The closed, typed forms of a run record's own `host` (GDR9-HOST-SCHEMA-01; the maintainer's GATE decision
  * 5; part of the PROPOSED shared interface, not an accepted one): one variant for each known
  * producer form, told apart by its exact member set, never one permissive object with optional
  * members. `gate-1.5` is what the 1.5 gate writes (scripts/security-gate.mjs, the run record's
  * `host`): { platform, arch, release, node, uid }. `maintenance` is what the maintenance producer
- * writes (gate-draft-r11, GDR10-HOST-PRODUCER-01; Codex's decision 20261019T073253967039Z item 2,
+ * writes (gate-draft-r11, GDR10-HOST-PRODUCER-01; the maintainer's decision 20261019T073253967039Z item 2,
  * which replaces the earlier three-member instruction): the maintenance gate, blob
  * 40bc87be8ab9be78e538bfdaa4af27d56746f9f5 (sha256 f8fe2857…, scripts/security-gate.mjs of the
- * maintenance tree export 57b02f9d and of orbit-codex's index), writes exactly { platform, arch,
+ * maintenance tree export 57b02f9d and of the maintenance index), writes exactly { platform, arch,
  * release, node }. The three-member { node, platform, arch } that gate-draft-r10 accepted was
  * written by synthetic fixtures only and no producer, and is refused like any other member set.
  * This decides the host form only: that producer's record is still refused as a whole (no record
@@ -386,14 +386,14 @@ export function parseRunRecord(bytes, { mode = 'commit' } = {}) {
   return record;
 }
 // The finalization (approval) version: 2 binds the complete identity. Version 1 named a single
-// parent and gives no authority, even for a commit with one parent (COORDINATOR-DECISIONS "C18
+// parent and gives no authority, even for a commit with one parent (maintainer decision "C18
 // legacy approvals").
 export const APPROVAL_SCHEMA = 2;
 
 // The stages the earlier gate recorded (B35 maintenance candidates are still judged by this list:
 // the catalog of v3 C23 is for the 1.5 gate, and v3 names no maintenance profile), with, before
 // the test stages, test-host and runtime-identity (MAINTENANCE_TEST_PREREQUISITES): GDR6-REQ-01,
-// under Codex's B35 decision of 20261017T140102522864Z, requires a maintenance run to identify its
+// under the maintainer's B35 decision of 20261017T140102522864Z, requires a maintenance run to identify its
 // runtimes before its tests run, as every other run does. A run without them, as the earlier gate
 // wrote, is refused on that basis (checkRun, and maintenanceRuntimeProblems through
 // checkPlatformEvidence). The list is the `always` part of the approved B35 plan
@@ -636,19 +636,19 @@ function readRun(runDirectory) {
   return readSealedRun(runDirectory);
 }
 
-// The obligation of a passing Actionlint that only F can establish (Codex decision 8; v4 C4, C7):
+// The obligation of a passing Actionlint that only F can establish (maintainer decision 8; v4 C4, C7):
 // the qualified golden-tool manifest of the trusted gate export must bind the pin. A golden-tool
 // record sealed with a run is a local file that nothing here authenticates, and this module has
 // no qualified manifest, so whatever the record says, the binding stays pending here: verify-1 of
 // gate-draft-r3 found a maintenance (B35) finalization passing on such a record.
 export const ACTIONLINT_PIN = 'actionlint-pin';
 const actionlintPinReason =
-  'the qualified golden-tool manifest of the trusted gate export must bind the Actionlint the run ran (its exact path, version, sha256, platform, provenance and dependency closure) before any finalization; the golden-tool record sealed with the run is a local file that nothing here authenticates, and this module has no qualified manifest, so only F can establish the binding (Codex decision 8; v4 C4, C7)';
+  'the qualified golden-tool manifest of the trusted gate export must bind the Actionlint the run ran (its exact path, version, sha256, platform, provenance and dependency closure) before any finalization; the golden-tool record sealed with the run is a local file that nothing here authenticates, and this module has no qualified manifest, so only F can establish the binding (maintainer decision 8; v4 C4, C7)';
 /** The F obligations of a maintenance (B35) finalization: only the Actionlint pin's binding. */
 export const maintenanceObligations = Object.freeze([ACTIONLINT_PIN]);
 
 /**
- * Problems with the pinned Actionlint of a run (Daybreak GD-R2), for a candidate with a platform
+ * Problems with the pinned Actionlint of a run (security review GD-R2), for a candidate with a platform
  * contract and for maintenance (B35) alike: actionlint-version names the binary its sealed
  * golden-tool record pins (path, sha256 and the candidate's reviewed version, on the run's
  * platform), and a passing workflow-analysis ran exactly that binary with the gate-owned
@@ -669,7 +669,7 @@ function actionlintProblems(run, stages, identity = null) {
       return [
         'workflow-analysis passed without a pinned Actionlint (actionlint-version did not pass)',
       ];
-    // A missing reviewed pin is pending AND blocking (Codex decision 8): both stages must name
+    // A missing reviewed pin is pending AND blocking (maintainer decision 8): both stages must name
     // exactly which pin and which evidence is missing, so a vague pending is refused.
     if (version?.status === 'pending') {
       const expected = JSON.stringify(
@@ -685,7 +685,7 @@ function actionlintProblems(run, stages, identity = null) {
         (analysis?.status === 'pending' && JSON.stringify(analysis.missingPin) !== expected)
       )
         return [
-          'a pending Actionlint stage does not name the missing pin and its evidence (Codex decision 8)',
+          'a pending Actionlint stage does not name the missing pin and its evidence (maintainer decision 8)',
         ];
     }
     return [];
@@ -707,7 +707,7 @@ function actionlintProblems(run, stages, identity = null) {
       );
     if (version.tool.dependencyClosureSha256 !== closureSha256(pinned.dependencyClosure))
       throw new Error(
-        'actionlint-version did not observe the dependency closure its golden-tool record pins (Codex decision 8)'
+        'actionlint-version did not observe the dependency closure its golden-tool record pins (maintainer decision 8)'
       );
     if (identity && identity.toolPaths?.actionlint !== pinned.path)
       throw new Error(
@@ -754,7 +754,7 @@ function actionlintProblems(run, stages, identity = null) {
       closure.after !== pinnedClosure
     )
       problems.push(
-        'workflow-analysis did not show that the dependency closure it ran with was the pinned one immediately before and after it ran (Codex decision 8)'
+        'workflow-analysis did not show that the dependency closure it ran with was the pinned one immediately before and after it ran (maintainer decision 8)'
       );
   }
   return problems;
@@ -804,7 +804,7 @@ const findingExitOf = name => (name === 'source-analysis' ? 1 : 10);
  * The sealed scanner-result judgment of one scanner stage `stage` of the sealed run `run` that ran
  * its command (`log` is its sealed log's text; `earlier` the run's stages by name so far, for the
  * inspected image), shared by the finalizer (checkRun) and the recorded-approval reader
- * (recordedApproval; GDR8-AUTH-SCAN-01, Daybreak's review of gate-draft-r8): the scanner's fixed
+ * (recordedApproval; GDR8-AUTH-SCAN-01, the security review of gate-draft-r8): the scanner's fixed
  * report (findingReports) must be sealed with the run and parse as its scanner's report; Semgrep
  * must have run the pinned image with the empty-ignore adapter, and Trivy's image report must be of
  * the inspected image and invocation; the findings are derived from that report, never taken from a
@@ -884,7 +884,7 @@ function pendingStageProblem(run, stage) {
 
 /**
  * The shared stage and report reconciliation of a sealed run's scanners (GDR9-AUTH-SCAN-02;
- * Codex's GATE decision 6), used by the finalizer (checkRun) and the recorded-approval reader
+ * the maintainer's GATE decision 6), used by the finalizer (checkRun) and the recorded-approval reader
  * (sealedScannerFindings) alike, before any scanner is judged: the fixed reports (findingReports)
  * are inventoried as well as the stages. Each fixed report sealed with the run must belong to
  * exactly one scanner stage that ran: a report beside a scanner withheld or otherwise recorded as
@@ -1016,7 +1016,7 @@ function checkRun(run, current, now) {
   )
     fail('Run no longer matches the candidate tree, complete ordered parent vector or refs');
   if (JSON.stringify(files) !== JSON.stringify(current.files)) fail('Candidate files changed');
-  // A tracked .github/actionlint.yaml or .yml could silence workflow findings (Daybreak GD-R2).
+  // A tracked .github/actionlint.yaml or .yml could silence workflow findings (security review GD-R2).
   // The 1.5 gate refuses one in candidate-policy; it is refused here as well, for every candidate,
   // maintenance (B35) included, whatever gate wrote the run.
   const actionlintFile = files.find(item => actionlintCandidateConfig(item?.file ?? ''));
@@ -1024,7 +1024,7 @@ function checkRun(run, current, now) {
     fail(
       `A tracked Actionlint configuration can silence workflow findings: ${actionlintFile.file}`
     );
-  // The run's window, and every stage of it inside that window (Daybreak GD-R3: the main run's
+  // The run's window, and every stage of it inside that window (security review GD-R3: the main run's
   // stages were not checked, only a companion's).
   const times = runTimeProblems(record, now);
   if (times.length) fail(`Run times: ${times.slice(0, 3).join('; ')}`);
@@ -1180,7 +1180,7 @@ function checkRun(run, current, now) {
     fail('Invalid lint stage requirement');
   let judgedCatalog = null;
   // The Actionlint stages that passed. A pass is checked against its sealed record below, but it
-  // is never a pass here: only F can establish the qualified binding (ACTIONLINT_PIN; Codex
+  // is never a pass here: only F can establish the qualified binding (ACTIONLINT_PIN; maintainer
   // decision 8). The gate of this draft runs no Actionlint, so its runs hold neither.
   const actionlintPassed = ['actionlint-version', 'workflow-analysis'].filter(
     name => stages.get(name)?.status === 'pass'
@@ -1227,7 +1227,7 @@ function checkRun(run, current, now) {
     // must show the pinned binary and the gate-owned configuration. A run whose workflow-analysis
     // ran a bare `actionlint` from PATH, as the earlier gate's did, is refused. Even a consistent
     // pin leaves the finalization pending: the qualified binding is F's (ACTIONLINT_PIN, in
-    // inspectRun), so no maintenance finalization this module writes is a pass (Codex decision 8).
+    // inspectRun), so no maintenance finalization this module writes is a pass (maintainer decision 8).
     const pinned = actionlintProblems(run, stages);
     if (pinned.length) fail(`Actionlint: ${pinned.join('; ')}`);
   }
@@ -1443,7 +1443,7 @@ export function finalizeRun(runDirectory, reviewFile, current, now = Date.now())
         }
       : {
           // Maintenance (B35): its one F obligation, the qualified binding of its pinned
-          // Actionlint, which this module leaves pending (Codex decision 8).
+          // Actionlint, which this module leaves pending (maintainer decision 8).
           obligations: Object.fromEntries(
             Object.entries(inventory.obligations ?? {}).map(([id, item]) => [id, item.status])
           ),
@@ -1491,7 +1491,7 @@ export function validateFinalization(runDirectory, current, now = Date.now()) {
   );
   if (approval.schemaVersion !== APPROVAL_SCHEMA)
     fail(
-      'Finalization is not schema 2: an approval bound to a single parent gives no authority (COORDINATOR-DECISIONS "C18 legacy approvals")'
+      'Finalization is not schema 2: an approval bound to a single parent gives no authority (maintainer decision "C18 legacy approvals")'
     );
   if (approval.status !== 'pass')
     fail(
@@ -1566,7 +1566,7 @@ export function validateFinalization(runDirectory, current, now = Date.now()) {
       );
   } else {
     // Maintenance (B35): no catalog or gate identity binding, and exactly its F obligation, the
-    // qualified binding of its pinned Actionlint, passed (Codex decision 8). Only F can write that
+    // qualified binding of its pinned Actionlint, passed (maintainer decision 8). Only F can write that
     // pass; this module's own finalization leaves it pending. Nothing else may be pending here.
     const localPending = Object.values(inventory.obligations ?? {}).filter(
       item => item.status !== 'pass'
@@ -1584,7 +1584,7 @@ export function validateFinalization(runDirectory, current, now = Date.now()) {
       inventory.pending.length !== localPending
     )
       fail(
-        'Finalization does not match the reviewed evidence: a maintenance (B35) finalization needs its pinned Actionlint bound by the qualified golden-tool manifest, an obligation only F can pass (actionlint-pin; Codex decision 8)'
+        'Finalization does not match the reviewed evidence: a maintenance (B35) finalization needs its pinned Actionlint bound by the qualified golden-tool manifest, an obligation only F can pass (actionlint-pin; maintainer decision 8)'
       );
   }
   return approval;
@@ -1727,7 +1727,7 @@ function maintenanceCoverageProblems(run) {
  * evidence and companion runs that still verify as sealed; only a candidate whose manifest path is
  * valid has one. A finalization without one approves only a candidate whose history never held the
  * platform manifest (B35), binds no profile or platform evidence, and has exactly its one F
- * obligation passed (ACTIONLINT_PIN; Codex decision 8), and its sealed run must still meet the
+ * obligation passed (ACTIONLINT_PIN; maintainer decision 8), and its sealed run must still meet the
  * current B35 rules that do not depend on the moment: the approved plan with its record forms and
  * their closed nested schemas (GDR8-SCHEMA-01), the stages it requires always, of the run's Node
  * and of the commit's lint requirement, and the host and runtime evidence validateFinalization
@@ -1773,7 +1773,7 @@ export function recordedApproval(runDirectory, { lintStages } = {}) {
   const { record } = run;
   if (!isRecord(approval) || approval.schemaVersion !== APPROVAL_SCHEMA)
     fail(
-      'Finalization is not schema 2: an approval bound to a single parent gives no authority (COORDINATOR-DECISIONS "C18 legacy approvals")'
+      'Finalization is not schema 2: an approval bound to a single parent gives no authority (maintainer decision "C18 legacy approvals")'
     );
   if (approval.status !== 'pass' || approval.mode !== 'commit' || approval.pending !== undefined)
     fail(`Finalization is ${JSON.stringify(approval.status)}, not a commit pass`);
@@ -1837,10 +1837,10 @@ export function recordedApproval(runDirectory, { lintStages } = {}) {
       review.platformSha256 !== undefined
     )
       fail(
-        'A finalization without a catalog binding approves only a candidate whose history never held the platform manifest (B35), binds no platform evidence, and has exactly its one F obligation passed: the qualified binding of its pinned Actionlint (actionlint-pin; Codex decision 8)'
+        'A finalization without a catalog binding approves only a candidate whose history never held the platform manifest (B35), binds no platform evidence, and has exactly its one F obligation passed: the qualified binding of its pinned Actionlint (actionlint-pin; maintainer decision 8)'
       );
     // The current B35 rules, applied again now that this approval would give authority to a new
-    // commit or reference update (GDR7-AUTH-01; Codex decision 2 of 20261018T051017695655Z): the
+    // commit or reference update (GDR7-AUTH-01; maintainer decision 2 of 20261018T051017695655Z): the
     // same moment-independent checks of the approved plan and of the host and runtime evidence
     // that validateFinalization applies (maintenanceEvidenceProblems). An approval recorded under
     // earlier rules, of a run they refuse (a legacy run without test-host or runtime-identity, an
@@ -1900,13 +1900,13 @@ export function recordedApproval(runDirectory, { lintStages } = {}) {
     )
       fail('Finalization does not match the reviewed platform evidence');
     // The record-pack entry profile its packs were read with must be this reader's own, and the
-    // one the installed catalog binds (Codex decision 3; v5 C21, C24).
+    // one the installed catalog binds (maintainer decision 3; v5 C21, C24).
     if (
       canonicalJson(approval.platform.recordPack ?? null) !== canonicalJson(recordPackIdentity()) ||
       recordPackBindingProblems(installed.catalog).length
     )
       fail(
-        'Finalization binds another record-pack entry profile than the installed validator and catalog (Codex decision 3; v5 C21, C24)'
+        'Finalization binds another record-pack entry profile than the installed validator and catalog (maintainer decision 3; v5 C21, C24)'
       );
     for (const item of approval.platform.companions) {
       if (!companionName.test(item?.directory ?? '') || !digest.test(item?.runSha256 ?? ''))

@@ -1,7 +1,7 @@
-// gate-draft-r5: the local run record's own family (Daybreak GDR4-02, P2; a new defect fixed).
+// gate-draft-r5: the local run record's own family (security review GDR4-02, P2; a new defect fixed).
 //
 // gate-draft-r4's local one-run result named `schemaVersion: 3` and its documents described reading
-// it as GATE-CONTRACT v5 C12's phase-record schema 3, a different and much larger form. Codex's
+// it as GATE-CONTRACT v5 C12's phase-record schema 3, a different and much larger form. The maintainer's
 // answer 014104 item 6c: the local result is not a C12 phase record; if it stays, it gets an
 // explicit record kind of its own, checked before its fields, with its version in that family.
 // Since gate-draft-r5 it is `kind: "orbit-gate-local-diagnostic-run"`, `kindVersion: 1`, and C12's

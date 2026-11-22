@@ -426,7 +426,7 @@ test(
   }
 );
 
-// The test above as its own runner reports it (the update side of Codex's
+// The test above as its own runner reports it (the update side of the maintainer's
 // TOOLING-GIT-REQUIRED-P3): a copy of the shipped files and of this file runs it in a nested
 // runner (with TEST_REQUIRE=browser, so that it cannot skip for want of Chrome), without and with
 // git in TEST_REQUIRE, with no git, a git that exits 23, one that answers --version but exits 23

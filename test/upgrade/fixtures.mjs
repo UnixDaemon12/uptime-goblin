@@ -208,7 +208,7 @@ export const tagProvenanceFile = '.orbit-tag.json';
 // tag does is the caller's: skipWithoutTag() skips, or fails under TEST_REQUIRE=history, and so
 // do the export tests (export-tag.test.mjs) and the 1.4.2 fixture tests; the notification policy
 // test leaves its 1.4.3 check out. Anything else is a broken Git or a repository Git cannot read, and throws with what
-// Git did, so every caller fails whatever TEST_REQUIRE says (Codex's TOOLING-GIT-REQUIRED-P3).
+// Git did, so every caller fails whatever TEST_REQUIRE says (the maintainer's TOOLING-GIT-REQUIRED-P3).
 // test/helpers/git.mjs decides the same way for the tests that declare Git; this module keeps its
 // own code because tests copy test/upgrade/ without test/helpers/.
 

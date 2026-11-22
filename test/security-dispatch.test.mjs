@@ -1,24 +1,24 @@
 // gate-draft-r5: what the gate may dispatch, decided before it dispatches it.
 //
-// - GDR4-01 (Daybreak's review of gate-draft-r4, P1; a new defect fixed): candidate-policy and
+// - GDR4-01 (the security review of gate-draft-r4, P1; a new defect fixed): candidate-policy and
 //   platform-manifest were recorded, and the gate went on to run candidate code whatever their
 //   status. Now one pre-dispatch barrier (scripts/security-dispatch.mjs) withholds every
 //   candidate-controlled command and dependencies-install unless both completed in this run with
 //   status pass, and a platform-manifest that did not pass also stops every candidate-controlled
 //   build.
-// - The carried blockers Codex's answers 20261016T014104832374Z settle: the test stages (whose
+// - The carried blockers the maintainer's answers 20261016T014104832374Z settle: the test stages (whose
 //   tests build images), the scan's image build, the Semgrep image's inspect and run, the T8 image
 //   inspect and docker version need an authority that no producer gives in this draft
 //   (scripts/security-authority.mjs), so each is withheld, recorded pending with why; the five
 //   host-listener stages never fall back to direct registry access.
-// - gate-draft-r6, GD5-CARRY-01 (Daybreak's review of gate-draft-r5; a disclosed carried
+// - gate-draft-r6, GD5-CARRY-01 (the security review of gate-draft-r5; a disclosed carried
 //   integration obligation now enforced, not a new r5 regression): test-host and runtime-identity
 //   were recorded before the test stages but were no dispatch condition, so given an authority a
 //   test stage started while either was blocked. Each of the four test-stage rules now needs both
 //   (runtime-identity where the run records it) recorded once in this run, passed, ended by the
-//   decision and applying to the stage (Codex 20261017T061149194320Z decision 3).
-// - gate-draft-r7, GDR6-REQ-01 (Daybreak's review of gate-draft-r6; a required correction under
-//   Codex's explicit B35 clarification of 20261017T140102522864Z, not a newly introduced r6
+//   decision and applying to the stage (maintainer note 20261017T061149194320Z decision 3).
+// - gate-draft-r7, GDR6-REQ-01 (the security review of gate-draft-r6; a required correction under
+//   the maintainer's explicit B35 clarification of 20261017T140102522864Z, not a newly introduced r6
 //   regression): gate-draft-r6 let a maintenance (B35) run start its test stages with test-host
 //   alone, recording no runtime-identity. A maintenance run now identifies its own approved
 //   runtimes and is held to both prerequisites like every run; the two tests that pinned the
@@ -216,7 +216,7 @@ test('GDR4-01: the pre-dispatch barrier opens only when candidate-policy and pla
 });
 
 // ---------------------------------------------------------------------------------------------
-// Dispatch authority (Codex 014104)
+// Dispatch authority (maintainer note 014104)
 
 const syntheticGrant = purpose => ({
   purpose,
@@ -542,7 +542,7 @@ test('GDR4-01: through the dispatch point, a pending, blocked, failed, absent, t
   );
 });
 
-test('Codex 014104: through the dispatch point, a missing or malformed authority starts no Docker, registry or image-building command; a given one starts each exactly once', t => {
+test('Maintainer note 014104: through the dispatch point, a missing or malformed authority starts no Docker, registry or image-building command; a given one starts each exactly once', t => {
   const { calls, through } = refusingStandIn(t);
   const barrier = barrierOf(both());
   // Valid test-host and runtime-identity records throughout, as in the test above.
@@ -574,7 +574,7 @@ test('Codex 014104: through the dispatch point, a missing or malformed authority
 });
 
 // ---------------------------------------------------------------------------------------------
-// The test stages' own prerequisites: test-host and runtime-identity (GD5-CARRY-01; v5 C3; Codex
+// The test stages' own prerequisites: test-host and runtime-identity (GD5-CARRY-01; v5 C3; maintainer note
 // 20261017T061149194320Z decision 3). A disclosed carried integration obligation of
 // gate-draft-r5, enforced here; not a newly introduced r5 regression.
 
@@ -815,7 +815,7 @@ test('GD5-CARRY-01: each test-stage rule needs test-host and runtime-identity, e
   );
 });
 
-// The pure probe of Daybreak's review, inverted: with an open barrier, a synthetic authority and
+// The pure probe of the security review, inverted: with an open barrier, a synthetic authority and
 // installed dependencies, gate-draft-r5 returned dispatch: true for all four test-stage rules while
 // test-host and runtime-identity were blocked. Each returns dispatch: false now.
 test('GD5-CARRY-01, the pure rule: blocked test-host or runtime-identity records give dispatch false for all four test-stage rules, with every other input passing', () => {
@@ -859,8 +859,8 @@ test('GD5-CARRY-01, the pure rule: blocked test-host or runtime-identity records
     assert.equal(dispatch.dispatchDecision(stage, state(testRunOf())).dispatch, true, stage);
 });
 
-// gate-draft-r7, GDR6-REQ-01 (Daybreak's review of gate-draft-r6; a required correction under
-// Codex's explicit B35 clarification of 20261017T140102522864Z, not a newly introduced r6
+// gate-draft-r7, GDR6-REQ-01 (the security review of gate-draft-r6; a required correction under
+// the maintainer's explicit B35 clarification of 20261017T140102522864Z, not a newly introduced r6
 // regression): gate-draft-r6 let a maintenance (B35) run, which it marked `contract: false`, start
 // all four test-stage rules with test-host alone when no runtime-identity was recorded, even with
 // no runtime identified (`runtime: null`). B35 decides which candidates are maintenance
@@ -885,7 +885,7 @@ test('GDR6-REQ-01: a maintenance (B35) run needs test-host and runtime-identity 
     for (const [marked, marking] of markings) {
       const of = (stages, overrides = {}) =>
         dispatch.dispatchDecision(stage, state(testRunOf(stages, { ...marking, ...overrides })));
-      // Daybreak's counterexample: test-host passed, no runtime-identity, with the stage's runtime
+      // The security review's counterexample: test-host passed, no runtime-identity, with the stage's runtime
       // identified or not. gate-draft-r6 dispatched both in a run marked contract: false.
       for (const runtime of [stageRuntime, null]) {
         const decision = of([...both(), hostPassed()], { runtime });
@@ -1542,7 +1542,7 @@ test(
 );
 
 test(
-  'Codex 014104: with both prerequisites passed and no authority, the lints run once each and nothing else candidate-controlled, Docker, registry or download is dispatched; every withheld stage says why',
+  'Maintainer note 014104: with both prerequisites passed and no authority, the lints run once each and nothing else candidate-controlled, Docker, registry or download is dispatched; every withheld stage says why',
   { timeout: 120000 },
   async t => {
     if (gitSkip) return t.skip(gitSkip);
@@ -1727,7 +1727,7 @@ const platformTests = ['platform-tests-current-runtime', 'platform-tests-minimum
 const prerequisiteReason =
   'test-host and runtime-identity must each pass in this run and apply to this test stage before it starts \\(v5 C3; GD5-CARRY-01; [^)]*\\): ';
 
-// Daybreak's counterexample (GD5-CARRY-01): with a synthetic authority, gate-draft-r5's positive
+// The security review's counterexample (GD5-CARRY-01): with a synthetic authority, gate-draft-r5's positive
 // control dispatched full-tests-current-runtime, ran the candidate's test and reached its nested
 // client and the loopback endpoint, while runtime-identity was blocked for want of an identity
 // record. The same fixture now dispatches no test stage, in a commit run and in a companion run.
@@ -1767,7 +1767,7 @@ test(
   }
 );
 
-// Codex's decision 3: the real matrix stays Node 24 and 26. A gate started on Node 24 runs Node 24
+// The maintainer's decision 3: the real matrix stays Node 24 and 26. A gate started on Node 24 runs Node 24
 // in both test stages, and one started on Node 26 without its Node 24 runtime runs only Node 26:
 // either way the run lacks a runtime its manifest requires, runtime-identity blocks, and no test
 // stage is dispatched, although every runtime it does run has its identity record.
@@ -1824,7 +1824,7 @@ const identityTwice = [
 ];
 
 // Each non-pass shape the gate's own recorder can give, made in the fixture's throwaway copy of the
-// gate (as Daybreak's probe made test-host blocked): a blocked, pending, absent or twice-recorded
+// gate (as the security review's probe made test-host blocked): a blocked, pending, absent or twice-recorded
 // test-host, and a pending, absent or twice-recorded runtime-identity. Everything else passes (a
 // valid host and runtime combination), so each is the one reason no test stage is dispatched. The
 // malformed and stale shapes, which the gate's recorder cannot write, are the pure and
@@ -2186,7 +2186,7 @@ test(
 );
 
 test(
-  'Codex 014104 item 2: the scan builds nothing and pulls nothing without authority; with it, it builds once without --pull, inspects, scans and removes that image once',
+  'Maintainer note 014104 item 2: the scan builds nothing and pulls nothing without authority; with it, it builds once without --pull, inspects, scans and removes that image once',
   { timeout: 120000 },
   async t => {
     if (gitSkip) return t.skip(gitSkip);
@@ -2807,7 +2807,7 @@ test('GDR8-AUTH-SCAN-01, GDR8-SCHEMA-01 and GDR8-AUTH-LINT-01: the documents des
     [
       'CHANGELOG.md',
       changelog,
-      "The gate draft's ninth round, for Daybreak's review of the eighth (GDR8-AUTH-SCAN-01, GDR8-SCHEMA-01, GDR8-AUTH-LINT-01)",
+      "The gate draft's ninth round, for the security review of the eighth (GDR8-AUTH-SCAN-01, GDR8-SCHEMA-01, GDR8-AUTH-LINT-01)",
     ],
     [
       'CHANGELOG.md',
@@ -2832,7 +2832,7 @@ test('GDR8-AUTH-SCAN-01, GDR8-SCHEMA-01 and GDR8-AUTH-LINT-01: the documents des
     [
       'docs/engineering-quality.md',
       quality,
-      "Since the ninth round (2026-10-18, Daybreak's GDR8-AUTH-SCAN-01, GDR8-SCHEMA-01 and GDR8-AUTH-LINT-01 on the eighth round",
+      "Since the ninth round (2026-10-18, the security review's GDR8-AUTH-SCAN-01, GDR8-SCHEMA-01 and GDR8-AUTH-LINT-01 on the eighth round",
     ],
     [
       'docs/engineering-quality.md',
@@ -2953,7 +2953,7 @@ test('GDR9-AUTH-ROOT-01, GDR9-AUTH-OBJECT-01, GDR9-AUTH-SCAN-02 and GDR9-HOST-SC
     [
       'CHANGELOG.md',
       changelog,
-      "The gate draft's tenth round, for Daybreak's review of the ninth (GDR9-AUTH-ROOT-01, GDR9-AUTH-OBJECT-01, GDR9-AUTH-SCAN-02, GDR9-HOST-SCHEMA-01)",
+      "The gate draft's tenth round, for the security review of the ninth (GDR9-AUTH-ROOT-01, GDR9-AUTH-OBJECT-01, GDR9-AUTH-SCAN-02, GDR9-HOST-SCHEMA-01)",
     ],
     ['CHANGELOG.md', changelog, 'now goes through one runner bound to the repository at its root'],
     [
@@ -2964,7 +2964,7 @@ test('GDR9-AUTH-ROOT-01, GDR9-AUTH-OBJECT-01, GDR9-AUTH-SCAN-02 and GDR9-HOST-SC
     [
       'CHANGELOG.md',
       changelog,
-      "The ninth round's own notes said that a commit whose `package.json` object is missing can only be refused; that was wrong, as Daybreak showed, and is corrected here.",
+      "The ninth round's own notes said that a commit whose `package.json` object is missing can only be refused; that was wrong, as the security review showed, and is corrected here.",
     ],
     ['CHANGELOG.md', changelog, 'this is a refusal path, not support for a first commit'],
     [
@@ -2980,7 +2980,7 @@ test('GDR9-AUTH-ROOT-01, GDR9-AUTH-OBJECT-01, GDR9-AUTH-SCAN-02 and GDR9-HOST-SC
     [
       'docs/engineering-quality.md',
       quality,
-      "Since the tenth round (2026-10-18, Daybreak's GDR9-AUTH-ROOT-01, GDR9-AUTH-OBJECT-01, GDR9-AUTH-SCAN-02 and GDR9-HOST-SCHEMA-01 on the ninth round",
+      "Since the tenth round (2026-10-18, the security review's GDR9-AUTH-ROOT-01, GDR9-AUTH-OBJECT-01, GDR9-AUTH-SCAN-02 and GDR9-HOST-SCHEMA-01 on the ninth round",
     ],
     [
       'docs/engineering-quality.md',
@@ -3095,7 +3095,7 @@ test('GDR9-AUTH-OBJECT-01, round 2 (check-1 claim): the documents scope the no-l
       assert.ok(!text.includes(claim), `${file} claims more than the code does: ${claim}`);
 });
 
-// gate-draft-r11 (the maintainer's rule that docs and changelogs stay current; Codex 20261019T083721636234Z):
+// gate-draft-r11 (the maintainer's rule that docs and changelogs stay current; maintainer note 20261019T083721636234Z):
 // the documents describe the eleventh round as it is, no more. The alternates file is read as Git
 // reads it (GDR10-ALT-PARSE-01); every stage gets one environment with no Git selector, no injected
 // configuration and no lazy fetch, the snapshot steps bound to the snapshot and the history scan to
@@ -3109,7 +3109,7 @@ test('GDR10-ALT-PARSE-01, GDR10-AUTH-STAGE-01 and GDR10-HOST-PRODUCER-01: the do
     [
       'CHANGELOG.md',
       changelog,
-      "The gate draft's eleventh round, for Daybreak's review of the tenth (GDR10-ALT-PARSE-01, GDR10-AUTH-STAGE-01, GDR10-HOST-PRODUCER-01) and Codex's assignment of 2026-10-19 (engineering; a draft, not reviewed, never run as a full gate; no approval can come from it yet).",
+      "The gate draft's eleventh round, for the security review of the tenth (GDR10-ALT-PARSE-01, GDR10-AUTH-STAGE-01, GDR10-HOST-PRODUCER-01) and the maintainer's assignment of 2026-10-19 (engineering; a draft, not reviewed, never run as a full gate; no approval can come from it yet).",
     ],
     [
       'CHANGELOG.md',
@@ -3135,7 +3135,7 @@ test('GDR10-ALT-PARSE-01, GDR10-AUTH-STAGE-01 and GDR10-HOST-PRODUCER-01: the do
     [
       'docs/engineering-quality.md',
       quality,
-      "Since the eleventh round (2026-10-19, Daybreak's GDR10-ALT-PARSE-01, GDR10-AUTH-STAGE-01 and GDR10-HOST-PRODUCER-01 on the tenth round",
+      "Since the eleventh round (2026-10-19, the security review's GDR10-ALT-PARSE-01, GDR10-AUTH-STAGE-01 and GDR10-HOST-PRODUCER-01 on the tenth round",
     ],
     [
       'docs/engineering-quality.md',
@@ -3155,7 +3155,7 @@ test('GDR10-ALT-PARSE-01, GDR10-AUTH-STAGE-01 and GDR10-HOST-PRODUCER-01: the do
     [
       'docs/engineering-quality.md',
       quality,
-      "The eleventh (2026-10-19) follows Daybreak's review of the tenth (REVISE BEFORE INTEGRATION, which closes GDR9-AUTH-SCAN-02",
+      'The eleventh (2026-10-19) follows the security review of the tenth (REVISE BEFORE INTEGRATION, which closes GDR9-AUTH-SCAN-02',
     ],
   ])
     assert.ok(text.includes(current), `${file} does not say: ${current}`);
@@ -3286,7 +3286,7 @@ test('GDR10-AUTH-STAGE-01, round 2: the documents describe the corrective round 
       assert.ok(!text.includes(claim), `${file} claims more than the code does: ${claim}`);
 });
 
-// gate-draft-r12 (Daybreak's GDR11-AUTH-CONFIG-01 and GDR11-HISTORY-ATTRS-01; the maintainer's rule that docs
+// gate-draft-r12 (the security review's GDR11-AUTH-CONFIG-01 and GDR11-HISTORY-ATTRS-01; the maintainer's rule that docs
 // and changelogs stay current): the documents describe the twelfth round as it is, no more. The
 // gate's own reads and every authority read follow the stages' configuration policy, the history
 // scan's Git command is independent of attributes and configuration, the metadata scan reads raw
@@ -3301,7 +3301,7 @@ test('GDR11-AUTH-CONFIG-01 and GDR11-HISTORY-ATTRS-01: the documents describe th
     [
       'CHANGELOG.md',
       changelog,
-      "The gate draft's twelfth round, for Daybreak's review of the eleventh (GDR11-AUTH-CONFIG-01, GDR11-HISTORY-ATTRS-01) and Codex's assignment of 2026-10-21 (engineering; a draft, not reviewed, never run as a full gate; no approval can come from it yet).",
+      "The gate draft's twelfth round, for the security review of the eleventh (GDR11-AUTH-CONFIG-01, GDR11-HISTORY-ATTRS-01) and the maintainer's assignment of 2026-10-21 (engineering; a draft, not reviewed, never run as a full gate; no approval can come from it yet).",
     ],
     [
       'CHANGELOG.md',
@@ -3333,7 +3333,7 @@ test('GDR11-AUTH-CONFIG-01 and GDR11-HISTORY-ATTRS-01: the documents describe th
     [
       'docs/engineering-quality.md',
       quality,
-      "Since the twelfth round (2026-10-21, Daybreak's GDR11-AUTH-CONFIG-01 and GDR11-HISTORY-ATTRS-01 on the eleventh round, under Codex's assignment of 2026-10-21)",
+      "Since the twelfth round (2026-10-21, the security review's GDR11-AUTH-CONFIG-01 and GDR11-HISTORY-ATTRS-01 on the eleventh round, under the maintainer's assignment of 2026-10-21)",
     ],
     [
       'docs/engineering-quality.md',
@@ -3343,7 +3343,7 @@ test('GDR11-AUTH-CONFIG-01 and GDR11-HISTORY-ATTRS-01: the documents describe th
     [
       'docs/engineering-quality.md',
       quality,
-      "The twelfth (2026-10-21) follows Daybreak's review of the eleventh (REVISE BEFORE INTEGRATION",
+      'The twelfth (2026-10-21) follows the security review of the eleventh (REVISE BEFORE INTEGRATION',
     ],
     [
       'docs/engineering-quality.md',

@@ -104,7 +104,7 @@ The gate tooling and these policy documents were ported into the 1.5 tree (candi
 
 | Document | 1.5 status after the port |
 |---|---|
-| `AGENTS.md`, `SECURITY.md` | **Updated.** The 1.5 copies were byte-identical to the maintenance baseline, so the maintenance revisions apply: the engineering-policy references and, in `AGENTS.md`, the portable collaboration path and current assignments (confirm assignments in the room). `SECURITY.md` is unchanged from that revision; `AGENTS.md` differs in one command, the gate entry point `node scripts/security-gate.mjs commit` (started with node, not through npm). |
+| `AGENTS.md`, `SECURITY.md` | **Updated.** The 1.5 copies were byte-identical to the maintenance baseline, so the maintenance revisions apply: the engineering-policy references and, in `AGENTS.md`, the portable collaboration path and current assignments (confirm assignments with the maintainer). `SECURITY.md` is unchanged from that revision; `AGENTS.md` differs in one command, the gate entry point `node scripts/security-gate.mjs commit` (started with node, not through npm). |
 | `CONTRIBUTING.md` | **Updated** by a manual merge: the policy, commit and release gate sections are added, and 1.5's SQL/import lint and `TEST_REQUIRE=browser,fixtures,systemd,docker,capacity,git` instructions are kept. The commit and release commands start the gate with `node scripts/security-gate.mjs`, not through npm. Shell blocks carry no `#` comments. |
 | `CHANGELOG.md` | **Updated:** the 1.5 section records the port and its remaining gaps. |
 | `ORBIT-HANDOFF.md` | **Updated** with a section on the port. It is still the dated internal handoff with local paths and earlier state; finding 6 applies to the 1.5 copy, which needs publication review. |

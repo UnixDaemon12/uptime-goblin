@@ -1966,7 +1966,7 @@ systemctl --no-pager --full status uptime-goblin.service >&2 || true
 journalctl --unit=uptime-goblin.service --lines=50 --no-pager >&2 || true
 # The status and the log are shown as they are, for the operator to read. The installer does not
 # establish which start wrote a log line (an earlier start's lines can be among them), so it draws
-# no diagnosis from them and recommends no setting (Codex disposition of review F-02-R2). A start
+# no diagnosis from them and recommends no setting (maintainer disposition of review F-02-R2). A start
 # refused for want of a resource limit says why in its own lines, and Resource limits in
 # docs/installation.md says what to do.
 # A migrated host gets the Orbit layout back, as it was (goblin_migration reverse): with no

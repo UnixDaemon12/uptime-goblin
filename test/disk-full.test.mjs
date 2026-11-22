@@ -1561,7 +1561,7 @@ test('T8 helpers: the driver refuses a run inside whose Node is not the runtime 
   assert.deepEqual(t8InnerProblems(inside(null), code), []);
 });
 
-// Codex (2026-10-11, item 6): before any filler operation, the bounded file system, the
+// The maintainer (2026-10-11, item 6): before any filler operation, the bounded file system, the
 // dedicated empty folder, a user other than root and the driver's code are checked, and a setup
 // that fails creates no filler file. Here the system is a stand-in whose open() and write() only
 // record their calls, so nothing is ever written, whatever the checks say.

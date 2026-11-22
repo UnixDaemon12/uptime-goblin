@@ -1,5 +1,5 @@
 // gate-draft-r4: GDR3-01 and the alignment with GATE-CONTRACT v5 round 2 (sha256 d0398079…, which
-// Daybreak accepted as the design baseline for this draft) and the coordinator decision that
+// the security review accepted as the design baseline for this draft) and the maintainer decision that
 // confirmed its change 19 (GATE-CONTRACT-v5-change19-decision.txt, sha256 aa2d5863…).
 //
 // - GDR3-01, a new defect fixed: t8-image-identity must end before t8-image-authenticity starts,
@@ -11,7 +11,7 @@
 //   build starting while its pre-build authority is pending, and the T8 and build stages never a
 //   pass.
 // - gate-draft-r4 read the local run record as "schema 3" and called that C12 alignment; it is
-//   not (Daybreak GDR4-02): since gate-draft-r5 the record is read only as its own local family
+//   not (security review GDR4-02): since gate-draft-r5 the record is read only as its own local family
 //   (kind and kindVersion 1), a diagnostic record and no C12 phase record, with the record pack's
 //   own format a separate series (test 11; test/security-record-family.test.mjs).
 //
@@ -252,7 +252,7 @@ test('a partial migration is refused: v4 arrays, a v4 placement, another contrac
     [
       'no change-19 decision',
       changed(v => (v.contract.decision = { document: 'none', sha256: '0'.repeat(64) })),
-      /another decision than the coordinator's confirmation of v5 change 19/,
+      /another decision than the maintainer's confirmation of v5 change 19/,
     ],
     [
       'catalog version 1',
@@ -335,7 +335,7 @@ test('GDR3-01: t8-image-authenticity may not start before t8-image-identity ends
   const check = stages => platform.t8OrderProblems(windowed(stages), 'full-tests-');
   const gdr =
     /t8-image-identity must end before t8-image-authenticity starts: .*inclusive.*GDR3-01/;
-  // Daybreak's counterexample: identity 2-5 s, authenticity 3-4 s, sql-lint at 6 s. r3 returned
+  // The security review's counterexample: identity 2-5 s, authenticity 3-4 s, sql-lint at 6 s. r3 returned
   // no problem; it is refused, although the record lists identity first and no candidate code
   // starts before both end.
   assert.match(
@@ -513,7 +513,7 @@ test('GDR3-01 through the finalizer: an overlapping or reversed T8 identity and 
 test('v5 change 19: platform-manifest ends before container-build, systemd-test-image or any other candidate-controlled build starts', async t => {
   const { platform } = await load();
   const rule =
-    /platform-manifest must end before (container-build|systemd-test-image) starts: .*change 19.*confirmed by the coordinator decision/;
+    /platform-manifest must end before (container-build|systemd-test-image) starts: .*change 19.*confirmed by the maintainer decision/;
   const check = stages => platform.orderProblems(windowed(stages), { prefix: 'full-tests-' });
   for (const build of platform.candidateBuildStages) {
     assert.deepEqual(
@@ -1043,7 +1043,7 @@ test('the local run record is read only as its own family (kind, kindVersion 1):
 });
 
 // ---------------------------------------------------------------------------------------------
-// What stays pending (Daybreak's gate-draft-r3 integration obligations)
+// What stays pending (the security review's gate-draft-r3 integration obligations)
 
 test('what stays pending is named, and nothing pending becomes a pass', async t => {
   const { catalog, finalization } = await load();

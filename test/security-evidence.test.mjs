@@ -232,7 +232,7 @@ test('independent review is bound to the exact tree and complete parent vector a
       JSON.stringify(changed)
     );
   // A review naming a single parent is the earlier form: no authority, even for one parent
-  // (COORDINATOR-DECISIONS "C18 legacy approvals").
+  // (maintainer decision "C18 legacy approvals").
   assert.throws(
     () =>
       checkReview(
@@ -425,7 +425,7 @@ else if (args[0] === 'version' || args[0] === '--version') console.log('syntheti
     const evidence = JSON.parse(
       fs.readFileSync(path.join(evidenceRoot, run, 'result.json'), 'utf8')
     );
-    // final-artifacts is an F release obligation (GATE-CONTRACT v4 C14, C23; Daybreak's review of
+    // final-artifacts is an F release obligation (GATE-CONTRACT v4 C14, C23; the security review of
     // v3), not a stage of a run: the run records it, with the other release-only obligations, as
     // pending, because release finalization does not exist. So the run is pending, exit 1.
     assert.equal(evidence.status, 'pending');
@@ -1014,7 +1014,7 @@ test(
 
     // An automatic merge runs the guard as pre-merge-commit, before Git writes MERGE_HEAD. The
     // guard cannot see the commit it joins, so its complete parent vector is not known and the
-    // merge is refused, whatever the record (GATE-CONTRACT v3 C18; Daybreak GD-R1).
+    // merge is refused, whatever the record (GATE-CONTRACT v3 C18; security review GD-R1).
     const side = git('rev-parse', 'HEAD');
     const incomplete =
       /complete parent vector of this commit is not known .*Merge with --no-commit, then run git commit/s;
@@ -1227,7 +1227,7 @@ test(
     }
 
     // An automatic merge cannot show the guard the commit it joins: refused, whatever its record
-    // (v3 C18; Daybreak GD-R1). Concluded with --no-commit and git commit, it is judged with every
+    // (v3 C18; security review GD-R1). Concluded with --no-commit and git commit, it is judged with every
     // parent: here the other side dropped lint:sql without the guard and the merge takes its
     // package.json, which is refused as a removal; a side that keeps both lint scripts merges.
     const merge = (side, scripts) => {
@@ -1456,7 +1456,7 @@ else if (args[0] === 'version' || args[0] === '--version') console.log('syntheti
   // stages a change to it: without one, candidate-policy is blocked in commit mode, and the
   // pre-dispatch barrier then withholds every candidate-controlled stage. (gate-draft-r4's
   // fixtures staged none, so every commit-mode run here recorded a blocked candidate-policy and
-  // went on to run candidate code anyway: Daybreak's GDR4-01.)
+  // went on to run candidate code anyway: the security review's GDR4-01.)
   write(
     path.join(root, 'CHANGELOG.md'),
     '# Synthetic fixture changelog\n\n- A synthetic change.\n'
@@ -2778,9 +2778,9 @@ test(
   }
 );
 
-// Daybreak GD-R2: a candidate's .github/actionlint.yaml or .yml could silence the bare `actionlint`
+// Security review GD-R2: a candidate's .github/actionlint.yaml or .yml could silence the bare `actionlint`
 // the earlier gate started from PATH; the gate refuses a candidate configuration before anything
-// is installed. Codex decision 8: Actionlint may run only as the qualified golden-tool manifest of
+// is installed. Maintainer decision 8: Actionlint may run only as the qualified golden-tool manifest of
 // the trusted gate export binds it, which this draft does not have, so both stages are pending and
 // blocking. verify-1 of gate-draft-r3 found that a local golden-tool record under
 // <git common dir>/orbit-security/golden-tools/ passed both stages, even one that pinned the
@@ -3017,7 +3017,7 @@ test(
   }
 );
 
-// Codex decision 8: with no reviewed Actionlint pin the run is pending AND blocking (exit 1). Both
+// Maintainer decision 8: with no reviewed Actionlint pin the run is pending AND blocking (exit 1). Both
 // Actionlint stages name the missing pin and the evidence it needs; nothing named actionlint on
 // PATH runs; the other stages still run, and none of them is an Actionlint pass. Stand-ins only.
 test(
@@ -3079,7 +3079,7 @@ test(
   }
 );
 
-// GATE-CONTRACT v5 (C3, C5, C23; changes 2, 3, 4, 18 and 19, change 19 as the coordinator
+// GATE-CONTRACT v5 (C3, C5, C23; changes 2, 3, 4, 18 and 19, change 19 as the maintainer
 // confirmed it): the gate's own record keeps every order rule the finalizer checks (orderProblems)
 // on its recorded intervals. The T8 identity and authenticity stages (N) come before both image
 // builds, one after the other; t8-image-activation (O) comes after them and before any candidate
@@ -3277,7 +3277,7 @@ if (args[0] === 'version') console.log('synthetic tool 0.0.0');
 );
 
 // ---------------------------------------------------------------------------------------------
-// gate-draft-r11, GDR10-AUTH-STAGE-01 (review finding, Medium/P2; Codex 20261019T073253967039Z
+// gate-draft-r11, GDR10-AUTH-STAGE-01 (review finding, Medium/P2; maintainer note 20261019T073253967039Z
 // item 1 and 20261019T083721636234Z item 2), at the real stage-dispatch boundary. The tenth round
 // bound the gate's own Git runner, but startStage() still gave every stage process.env: the
 // snapshot clone, its read-tree and checkout-index, the history secret scan and the npm, test and
@@ -3825,7 +3825,7 @@ test(
 
 // ---------------------------------------------------------------------------------------------
 // Round 2 of gate-draft-r11: check-1 R11C1-STAGE-CONF-CLONE, R11C1-STAGE-CONF-HISTORY and
-// R11C1-RECORD-ENV, on review finding GDR10-AUTH-STAGE-01 (Codex 20261019T083721636234Z item 2:
+// R11C1-RECORD-ENV, on review finding GDR10-AUTH-STAGE-01 (maintainer note 20261019T083721636234Z item 2:
 // "local snapshot cloning uses a clean environment", zero remote-helper invocation, and
 // secrets-history inheriting the safe environment). Round 1's stage environment still admitted
 // GIT_CONFIG_GLOBAL and GIT_CONFIG_SYSTEM, and HOME and XDG_CONFIG_HOME passed on, so a Git
@@ -4146,7 +4146,7 @@ test(
 );
 
 // ---------------------------------------------------------------------------------------------
-// gate-draft-r12: Daybreak's review of the eleventh round (REVISE BEFORE INTEGRATION), at the gate's
+// gate-draft-r12: the security review of the eleventh round (REVISE BEFORE INTEGRATION), at the gate's
 // stage-dispatch boundary. GDR11-HISTORY-ATTRS-01 (Medium/P2): the history secret scan's Git
 // command (gitleaks runs `git -C <root> log -p -U0 <log options>`) was given `--all` alone, so a
 // committed or untracked .gitattributes or info/attributes with `* -diff`, a diff driver with
@@ -4346,7 +4346,7 @@ test(
         { env: { XDG_CONFIG_HOME: hostileXdg, GIT_CONFIG_GLOBAL: undefined } },
       ],
       [
-        "the repository's .git/config i18n.logOutputEncoding=UTF-16, with GIT_CONFIG_GLOBAL and GIT_CONFIG_SYSTEM /dev/null, GIT_CONFIG_NOSYSTEM=1 and GIT_CONFIG=/dev/null (Daybreak's counterexample)",
+        "the repository's .git/config i18n.logOutputEncoding=UTF-16, with GIT_CONFIG_GLOBAL and GIT_CONFIG_SYSTEM /dev/null, GIT_CONFIG_NOSYSTEM=1 and GIT_CONFIG=/dev/null (the security review's counterexample)",
         local([['i18n.logOutputEncoding', 'UTF-16']], {
           env: {
             GIT_CONFIG_GLOBAL: '/dev/null',

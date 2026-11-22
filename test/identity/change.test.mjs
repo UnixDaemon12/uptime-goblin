@@ -426,7 +426,7 @@ test('a recorder that rejects the mirror row never fails the change that stands'
   assert.equal((await identity.authenticateSession(result.issue.value, {})).via, 'session');
 });
 
-// Codex's review of eb1b455: a password change whose write waits out a busy database (SQLite
+// An independent review of eb1b455: a password change whose write waits out a busy database (SQLite
 // retries after a delay) must still be refused if its session ended during that wait, and a
 // valid retry must not be refused by what its own rolled-back attempt changed in memory.
 // `holdWriter` keeps a second connection's BEGIN IMMEDIATE open so the first write attempt
@@ -543,7 +543,7 @@ for (const via of ['session', 'basic'])
     assert.equal(await identity.authenticateBasic(basicBytes(adminPassword)), null);
   });
 
-// Codex's re-review of 369a03d: the first attempt runs in full (marking this session revoked
+// An independent re-review of 369a03d: the first attempt runs in full (marking this session revoked
 // tentatively), SQLite rolls it back, and during the retry wait a real sign-out of this very
 // session commits. Undoing the rolled-back attempt must not take back that sign-out's mark.
 test('a sign-out during the retry wait survives the undo of a rolled-back password change', async t => {
@@ -598,7 +598,7 @@ test('a sign-out during the retry wait survives the undo of a rolled-back passwo
   assert.throws(() => identity.assertCurrent(mine.access), { code: 'session_expired' });
 });
 
-// Codex's companion control: the same rollback, but the sign-out during the retry wait cannot
+// The independent reviewer's companion control: the same rollback, but the sign-out during the retry wait cannot
 // delete its row (a full disk). Its refusal then lives only in this process's revoked map, and
 // the retry's undo must keep it: the password stays, no session is issued, the row remains.
 test('a sign-out whose delete failed during the retry wait also survives the undo', async t => {

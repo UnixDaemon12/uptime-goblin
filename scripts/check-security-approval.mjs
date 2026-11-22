@@ -34,7 +34,7 @@ import {
 // object and before any ref moves: it recomputes the commit's tree and parents from that object,
 // compares them with what was approved, exactly and in order, and checks the finalization again
 // (verifyCommit); any difference aborts the update, so HEAD does not move (GATE-CONTRACT v3 C18,
-// a draft, and the C18 clarification in CLAUDE-RESUME.md). Every other ref update (a fetch, a
+// a draft, and the maintainer's C18 clarification). Every other ref update (a fetch, a
 // checkout, a rebase or cherry-pick, which run no pre-commit hook) finds no record of this Git
 // process and passes through unchanged.
 export const guardHook = `#!/bin/sh
@@ -264,7 +264,7 @@ function packageVersions(run, names) {
 // The text of a package.json blob `bytes` (of `holder`, blob `id`) when it is well formed: UTF-8
 // text (with no byte order mark, which JSON does not allow), a JSON object, and a `scripts` member,
 // if it has one, that is an object. Anything else is malformed content and refuses (gate-draft-r10
-// round 2, check-1 of GDR9-AUTH-OBJECT-01; Codex 153201 criterion 2): it cannot say which lint
+// round 2, check-1 of GDR9-AUTH-OBJECT-01; maintainer note 153201 criterion 2): it cannot say which lint
 // scripts that version defines, so nothing is approved for it, the subject's own, a parent's or a
 // history version alike. A well-formed file that is not in canonical form is not malformed: it is
 // read as before (packageScripts; requiredLintStages).
@@ -369,7 +369,7 @@ function parentLintScripts(git, head, automaticMerge, run) {
 
 /**
  * The lint stages the exact commit `object` ({ tree, parents }, read from its own commit object)
- * requires (GDR8-AUTH-LINT-01, Codex's decision 1 of hourly-0918): what the pre-commit guard
+ * requires (GDR8-AUTH-LINT-01, the maintainer's decision 1): what the pre-commit guard
  * derives for its candidate (requiredLintStages), from the commit's own tree, its complete ordered
  * parent vector and their history, never from the checkout, HEAD, MERGE_HEAD, process.cwd() or a
  * caller's assertion. `git(args, input)` is verifyCommit's runner, bound to the repository being
@@ -567,7 +567,7 @@ function main({ hook = false } = {}) {
   // The commit's complete ordered parent vector (HEAD, then each MERGE_HEAD; GATE-CONTRACT v3
   // C18). An automatic merge runs this guard before Git writes MERGE_HEAD, so its other parents
   // cannot be read here: nothing is approved for an incomplete vector, for any candidate
-  // (Daybreak GD-R1 found that the earlier maintenance exception let a two-parent commit through
+  // (security review GD-R1 found that the earlier maintenance exception let a two-parent commit through
   // before its unseen parent was judged).
   if (!current.parentsComplete)
     throw new Error(
@@ -643,7 +643,7 @@ function main({ hook = false } = {}) {
   });
   const platform =
     contract.kind === 'maintenance'
-      ? ' A maintenance candidate (no platform manifest in its history) also needs its pinned Actionlint bound by the qualified golden-tool manifest, an obligation only F on the Mac can pass (actionlint-pin; Codex decision 8), so no finalization this draft writes for it is a pass either.'
+      ? ' A maintenance candidate (no platform manifest in its history) also needs its pinned Actionlint bound by the qualified golden-tool manifest, an obligation only F on the Mac can pass (actionlint-pin; maintainer decision 8), so no finalization this draft writes for it is a pass either.'
       : ` The candidate has a platform contract (test/platform-manifest.json): the finalization must also bind its coverage and the companion runs its manifest requires (node scripts/security-gate.mjs platform <run-id> on each other platform, named after the run to node scripts/finalize-security.mjs), and under GATE-CONTRACT v3 (a draft) only F on the Mac can pass its finalization obligations, so no finalization this draft writes for it is a pass.${contract.problems.length ? ` Without reviewed dispositions its manifest is refused: ${contract.problems.slice(0, 3).join('; ')}.` : ''}`;
   throw new Error(
     `Commit blocked: stage the complete change, run node scripts/security-gate.mjs commit, and finalize its exact reviewed findings with node scripts/finalize-security.mjs. No fresh verified finalization matches the candidate and evidence.${unknown
@@ -652,7 +652,7 @@ function main({ hook = false } = {}) {
   );
 }
 
-// After a commit exists (GATE-CONTRACT v3 C18, and the C18 clarification in CLAUDE-RESUME.md):
+// After a commit exists (GATE-CONTRACT v3 C18, and the maintainer's C18 clarification):
 // `--verify-commit [<commit>]` (HEAD by default) recomputes the commit's tree and complete ordered
 // parent vector from its own object, finds a finalization of exactly that tree and vector, in
 // order, that still verifies as a recorded approval (recordedApproval in

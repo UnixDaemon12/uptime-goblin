@@ -188,10 +188,10 @@ test('decision table, processes: enforced, missing (no controller, max) and unve
     );
 });
 
-// The CPU limit is cpu.max's quota, or else a CPU set Uptime Goblin's own cgroup sets (Codex D21, PU5):
+// The CPU limit is cpu.max's quota, or else a CPU set Uptime Goblin's own cgroup sets (maintainer decision D21, PU5):
 // its cpuset.cpus not empty, a CPU list and only of CPUs the host has online, its
 // cpuset.cpus.effective not empty, a CPU list and within that set, and both fewer CPUs than the
-// host has online (Codex review F-01: which CPUs, not only how many). Docker left a container given
+// host has online (independent review F-01: which CPUs, not only how many). Docker left a container given
 // --cpuset-cpus 0 (or cpus: 0 with cpuset: '0') cpu.max `max 100000`, cpuset.cpus `0` and
 // cpuset.cpus.effective `0`; one whose CPU set Docker discarded had no cpuset controller at all;
 // one with no CPU option inside a Docker held to CPUs 0-1 had an empty cpuset.cpus and effective
@@ -377,7 +377,7 @@ test('decision table, CPU: a CPU set counts only where the CPUs Uptime Goblin ru
   assert.deepEqual(unenforcedLimits(limitsStatus(waived.status)), ['cpu']);
 });
 
-// A CPU set counts only where every CPU it names is one the host has online (Codex review F-01):
+// A CPU set counts only where every CPU it names is one the host has online (independent review F-01):
 // a set of fewer CPUs than the host's can still name CPUs that are offline, that do not exist or
 // that this process cannot see in /sys (LXCFS can hide the host's CPUs from an LXC), and what it
 // then holds Uptime Goblin to cannot be told: unverifiable, never a limit, whatever its count. The sets

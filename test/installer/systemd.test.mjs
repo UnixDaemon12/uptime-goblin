@@ -22,7 +22,7 @@ import path from 'node:path';
 const image = 'orbit-installer-systemd:debian13';
 const docker = (...args) => spawnSync('docker', args, { encoding: 'utf8', timeout: 300000 });
 // Every test container is privileged (systemd needs that) and runs an install or a flood of
-// processes, so each gets limits of its own, as Codex's maintenance systemd test gives it: 2 GiB
+// processes, so each gets limits of its own, as the maintenance systemd test gives it: 2 GiB
 // of memory, 2 CPUs and 512 processes. Checked on the started container (Docker drops a limit
 // the kernel cannot apply with only a warning). test/docker-limits.test.mjs checks that every
 // container a test starts has them, right after the subcommand.
@@ -928,7 +928,7 @@ test(
     // entries after it. The cursor is opaque: given back as one argument with no shell between
     // (docker exec), never taken apart. No second has to pass: the previous start has failed
     // before the cursor is taken. That its lines were stored before the cursor is what a run
-    // observes on that journal, not something a position proves (Codex review F-02-R2).
+    // observes on that journal, not something a position proves (independent review F-02-R2).
     const position = () => {
       const shown = docker(
         'exec',

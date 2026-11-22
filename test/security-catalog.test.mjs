@@ -1,7 +1,7 @@
 // The catalog of required stages and F obligations (scripts/security-catalog.json: the C23 arrays of
-// GATE-CONTRACT v5 round 2, accepted by Daybreak as a design baseline; the v5 cases are in
+// GATE-CONTRACT v5 round 2, accepted by the security review as a design baseline; the v5 cases are in
 // test/security-v5-alignment.test.mjs), the finalizer's use of it, the
-// pinned Actionlint of a run (Daybreak GD-R2), the times of a main run's stages (GD-R3), the T8
+// pinned Actionlint of a run (security review GD-R2), the times of a main run's stages (GD-R3), the T8
 // image authority (IP-01) and the run nonce. Every run here is synthetic
 // (test/helpers/platform-run.mjs): test evidence for the checks, never a test or scan result.
 import test from 'node:test';
@@ -491,7 +491,7 @@ test('GD-R2: a run counts the workflow analysis only from the pinned Actionlint 
               name,
               status: 'pending',
               reason: 'synthetic: no reviewed golden-tool record',
-              // What the gate names when no reviewed pin exists (Codex decision 8).
+              // What the gate names when no reviewed pin exists (maintainer decision 8).
               missingPin: s.platform.missingToolPin({
                 tool: 'actionlint',
                 version: r.tools.actionlint,
@@ -971,9 +971,9 @@ test('GDR8-AUTH-SCAN-01, round 2 (check-1 CONTRACT-T4): the finalizer and the re
   assert.equal(s.finalization.recordedApproval(withheld.run, lint).approval.findings, 0);
 });
 
-// gate-draft-r10, GDR9-AUTH-SCAN-02 (review finding; Codex's GATE decision 6): a withheld or no-run
+// gate-draft-r10, GDR9-AUTH-SCAN-02 (review finding; the maintainer's GATE decision 6): a withheld or no-run
 // scanner could carry a sealed fixed report that neither the finalizer nor the recorded-approval
-// reader read (Daybreak's P4, CONTRACT-R2-6), and the synthetic fixtures sealed every report for
+// reader read (the security review's P4, CONTRACT-R2-6), and the synthetic fixtures sealed every report for
 // every run, a withheld scanner's included, so they defined that as normal. The fixtures now seal a
 // scanner's report only when its stage ran, as the gate creates one only when it starts the
 // scanner, and one shared reconciliation of stages and reports (scannerReportProblems), used by
@@ -1029,7 +1029,7 @@ test('GDR9-AUTH-SCAN-02: the fixtures seal no report for a withheld scanner, and
       pendingReport('container-vulnerabilities'),
     ],
     [
-      "Daybreak's P4: secrets-source withheld, a finding in its sealed report",
+      "The security review's P4: secrets-source withheld, a finding in its sealed report",
       (record, files) => {
         withheld(record);
         files['secrets-source.json'] = finding;

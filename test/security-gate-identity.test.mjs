@@ -1,4 +1,4 @@
-// The gate identity's version (Daybreak GCV3-03; GATE-CONTRACT v4 C1, C12, C14, a draft that has
+// The gate identity's version (security review GCV3-03; GATE-CONTRACT v4 C1, C12, C14, a draft that has
 // not been reviewed): the eight-part identity is version 3; every reader in this tree refuses
 // versions 1 and 2 with no fallback, and binds the version wherever it binds the identity. The
 // negative controls: a seven-part record labelled 3, an eight-part record labelled 2, and any
@@ -400,7 +400,7 @@ test('a sealed record, review or approval that names a member twice is refused b
   assert.equal(modules.finalization.approvedManifests(security, keys).size, 0);
 });
 
-// verify-1 of gate-draft-r3 (Codex decision 3 asks to bind the profile to the reviewed identity
+// verify-1 of gate-draft-r3 (maintainer decision 3 asks to bind the profile to the reviewed identity
 // and evidence; GCV3-03 binds the identity wherever records name it): the approval now binds the
 // record-pack entry profile its packs were read with, and each companion's own gate identity,
 // inside the platform evidence its review names.
@@ -439,7 +439,7 @@ test("a finalization binds the record-pack profile and each companion's gate ide
   fs.writeFileSync(approvalFile, `${JSON.stringify(forged, null, 2)}\n`, { mode: 0o600 });
   assert.throws(
     () => modules.finalization.recordedApproval(run, { lintStages: candidate.current.lintStages }),
-    /binds another record-pack entry profile than the installed validator and catalog \(Codex decision 3; v5 C21, C24\)/
+    /binds another record-pack entry profile than the installed validator and catalog \(maintainer decision 3; v5 C21, C24\)/
   );
   // The guard, which judges the platform evidence again, refuses it too.
   assert.throws(() =>

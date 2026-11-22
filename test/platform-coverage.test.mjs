@@ -1,5 +1,5 @@
 // The platform coverage check (scripts/check-platform-coverage.mjs) on synthetic runs: the
-// adversarial cases Codex listed on 2026-10-11 that belong to the harness. Missing, duplicate and
+// adversarial cases the maintainer listed on 2026-10-11 that belong to the harness. Missing, duplicate and
 // wrong-platform names; skipped, todo and failing tests; records from another run or manifest, of
 // another runtime or platform, or of no entry; changed container evidence and the wrong inner
 // runtime or code; removed or narrowed entries and runs, and the dispositions that may excuse
@@ -518,7 +518,7 @@ const evidence = (manifest, manifestSha256, directory) => {
   });
 };
 
-// Codex 2026-10-11 items 3 and 6: container evidence is validated separately, per runtime, from
+// Maintainer note 2026-10-11 items 3 and 6: container evidence is validated separately, per runtime, from
 // the driver's saved inner TAP and records; a Node 24 run does not cover Node 26.
 test('container evidence: each runtime of the T8 run needs its own passing inner run; Node 26 is reported missing while it has no image', t => {
   // As tracked today: Node 26 has no approved image, so a host run cannot cover it.
@@ -721,7 +721,7 @@ test('records: only bounded <pid>-<uuid>.jsonl regular files of known records, a
   assert.match(readRecords(path.join(directory, 'gone')).problems.join(), /cannot be read: ENOENT/);
 });
 
-// Codex 2026-10-11 item 4: a removed or narrowed entry or run is a loss that only an exact, bound
+// Maintainer note 2026-10-11 item 4: a removed or narrowed entry or run is a loss that only an exact, bound
 // disposition excuses. coverageLoss judges against one baseline, which must exist: a missing
 // parent manifest is not a maintenance branch (verify-1's hole; judgeCandidateManifest below).
 test('coverage loss: removed or narrowed entries and runs, another pinned image or driver, and a dropped prerequisite are losses; additions are not; a deleted manifest loses everything', () => {
@@ -827,8 +827,8 @@ test('coverage loss: only one exact disposition per loss, bound to the candidate
     old,
     replacement: 'a.replacement',
     reason: 'rewritten as a.replacement, which checks the same files',
-    reviewer: 'Codex',
-    reference: 'room message 20261012T000000Z',
+    reviewer: 'independent reviewer',
+    reference: 'review note 20261012T000000Z',
     ...binding,
   };
   // A new test alone does not excuse the removal.
@@ -997,8 +997,8 @@ test('history: a manifest deleted, broken or weakened by a commit made without t
     old,
     replacement: null,
     reason: 'the Linux behaviour is covered elsewhere',
-    reviewer: 'Codex',
-    reference: 'room message 20261012T000000Z',
+    reviewer: 'independent reviewer',
+    reference: 'review note 20261012T000000Z',
     ...judgeBinding,
   };
   const excused = judge(weak, weak, { dispositions: [disposition] });
@@ -1038,8 +1038,8 @@ test('history: without a manifest the gate approved, or a baseline disposition, 
     baseline: commitId(1),
     manifestSha256: sha256(full),
     reason: 'the manifest was added in a commit made without the guard; reviewed as it is',
-    reviewer: 'Codex',
-    reference: 'room message 20261012T000000Z',
+    reviewer: 'independent reviewer',
+    reference: 'review note 20261012T000000Z',
     ...judgeBinding,
   };
   const established = judgeCandidateManifest({

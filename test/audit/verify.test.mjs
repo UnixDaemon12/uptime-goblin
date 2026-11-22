@@ -972,7 +972,7 @@ test('journal lines under a key the keyring does not hold, after a prune: lines 
   );
 });
 
-// Codex review A1: Uptime Goblin numbers its entries from 1 (D27), and the walk started after seq 0. Someone
+// Independent review A1: Uptime Goblin numbers its entries from 1 (D27), and the walk started after seq 0. Someone
 // with the database but not the key copied a row to seq 0 or -1 with another detail and a made-up
 // hash: it was listed and exported while both modes, against every genuine journal line, read
 // intact. The first unit now reads the lowest stored seq, the walk starts at the lowest stored
@@ -1002,7 +1002,7 @@ async function forgeAt(f, seq, { signed = false } = {}) {
   return forged;
 }
 
-test('Codex review A1: a row at seq 0 or below is link_broken at its seq in both modes, with and without the key or the journal; the rows from 1 on are still checked; list and export still show it', async t => {
+test('Independent review A1: a row at seq 0 or below is link_broken at its seq in both modes, with and without the key or the journal; the rows from 1 on are still checked; list and export still show it', async t => {
   for (const seq of [0, -1, -1234, Number.MIN_SAFE_INTEGER])
     await t.test(`a forged copy at seq ${seq}`, async t => {
       const f = await logOf(t, 3);

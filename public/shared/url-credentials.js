@@ -25,7 +25,7 @@ export const secretName = name =>
     .split(/[^a-z0-9]+/)
     .some(word => secretWord(word.replace(/\d+$/, '')));
 // Key=value pairs in a fragment, as in an OAuth return (#access_token=...&state=/home?tab=1).
-// Codex review A2: each '&'-separated member of the fragment, and of each text directive after
+// Independent review A2: each '&'-separated member of the fragment, and of each text directive after
 // ':~:', is judged on its own, as the query's parameters are: a member is a pair when it holds
 // '=' (also spelled %3D), and a credential when secretName matches its decoded name, whatever
 // route characters that name holds (#a=1&api/key=..., ##access_token=...) and whatever its

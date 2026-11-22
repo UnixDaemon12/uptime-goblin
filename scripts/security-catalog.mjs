@@ -1,8 +1,8 @@
 // The versioned catalog of required stages and finalization obligations (scripts/security-catalog.json).
 //
 // The arrays are GATE-CONTRACT v5 round 2's C23 arrays, copied exactly (sha256 d0398079…, which
-// Daybreak accepted as the design baseline for gate-draft-r4, with v5 change 19 confirmed by the
-// coordinator decision the catalog names). A design baseline approves no implementation: these
+// the security review accepted as the design baseline for gate-draft-r4, with v5 change 19 confirmed by the
+// maintainer decision the catalog names). A design baseline approves no implementation: these
 // arrays are required proof obligations, not a claim that every stage exists. v5 moves
 // t8-image-identity and t8-image-authenticity into phase N, before every candidate-controlled
 // build, and adds t8-image-activation to phase O (v5 changes 2 and 4; N has 28 entries, O 25).
@@ -13,11 +13,11 @@
 //
 // The catalog names and binds the record-pack entry profile (`recordPack`: its name, version and
 // sha256), which every producer and consumer of a pack must use exactly (v5 C21, C24 change 11;
-// Codex decision 3). That needs a member the earlier form did not have, so this draft numbers the
+// maintainer decision 3). That needs a member the earlier form did not have, so this draft numbers the
 // form version 2 and refuses version 1, which named no profile: two incompatible canonical forms
 // must never share one version number (the rule v5 C1 states for the gate identity). That format
 // change is this draft's proposal, not a v5 requirement: v5 C1 (change 6) says the catalog's format
-// does not change, and Codex decides whether the profile is bound here or elsewhere. That the
+// does not change, and the maintainer decides whether the profile is bound here or elsewhere. That the
 // profile named here is the installed validator's own is checked in security-platform.mjs, which
 // holds the validator's profile, so this module needs no import of it.
 //
@@ -36,7 +36,7 @@ const ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const HEX64 = /^[0-9a-f]{64}$/;
 
 /**
- * The contract the catalog's arrays come from, and the coordinator decision that confirmed its
+ * The contract the catalog's arrays come from, and the maintainer decision that confirmed its
  * change 19 after it was frozen (platform-manifest ends before every candidate-controlled build
  * starts). A catalog that names another contract (v3's or v4's arrays, say) is refused: a partial
  * migration is not v5's catalog (v5 C1, C23; v5 change 6).
@@ -406,7 +406,7 @@ export function parseCatalog(bytes) {
         catalog.contract.decision.sha256 !== CHANGE19_DECISION.sha256)
     )
       problems.push(
-        `the catalog names another decision than the coordinator's confirmation of v5 change 19 (${CHANGE19_DECISION.sha256})`
+        `the catalog names another decision than the maintainer's confirmation of v5 change 19 (${CHANGE19_DECISION.sha256})`
       );
     if (typeof catalog.contract.status !== 'string' || !catalog.contract.status.trim())
       problems.push('the catalog contract has no status');
@@ -490,7 +490,7 @@ export function installedCatalog() {
 export const mainProfileFor = platform => (platform === 'linux' ? 'linux-full' : null);
 
 /**
- * The platform the finalizer itself binds to each profile of the catalog (v4 C2, C14; Daybreak's
+ * The platform the finalizer itself binds to each profile of the catalog (v4 C2, C14; the security review's
  * review of v3: F chooses the mode, the profile and the catalog, and compares each with what a
  * record names). A candidate's manifest, a run record or a caller can name a platform for a run,
  * but none of them decides the platform of a catalog profile: a manifest that declares one of

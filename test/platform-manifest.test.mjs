@@ -1,7 +1,7 @@
 // The platform coverage contract (test/platform-manifest.json) and the helpers that bind a test
 // to its platform (test/helpers/platform.mjs): the tracked manifest is valid, every entry is
 // registered exactly once through platformTest or platformSubtest in its file and no call names
-// an id the manifest lacks; the validator refuses what Codex listed (2026-10-11, items 3 and 4);
+// an id the manifest lacks; the validator refuses what the maintainer listed (2026-10-11, items 3 and 4);
 // a test is absent on another platform and fails on a missing prerequisite; and a run with
 // TEST_PLATFORM_RECORDS writes a record of each bound test, while malformed settings fail.
 import test from 'node:test';
@@ -121,7 +121,7 @@ test('platform manifest: the tracked contract is valid, and each entry is regist
   assert.ok(!allTestFiles(repository).some(file => file.startsWith('test/fixtures/')));
 });
 
-// Codex 2026-10-11 item 3: strict data. Each case is the tracked manifest with one change.
+// Maintainer note 2026-10-11 item 3: strict data. Each case is the tracked manifest with one change.
 test('platform manifest: the validator refuses duplicates, unknown fields, unbounded paths, names TAP cannot match exactly, and inconsistent runs', () => {
   const problems = change => {
     const copy = structuredClone(tracked);
@@ -429,7 +429,7 @@ test('platformDecision: absent on another platform, never a skip; a missing prer
   assert.equal(runPlatform({ TEST_T8_DIR: '/t8' }, 'darwin'), 'container');
 });
 
-// Codex 2026-10-11 item 5: malicious and accidental inherited values are refused, not used.
+// Maintainer note 2026-10-11 item 5: malicious and accidental inherited values are refused, not used.
 test('record settings: neither set is a developer run; a partial, relative, linked, oversized or malformed setting throws', t => {
   const directory = temporary(t);
   const run = 'a'.repeat(64);

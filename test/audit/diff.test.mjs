@@ -245,14 +245,14 @@ test('URL stripping: user info and credential parameters go before a value is co
   assert.match(text, /blog\.example\.com\/\?page=1/);
 });
 
-// Codex review A2: one fragment member without "=" (an empty one after a trailing &, a bare
+// Independent review A2: one fragment member without "=" (an empty one after a trailing &, a bare
 // name) made every member read as no credential, so validation took the destination and the
 // diff kept its token. Each member is judged on its own now, and the destination is refused or
 // stripped exactly as an ordinary #access_token=… is; routes and anchors keep their spelling.
-test('URL stripping (Codex review A2): a fragment credential pair is found beside empty or valueless members', () => {
+test('URL stripping (independent review A2): a fragment credential pair is found beside empty or valueless members', () => {
   const token = 'synthetic-fragment-secret';
   for (const [url, stripped] of [
-    // The ordinary pair (control), then Codex's two cases and their neighbours.
+    // The ordinary pair (control), then the independent reviewer's two cases and their neighbours.
     [`https://example.test/#access_token=${token}`, 'https://example.test/'],
     [`https://example.test/#access_token=${token}&`, 'https://example.test/'],
     [`https://example.test/#access_token=${token}&state`, 'https://example.test/#state'],
@@ -292,12 +292,12 @@ test('URL stripping (Codex review A2): a fragment credential pair is found besid
   }
 });
 
-// Codex review A2, verification round: a route-like first member (/, !, ?, home/) made the whole
+// Independent review A2, verification round: a route-like first member (/, !, ?, home/) made the whole
 // fragment a route, so the same neighbours placed before the pair still hid it (#/home&… was
 // taken while #…&/home was refused), and a route character in a later name (api/key, x?…) or an
 // encoded "=" hid it too, though the query's equivalents are refused. Only a route's own
 // parameters, after a first member's "<route>?", are the application's now.
-test('URL stripping (Codex review A2): a route-like member before the pair, a route character in its name or an encoded "=" no longer hides it', () => {
+test('URL stripping (independent review A2): a route-like member before the pair, a route character in its name or an encoded "=" no longer hides it', () => {
   const token = 'synthetic-fragment-secret';
   for (const [fragment, stripped] of [
     ['/&access_token=T', '#/'],
@@ -343,7 +343,7 @@ test('URL stripping (Codex review A2): a route-like member before the pair, a ro
   }
 });
 
-// Codex review A2, through the writer: whatever let such a value into config.value (the API now
+// Independent review A2, through the writer: whatever let such a value into config.value (the API now
 // refuses it and a start repairs a hand edit), the diff's own stripping keeps the token out of
 // every row, the list, both exports and the stdout-full copy.
 for (const [name, prefix, suffix, kept] of [
@@ -354,7 +354,7 @@ for (const [name, prefix, suffix, kept] of [
   ['a slash member before it', '/&', '', /https:\/\/example\.test\/#\/(?![\w&])/],
   ['a hashbang member before it', '!&', '&state', /https:\/\/example\.test\/#!&state\b/],
 ])
-  test(`a fragment token beside ${name} reaches no row, list, export or stdout-full line (Codex review A2)`, async t => {
+  test(`a fragment token beside ${name} reaches no row, list, export or stdout-full line (independent review A2)`, async t => {
     const { audit, db, out } = await auditFixture(t, { mirror: 'stdout-full' });
     const token = `synthetic-fragment-secret-${randomBytes(6).toString('hex')}`;
     const value = config();
@@ -439,7 +439,7 @@ test('property: 500 random settings and source changes with planted secrets neve
       default:
         value.title = `Title ${round}`;
         value.services.push(newService('http', `added-${round}`, `Added ${round}`));
-        // Codex review A2: also beside an empty or a valueless member, after a route-like one.
+        // Independent review A2: also beside an empty or a valueless member, after a route-like one.
         value.services.at(-1).url = `https://h.example.com/#${
           ['', '', '', '/home&', '!&', '?&'][Math.floor(round / 6) % 6]
         }access_token=${sentinel('Fragment')}${[`&state=${round}`, '&', '&state'][Math.floor(round / 6) % 3]}`;

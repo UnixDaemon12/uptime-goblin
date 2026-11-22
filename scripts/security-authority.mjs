@@ -6,7 +6,7 @@
 // and for the builds the candidate's tests start.
 //
 // None of those exists in this draft, and no producer of any of them is reviewed or qualified
-// (GATE-CONTRACT v5 C5, C6, C17 item 12; Codex's answers of 20261016T014104832374Z). So this module
+// (GATE-CONTRACT v5 C5, C6, C17 item 12; the maintainer's answers of 20261016T014104832374Z). So this module
 // grants nothing: every purpose gets null, the gate withholds each stage that needs one, and the run
 // is never a pass. It reads no file, environment variable or record: a local file nothing
 // authenticates must not become authority. Once a reviewed producer exists, its verified record is

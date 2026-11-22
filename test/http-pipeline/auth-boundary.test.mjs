@@ -1,4 +1,4 @@
-// Codex's review of eb1b455: authenticate() checks the session before it resolves, but the
+// An independent review of eb1b455: authenticate() checks the session before it resolves, but the
 // pipeline resumes a microtask or more later. A sign-out landing in that gap must still stop
 // the request: a protected read, an unkeyed write and a keyed write all answer 401, and the
 // handler never runs. The hook only delays when the session lookup's result is delivered; the

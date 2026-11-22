@@ -735,7 +735,7 @@ test('a deleted or weakened committed manifest is refused unless an exact dispos
     judge(baseBytes, [], { complete: false, reason: 'synthetic' }).problems.join('\n'),
     /not all known \(synthetic\): merge with --no-commit/
   );
-  // ...and, since v3 C18 and Daybreak GD-R1, also when neither the candidate nor its known
+  // ...and, since v3 C18 and security review GD-R1, also when neither the candidate nor its known
   // history has one: an incomplete parent vector approves nothing, for any candidate.
   const maintenance = platform.judgePlatformManifest({
     candidate: null,
@@ -1065,9 +1065,9 @@ test('T8 evidence counts only for an image whose authenticity record binds its d
       r.outcome = 'exception';
       delete r.verification;
       r.exception = {
-        disposition: 'reviewed by Codex',
+        disposition: 'reviewed by an independent reviewer',
         reason: 'no publisher signature',
-        reviewer: 'Codex',
+        reviewer: 'independent reviewer',
         reference: 'synthetic',
         reviewedAt: new Date(now).toISOString(),
         evidenceSha256: 'a'.repeat(64),
@@ -1903,7 +1903,7 @@ test("an approved commit's manifest becomes a reviewed baseline: deleting or wea
   g.fixture.asIfFinalizedByF(g.fixture.finalizePlatformRun(g.security, next, { now }).run);
   assert.equal(g.guard().status, 0);
   // The same evidence, but Git may be running the guard for an automatic merge whose other parent
-  // it cannot see yet: refused, as for every candidate (v3 C18; Daybreak GD-R1).
+  // it cannot see yet: refused, as for every candidate (v3 C18; security review GD-R1).
   const automatic = spawnSync(
     process.execPath,
     [path.join(repositoryRoot, 'scripts/check-security-approval.mjs')],

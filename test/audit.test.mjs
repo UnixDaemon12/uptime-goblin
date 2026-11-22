@@ -931,7 +931,7 @@ test('the result-row gate (§9.3): a lost result goes to stderr once, its attemp
   );
 });
 
-// Codex review A3: exclusive() ends a write's turn before settle writes its result row, so the
+// Independent review A3: exclusive() ends a write's turn before settle writes its result row, so the
 // next configuration write can be answered and its result written while the first result still
 // waits (between SQLite retries). That result moved the configuration keys to its own
 // after-snapshot, which held the first change: lost, the first change was in neither a result
@@ -951,7 +951,7 @@ const configKeysIn = directory => {
     db.close();
   }
 };
-test('the result-row gate, overlapping (Codex review A3): a result written while the result of an earlier configuration write waits leaves the keys below it; lost, the next start records the earlier change; written, the keys follow the later one', async t => {
+test('the result-row gate, overlapping (independent review A3): a result written while the result of an earlier configuration write waits leaves the keys below it; lost, the next start records the earlier change; written, the keys follow the later one', async t => {
   for (const [name, times] of [
     ['lost after the retries', 4],
     ['written at its third attempt', 2],
@@ -1241,11 +1241,11 @@ test(
   }
 );
 
-// Codex review A5: a password change refused before its credential signed in (none sent; an
+// Independent review A5: a password change refused before its credential signed in (none sent; an
 // ended session) answered its 401 but left no trace in the log, though spec §5.2 counts every
 // refusal of the route. Through a real Uptime Goblin: one row each, as nobody signed in, the first at
 // once and the second in the summary written at the stop; the log still verifies.
-test('Codex review A5: password changes refused before sign-in are rows of the log, as nobody signed in', async t => {
+test('Independent review A5: password changes refused before sign-in are rows of the log, as nobody signed in', async t => {
   const { app, base, script, directory } = await start(t);
   const pass = {
     currentPassword: 'synthetic-current',
@@ -1298,7 +1298,7 @@ test('Codex review A5: password changes refused before sign-in are rows of the l
 // second put nobody into the summary), then guessed the current password from the session: the
 // summary that counted the guesses named no one, and no row held the session's id. Through a
 // real Uptime Goblin, the summary names the guessing session; its codes say which refusal came first.
-test('Codex review A5: password-change refusals before sign-in cannot wipe a guessing session from the log', async t => {
+test('Independent review A5: password-change refusals before sign-in cannot wipe a guessing session from the log', async t => {
   // One audit window whatever the time of day: the audit's clock stays where the test began.
   const now = Date.now();
   const { app, base, directory } = await start(t, { audit: { clock: () => now } });
@@ -1685,7 +1685,7 @@ test(
       201
     );
     const id = created.body.service.id;
-    // Codex review A2: fragment tokens beside an empty, a valueless or (verification round) a
+    // Independent review A2: fragment tokens beside an empty, a valueless or (verification round) a
     // route-like member before them, sent to the API here and hand-edited into config.json
     // below. These values are this test's own (the sentinel list is frozen) and are searched
     // with the others.
@@ -1879,7 +1879,7 @@ test(
       `https://linux.example.test/?token=${sentinels.urlToken}`;
     edited.services.find(s => s.id === 'linux').apiUrl =
       `https://linux.example.test/api?token=${sentinels.apiUrlToken}`;
-    // Codex review A2: fragment tokens beside an empty and a valueless member.
+    // Independent review A2: fragment tokens beside an empty and a valueless member.
     edited.services.find(s => s.id === 'docker').url =
       `https://docker.example.test/#access_token=${fragmentTokens.editedFragmentEmpty}&`;
     edited.services.find(s => s.id === 'windows').url =

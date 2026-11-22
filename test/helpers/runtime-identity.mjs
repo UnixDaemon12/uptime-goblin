@@ -1,7 +1,7 @@
 // Synthetic runtime identity records for the gate's throwaway fixture repositories. A test stage
 // is dispatched only once test-host and runtime-identity have passed in its run and apply to it,
 // in a maintenance (B35) run too (scripts/security-dispatch.mjs, testStagePrerequisiteProblems;
-// Daybreak's GD5-CARRY-01 and GDR6-REQ-01, v5 C3), and runtime-identity passes only
+// the security review's GD5-CARRY-01 and GDR6-REQ-01, v5 C3), and runtime-identity passes only
 // with a record for each runtime the test stages will run. A test that needs such a run's test
 // stage to start (with a synthetic dispatch authority, test/helpers/dispatch-authority.mjs) writes
 // these records into its fixture repository, where the gate reads them

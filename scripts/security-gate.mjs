@@ -198,7 +198,7 @@ const write = (name, value) =>
       : `${JSON.stringify(value, null, 2)}\n`,
     { mode: 0o600 }
   );
-// The local run record: its own record family and version (Daybreak GDR4-02; Codex 014104 item
+// The local run record: its own record family and version (security review GDR4-02; maintainer note 014104 item
 // 6c), a diagnostic record of this local run, not a C12 phase record (security-finalization.mjs).
 const evidence = {
   kind: LOCAL_RUN_KIND,
@@ -274,7 +274,7 @@ function unexecutedTests(tap) {
   return { count: found.length, tests: found.slice(0, 500) };
 }
 
-// What may be dispatched (scripts/security-dispatch.mjs; Daybreak GDR4-01, Codex 014104). The
+// What may be dispatched (scripts/security-dispatch.mjs; security review GDR4-01, maintainer note 014104). The
 // pre-dispatch barrier is decided once, after candidate-policy and platform-manifest have
 // completed, and the dispatch authorities with it (scripts/security-authority.mjs, which gives
 // none in this draft). Until then both are null, and anything that needs either is withheld.
@@ -282,7 +282,7 @@ function unexecutedTests(tap) {
 let barrier = null;
 let authorities = null;
 let dependenciesInstalled = false;
-// `run` is what a test stage's rule judges besides (testStagePrerequisiteProblems; Daybreak's
+// `run` is what a test stage's rule judges besides (testStagePrerequisiteProblems; the security review's
 // GD5-CARRY-01, v5 C3): test-host and runtime-identity must each be recorded once in this run,
 // passed, ended by now and apply to the stage, in every kind of run, maintenance (B35) included
 // (GDR6-REQ-01). A test stage gives the runtime it would use (testStage); without it a test
@@ -720,7 +720,7 @@ function runtimeOf(executable, version) {
 // runs one test stage, and would otherwise pass and then always fail finalization. A maintenance
 // (B35) run has no manifest, so it identifies exactly its own approved runtimes, the gate's own
 // Node plus the configured Node 24 executable when that executable is different, and no 1.5
-// matrix is asked of it (GDR6-REQ-01; Codex's B35 decision of 20261017T140102522864Z). A test
+// matrix is asked of it (GDR6-REQ-01; the maintainer's B35 decision of 20261017T140102522864Z). A test
 // stage is dispatched only once it has passed and lists that stage's runtime (testStage;
 // GD5-CARRY-01).
 function runtimeIdentity(runId, versions) {
@@ -873,12 +873,12 @@ function networkPolicy() {
 // runtime, and its records sealed as one file beside its log (packRecords). Its tests run with
 // TEST_REQUIRE including docker, and some of them build images (test/installer/docker.test.mjs
 // builds the candidate's own image and a FROM scratch context): v5 C5 lets no such build start
-// without its pre-build authority, and Codex 014104 item 1 says it must not start at all. So the
+// without its pre-build authority, and maintainer note 014104 item 1 says it must not start at all. So the
 // stage is withheld before dispatch, its records folder never made, while that authority (or the
 // barrier, or the installed dependencies) is missing: docker stays in TEST_REQUIRE, the coverage
 // stays required, and the stage is pending and blocking (`{ withheld: name }` is returned).
 // It is withheld too unless test-host and runtime-identity have passed in this run and apply to it
-// (Daybreak's GD5-CARRY-01; v5 C3), in every kind of run, a maintenance (B35) run included
+// (the security review's GD5-CARRY-01; v5 C3), in every kind of run, a maintenance (B35) run included
 // (GDR6-REQ-01): its rule judges them with the runtime it would use, as runtimeOf hashed it for
 // runtime-identity. A binary that cannot be hashed leaves its runtime unidentified, and the stage
 // is withheld.
@@ -1000,7 +1000,7 @@ function coverageStage(tested, runId) {
 // The exact forms of all three records are pending and no producer is qualified (v5 C17 item 12),
 // so each is recorded pending, never pass, also when its check found nothing wrong: what
 // t8-image-identity observed is evidence, a consistent authenticity record is evidence and not
-// authority to run the image (Daybreak IP-01), and the activation's binding is a proposal. All
+// authority to run the image (security review IP-01), and the activation's binding is a proposal. All
 // three are required of every Linux gate run (it hosts T8, so they cannot disappear); with no
 // pinned image to check they are pending with that reason. After the tests, coverageStage
 // requires every T8 container record to name an image observed here, with the image ID Docker
@@ -1008,7 +1008,7 @@ function coverageStage(tested, runId) {
 // t8-image-identity's one `docker image inspect` is dispatched only through stage(), so only with
 // the pre-dispatch barrier open (the images are named by the candidate's manifest, which
 // platform-manifest judges) and with `t8-image-inspect` authority: the reviewed Docker stage
-// policy for the query, a qualified endpoint and the operational hold lifted (Codex 014104). None
+// policy for the query, a qualified endpoint and the operational hold lifted (maintainer note 014104). None
 // exists in this draft, so it is withheld and nothing is observed; t8-image-authenticity and
 // t8-image-activation then stay pending with nothing to check or bind. The inspect-consistency
 // checks stay, for a run in which the inspect was dispatched.
@@ -1188,7 +1188,7 @@ function runCompanion(preparedSteps) {
   testHost();
   npmStage('npm-version', ['--version']);
   // Its npm ci needs the barrier and a qualified host listener, as the gate run's does: withheld,
-  // never a direct registry fallback (Codex 014104).
+  // never a direct registry fallback (maintainer note 014104).
   dependenciesInstalled = npmStage(
     'dependencies-install',
     ['ci', '--ignore-scripts', '--no-audit', '--no-fund'],
@@ -1334,7 +1334,7 @@ try {
     if (npmrc)
       throw new Error(`A tracked .npmrc can change what every npm stage runs: ${npmrc.file}`);
     // Actionlint reads .github/actionlint.yaml or .yml, whose ignore rules silence findings
-    // (Daybreak GD-R2). workflow-analysis names the gate-owned configuration with -config-file,
+    // (security review GD-R2). workflow-analysis names the gate-owned configuration with -config-file,
     // and a candidate configuration is refused here too, before anything is installed or run.
     const actionlintFile = files.find(({ file }) => actionlintCandidateConfig(file));
     if (actionlintFile)
@@ -1374,7 +1374,7 @@ try {
     }
   });
   // platform-manifest, in every mode (the CI scan included: its candidate-controlled stages need the
-  // same two prerequisites; Codex 014104 items 2 and 4). It reads the candidate's manifest and
+  // same two prerequisites; maintainer note 014104 items 2 and 4). It reads the candidate's manifest and
   // history from Git as objects and runs no candidate code.
   judgePlatform();
   // GDR4-01: the one pre-dispatch barrier, decided here, once, after candidate-policy and
@@ -1417,8 +1417,8 @@ try {
     }
     // actionlint-version: Actionlint may run only by the exact path, version, sha256, platform,
     // provenance and dependency closure that the qualified golden-tool manifest of the trusted
-    // gate export binds (Codex decision 8; v4 C4, C7), never as whatever `actionlint` is first on
-    // PATH (Daybreak GD-R2). That manifest does not exist in this draft, and neither does the
+    // gate export binds (maintainer decision 8; v4 C4, C7), never as whatever `actionlint` is first on
+    // PATH (security review GD-R2). That manifest does not exist in this draft, and neither does the
     // trusted bootstrap that would give the gate its binding (the gate identity's toolPinsSha256
     // and toolPaths, v4 C1). So this stage, and workflow-analysis with it, is pending AND blocking:
     // the stage names the missing pin and the evidence it needs (missingPin), the run exits
@@ -1439,7 +1439,7 @@ try {
       goldenToolName('actionlint', process.platform, process.arch)
     );
     const missingActionlintReason = () =>
-      `BLOCKING: no qualified Actionlint pin. Missing: the qualified golden-tool manifest's binding of Actionlint ${pins.actionlint} on ${process.platform}/${process.arch}, with ${missingActionlint.evidence.join('; ')}.${fs.lstatSync(localActionlintRecord, { throwIfNoEntry: false }) ? ` A local golden-tool record exists at ${localActionlintRecord}: it gives no authority, so it was not read and nothing it names ran.` : ''} The pin is pending and this run cannot pass (v4 C4, C7; Codex decision 8)`;
+      `BLOCKING: no qualified Actionlint pin. Missing: the qualified golden-tool manifest's binding of Actionlint ${pins.actionlint} on ${process.platform}/${process.arch}, with ${missingActionlint.evidence.join('; ')}.${fs.lstatSync(localActionlintRecord, { throwIfNoEntry: false }) ? ` A local golden-tool record exists at ${localActionlintRecord}: it gives no authority, so it was not read and nothing it names ran.` : ''} The pin is pending and this run cannot pass (v4 C4, C7; maintainer decision 8)`;
     requirement('actionlint-version', record => {
       record.missingPin = missingActionlint;
       throw new PendingStage(missingActionlintReason());
@@ -1487,7 +1487,7 @@ try {
     );
     // dependencies-install and the npm audit stages reach the npm registry: v5 lets them use only
     // a qualified host listener's verified cache, and direct registry access is no fallback (C3,
-    // C6, C14 change 10; Codex 014104). This draft has no listener (gate-network and int-d own it),
+    // C6, C14 change 10; maintainer note 014104). This draft has no listener (gate-network and int-d own it),
     // so each is withheld, pending, as are the npm script stages, which need what it installs. Each
     // is recorded, withheld or not, so a required stage is never simply missing.
     dependenciesInstalled = npmStage('dependencies-install', [
@@ -1503,7 +1503,7 @@ try {
     npmStage('dependencies-production', ['audit', '--omit=dev', '--json']);
     npmStage('registry-signatures', ['audit', 'signatures']);
     // workflow-analysis: pending AND blocking with actionlint-version (above), naming the same
-    // missing pin: nothing runs until the qualified golden-tool manifest binds Actionlint (Codex
+    // missing pin: nothing runs until the qualified golden-tool manifest binds Actionlint (maintainer
     // decision 8). Once it does, the gate must run exactly the bound binary with the gate-owned
     // empty configuration and no external shellcheck or pyflakes (actionlintArguments), hash it
     // and its dependency closure immediately before and after, and seal its record; the finalizer
@@ -1605,10 +1605,10 @@ try {
     // activation record for that use before it is used. None is defined or reviewed yet, so this
     // is pending. It comes before the Semgrep run, both builds, the scans of the built image and
     // the test stages (v5 C3, C23). Neither the Semgrep image's inspect nor its run is dispatched
-    // while it is pending (`semgrep-image`, Codex 014104 item 3): source-analysis stays required,
+    // while it is pending (`semgrep-image`, maintainer note 014104 item 3): source-analysis stays required,
     // pending and blocking, and no host binary stands in. In a commit or release run the builds do
     // not start (below). The image-authority successor owns the Docker, Compose and Buildx
-    // enforcement (Daybreak IP-01 to IP-05).
+    // enforcement (security review IP-01 to IP-05).
     pendingStage(
       'image-approval',
       'no reviewed activation record exists for the images this run builds from, runs or scans (v3 C5, C17 item 12)'
@@ -1617,7 +1617,7 @@ try {
     // are recorded inside it: the pinned Semgrep rules archive downloaded (until the controller
     // stages it, C10), checked against its pinned sha256, and extracted. The download is one of
     // the five stages v5 serves only from a qualified host listener (C14 change 10), with no direct
-    // download as a fallback, so it is withheld and sast-rules is pending (Codex 014104).
+    // download as a fallback, so it is withheld and sast-rules is pending (maintainer note 014104).
     const rulesArchive = path.join(scratch, 'rules.tar.gz');
     const ruleSteps = [];
     const verified = requirement('sast-rules', record => {
@@ -1767,7 +1767,7 @@ try {
     // open and `scan-image-build` authority (pre-build authority for the build: approved staged
     // bases, context, Dockerfile, arguments, platform, qualified builder and endpoint), and never
     // with --pull (v5 C5: no pull anywhere); without that authority it dispatches nothing to Docker
-    // (Codex 014104 item 2): no build, no pull, and no image already in the store stands in. Its
+    // (maintainer note 014104 item 2): no build, no pull, and no image already in the store stands in. Its
     // container stages are then pending, and the scan is blocking.
     if (mode !== 'scan') {
       withhold('container-build', [pendingRecordStages['container-build'], ...closedBarrier()]);
@@ -1901,7 +1901,7 @@ try {
   removeScratch();
   evidence.finished = new Date().toISOString();
   // A release run: final-artifacts and the other release-only obligations of the catalog are F's
-  // release obligations (v4 C14, C23; Daybreak's review of v3 accepts final-artifacts in F's
+  // release obligations (v4 C14, C23; the security review of v3 accepts final-artifacts in F's
   // release array), not stages of a run, and release finalization does not exist. They are
   // recorded pending here, so a release run is never a pass: it fails closed, with exit 1.
   if (mode === 'release') {

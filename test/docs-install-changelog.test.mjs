@@ -1845,8 +1845,8 @@ test('docs: the container limits are changed by an override file, the host witho
 
 // B48 (the maintainer's decision of 2026-10-11): a supervised Uptime Goblin refuses to start (78) unless its memory,
 // CPU and process limits are in force in its own cgroup, or GOBLIN_ALLOW_UNLIMITED names them, and
-// a CPU set counts only where Uptime Goblin verifies at its start that it applies (Codex D21, PU5), every
-// CPU it names online (Codex review F-01). These checks: every refusal and start line the start
+// a CPU set counts only where Uptime Goblin verifies at its start that it applies (maintainer decision D21, PU5), every
+// CPU it names online (independent review F-01). These checks: every refusal and start line the start
 // prints for the decision table's cases, and for
 // supervision and the setting, has a row in troubleshooting.md's "Resource limits" whose message
 // cell matches it (literal pieces in order, … for what varies, the first piece at its start); the
@@ -2040,7 +2040,7 @@ test('docs: a row per resource-limits line, GOBLIN_ALLOW_UNLIMITED and --supervi
     )
   );
   assert.ok(flat(read('docs/security.md')).includes('start Uptime Goblin with `--supervised`'));
-  // security.md's summary says what cpuLimit and cpuSet decide (Codex review D-01): which CPUs the
+  // security.md's summary says what cpuLimit and cpuSet decide (independent review D-01): which CPUs the
   // sets name, not only how many, beside a quota that counts by itself; the placement, the
   // setting and the platforms not qualified stay as they were.
   const securityParagraph = read('docs/security.md')
@@ -2118,7 +2118,7 @@ test('docs: a row per resource-limits line, GOBLIN_ALLOW_UNLIMITED and --supervi
       assert.doesNotMatch(flat(read(file)), pattern, file);
 });
 
-// Codex review F-02-R2 and its disposition: after a failed start the installer shows the status,
+// Independent review F-02-R2 and its disposition: after a failed start the installer shows the status,
 // the recent log and the rollback, and recommends no setting from what the journal holds, since it
 // does not establish which start wrote a line (test/installer/installer.test.mjs checks what it
 // prints). The troubleshooting row and the unreleased CHANGELOG say so, and no text promises again

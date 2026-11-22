@@ -1,4 +1,4 @@
-// Daybreak's decisions on the choices GATE-CONTRACT v3 put to review (its review of v3, table
+// The security review's decisions on the choices GATE-CONTRACT v3 put to review (its review of v3, table
 // "Decisions on the draft's requested choices"), where this draft implements them: F chooses the
 // mode, the profile and the catalog itself and compares each with what a record names; the T8
 // image stages come before the candidate code they guard (as GATE-CONTRACT v5 now places them:
@@ -209,7 +209,7 @@ test('F selects each companion profile itself: a companion of a run the candidat
 });
 
 // GATE-CONTRACT v5 replaces v3's single placement of the T8 stages (both in O, before any
-// candidate code), which Daybreak's review of v3 accepted only on that condition and the N builds
+// candidate code), which the security review of v3 accepted only on that condition and the N builds
 // broke (GCV4-01): t8-image-identity and t8-image-authenticity now run in N, before every
 // candidate-controlled build, and the distinct t8-image-activation in O, before every stage that
 // executes candidate code (v5 changes 2 and 4). The v5 cases themselves are in

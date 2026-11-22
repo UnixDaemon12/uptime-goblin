@@ -218,7 +218,7 @@ test('docs: an http:// page Orbit would refuse shows no password form (B11), and
     )
   );
   // A sign-in view without a form asks Uptime Goblin again at a look at the tab (probeAgain()), so the
-  // fix and a restart bring the form without a reload (Codex's checkpoint-2 review, CLIENT-1).
+  // fix and a restart bring the form without a reload (the independent checkpoint-2 review, CLIENT-1).
   assert.match(
     read('public/modules/identity/session.js'),
     /if \(state\.started\) \{\n\s+if \(\n\s+!state\.starting &&\n\s+!\$\('#signin-page'\)\.hidden &&\n\s+\$\('#signin-form'\)\.hidden &&\n\s+\$\('#display-form'\)\.hidden\n\s+\)\n\s+probeAtStart\(\);/

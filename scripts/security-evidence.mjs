@@ -53,7 +53,7 @@ export function testTotals(tap) {
 
 // A review is bound to the candidate's tree and its complete ordered parent vector (`parents`:
 // HEAD, then each MERGE_HEAD in order; GATE-CONTRACT v3 C18). A review that names a single
-// `parent` is the earlier form, which gives no authority (COORDINATOR-DECISIONS "C18 legacy
+// `parent` is the earlier form, which gives no authority (maintainer decision "C18 legacy
 // approvals"), even for a commit with one parent.
 export function checkReview(review, { tree, parents, files, release = false }) {
   if (Object.hasOwn(review, 'parent'))
