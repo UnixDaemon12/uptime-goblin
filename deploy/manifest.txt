@@ -80,6 +80,7 @@ lib/http/body.mjs
 lib/http/cookies.mjs
 lib/http/display-view.mjs
 lib/http/exclusive.mjs
+lib/http/history-budget.mjs
 lib/http/idempotency.mjs
 lib/http/pipeline.mjs
 lib/http/principal-routes.mjs

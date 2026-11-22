@@ -351,6 +351,9 @@ export async function createApp({
   insecureHttpSessions,
   // Tests only: {clock, derive, limits, log, writeAuthRecord} for createIdentity().
   identityOptions = {},
+  // Tests only: a wall display's history budget ({burstMs, refillPerSecond}, see
+  // lib/http/history-budget.mjs).
+  historyBudget,
   // A stop requested while Uptime Goblin starts (the main block's stop signals).
   signal = null,
   // Tests only: the delivery service's seams ({clock, rng, policy, pollMs, webhookUnknown, ca,
@@ -637,6 +640,7 @@ export async function createApp({
       writeStartMs,
       settingsPruneMs,
       releasesDirectory,
+      historyBudget,
       trusted,
       perClient,
       lock,
@@ -720,6 +724,7 @@ function composeApp({
   writeStartMs,
   settingsPruneMs,
   releasesDirectory,
+  historyBudget,
   trusted,
   perClient,
   lock,
@@ -1449,6 +1454,7 @@ function composeApp({
       exclusive,
       mono,
       settingsPruneMs,
+      historyBudget,
       webhookConfigured: Boolean(webhook),
       configured,
       noCollector,

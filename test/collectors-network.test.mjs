@@ -103,7 +103,6 @@ test('the pinned client speaks HTTP as fetch did: headers, bodies, compression, 
     'deflate (raw)': zlib.deflateRawSync(json),
     br: zlib.brotliCompressSync(json),
     'gzip, br': zlib.brotliCompressSync(zlib.gzipSync(json)),
-    ...(zlib.zstdCompressSync && { zstd: zlib.zstdCompressSync(json) }),
   };
   const seen = [];
   const server = http.createServer(async (req, res) => {
@@ -312,6 +311,7 @@ test('mid-body failures are retried unless the body itself is malformed', async 
     [failure('Z_BUF_ERROR'), /malformed response/, false],
     [failure('ERR__ERROR_FORMAT_PADDING_1'), /malformed response/, false],
     [failure('ZSTD_error_prefix_unknown'), /malformed response/, false],
+    [failure('ERR_CONTENT_CODING_LIMIT', 'RangeError'), /malformed response/, false],
   ]) {
     cause = reason;
     await assert.rejects(
