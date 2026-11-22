@@ -2777,33 +2777,35 @@ test(
     );
     assert.equal(owners.status, 0, owners.stderr);
 
-    // A flood of processes stops at pids_limit (no docker exec can start then either); Uptime Goblin
-    // keeps answering, from a container on its network, and is not restarted.
+    // A flood of processes stops at pids_limit; Uptime Goblin keeps answering, from a container on
+    // its network, and is not restarted. The flood asks for 400 processes and, for up to 60 s,
+    // asks again for every one the kernel refuses, so the container's process count stays at its
+    // limit; it records each refusal in /tmp/pids-flood.json. What proves the limit is the count
+    // at exactly 256 and the kernel's own EAGAIN refusals. The test once took a refused docker
+    // exec as that proof, with a shell loop as the flood: the shell exited at its first refused
+    // fork and left processes free (a GitHub runner: 249 of 256, and docker exec started), and the
+    // pids controller limits forks, not a process moved into the cgroup, so whether docker exec
+    // starts at the limit depends on how the runtime enters the container (measured on OrbStack,
+    // Docker 29.8.2: at 64 of 64 it sometimes started). Its command line carries the word
+    // pids-flood, so the helper below can stop it first.
     const pid = inspected.State.Pid;
     const flood = docker(
       'exec',
       '--detach',
       id,
-      'sh',
-      '-c',
-      'i=0; while [ $i -lt 400 ]; do sleep 60 & i=$((i+1)); done; wait'
+      'node',
+      '-e',
+      "const { spawn } = require('node:child_process'); const fs = require('node:fs'); const end = Date.now() + 60000; const seen = { started: 0, refused: {} }; const note = code => { seen.refused[code] = (seen.refused[code] ?? 0) + 1; fs.writeFileSync('/tmp/pids-flood.json', JSON.stringify(seen)); }; const more = () => { if (seen.started >= 400 || Date.now() > end) return; let child; try { child = spawn('sleep', ['60'], { stdio: 'ignore' }); } catch (error) { note(error.code); setTimeout(more, 20); return; } child.on('spawn', () => { seen.started++; child.unref(); setImmediate(more); }); child.on('error', error => { note(error.code); setTimeout(more, 20); }); }; more(); // pids-flood"
     );
     assert.equal(flood.status, 0, flood.stderr);
-    let refused = '',
-      last = '';
-    for (let i = 0; i < 40 && !refused; i++) {
-      const tried = docker('exec', id, 'true');
-      const said = tried.stdout + tried.stderr;
-      last = `exit ${tried.status}: ${said}`;
-      if (tried.status !== 0 && /Resource temporarily unavailable/.test(said)) refused = said;
-      else await delay(250);
+    const processes = () =>
+      Number(docker('stats', '--no-stream', '--format', '{{.PIDs}}', id).stdout.trim());
+    let pids = processes();
+    for (let i = 0; i < 40 && pids !== 256; i++) {
+      await delay(250);
+      pids = processes();
     }
-    assert.ok(
-      refused,
-      `the flood reached pids_limit: docker exec cannot start a process (last try: ${last}; ${docker('stats', '--no-stream', '--format', '{{.PIDs}}', id).stdout.trim()} processes)`
-    );
-    const pids = Number(docker('stats', '--no-stream', '--format', '{{.PIDs}}', id).stdout);
-    assert.ok(pids > 200 && pids <= 256, `${pids} processes`);
+    assert.equal(pids, 256, 'the flood holds the container at its pids_limit, 256 processes');
     const answered = helper(
       '--network',
       `container:${id}`,
@@ -2823,9 +2825,14 @@ test(
       'node:24-bookworm-slim',
       'sh',
       '-c',
-      'for d in /proc/[0-9]*; do [ "$(cat $d/comm 2>/dev/null)" = sleep ] && kill ${d#/proc/}; done; true'
+      'for d in /proc/[0-9]*; do tr "\\0" " " < $d/cmdline 2>/dev/null | grep -q "pids-floo[d]" && kill -9 ${d#/proc/}; done; sleep 1; for d in /proc/[0-9]*; do [ "$(cat $d/comm 2>/dev/null)" = sleep ] && kill ${d#/proc/}; done; true'
     );
     assert.equal(released.status, 0, released.stderr);
+    // The kernel refused the flood's further processes (EAGAIN) before it had its 400.
+    const seen = docker('exec', id, 'cat', '/tmp/pids-flood.json');
+    assert.equal(seen.status, 0, seen.stderr);
+    const counted = JSON.parse(seen.stdout);
+    assert.ok(counted.started < 400 && counted.refused.EAGAIN > 0, seen.stdout);
     const after = JSON.parse(docker('inspect', id).stdout)[0];
     assert.deepEqual([after.State.Pid, after.RestartCount], [pid, 0]);
 
