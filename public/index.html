@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#090c12" />
+    <meta
+      name="description"
+      content="Your private homelab dashboard. Live measurements, history, and alerts in one quiet place."
+    />
+    <title>Uptime Goblin · Homelab</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/boot.js"></script>
+  </head>
+  <body>
+    <div class="ambient" aria-hidden="true"></div>
+    <div class="shell">
+      <header class="topbar">
+        <a class="brand" href="#"
+          ><img class="brandmark" src="/favicon.svg" alt="" width="34" height="34" /><span
+            class="brand-name"
+            >Uptime Goblin</span
+          ><span class="brand-label">HOMELAB</span></a
+        >
+        <div class="top-actions">
+          <span class="connection" id="connection">Connecting…</span>
+          <div class="user-area">
+            <button
+              class="user-chip"
+              id="user-chip"
+              type="button"
+              aria-expanded="false"
+              aria-controls="user-menu"
+              hidden
+            >
+              <svg
+                class="user-chip-icon"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M4 21a8 8 0 0 1 16 0" /></svg
+              ><span id="user-chip-name">Administrator</span
+              ><span class="user-chip-caret" aria-hidden="true">▾</span>
+            </button>
+            <div class="user-menu" id="user-menu" hidden>
+              <a id="user-account" href="#configure/account">Account</a>
+              <button id="sign-out" type="button">Sign out</button>
+              <p id="sign-out-error" class="user-menu-error" role="alert" hidden></p>
+            </div>
+          </div>
+          <button
+            class="icon-button"
+            id="refresh"
+            title="Refresh measurements"
+            aria-label="Refresh measurements"
+          >
+            ↻</button
+          ><button class="button" id="settings">
+            Configure <span aria-hidden="true">↗</span>
+          </button>
+        </div>
+      </header>
+      <div id="update-banner" class="update-banner" role="status" hidden>
+        <p id="update-text"></p>
+        <button class="button primary" type="button" id="update-reload">Reload</button>
+      </div>
+      <div id="session-banner" class="session-banner" role="status" hidden></div>
+      <div id="display-banner" class="session-banner display-banner" role="status" hidden>
+        <p id="display-banner-text"></p>
+        <button class="button" type="button" id="display-banner-setup">Set up</button>
+      </div>
+      <main id="signin-page" class="signin-page" aria-labelledby="signin-title" hidden>
+        <div class="signin-card">
+          <p class="eyebrow">PRIVATE BY DESIGN</p>
+          <img class="signin-mark" src="/favicon.svg" alt="" width="64" height="64" />
+          <h1 id="signin-title" tabindex="-1">Sign in to Uptime Goblin</h1>
+          <p id="signin-notice" class="signin-notice" role="status" hidden></p>
+          <form id="signin-form" class="signin-form" method="post">
+            <div class="field">
+              <label for="signin-login">Login name</label>
+              <input
+                id="signin-login"
+                name="username"
+                type="text"
+                autocomplete="username"
+                autocapitalize="none"
+                spellcheck="false"
+                maxlength="256"
+                required
+                aria-describedby="signin-login-hint"
+              />
+              <small id="signin-login-hint">The built-in login name is admin.</small>
+            </div>
+            <div class="field">
+              <label for="signin-password">Password</label>
+              <input
+                id="signin-password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                required
+              />
+            </div>
+            <div class="signin-remember">
+              <input
+                id="signin-remember"
+                name="remember"
+                type="checkbox"
+                aria-describedby="signin-remember-hint"
+              />
+              <label for="signin-remember">Keep me signed in on this device</label>
+              <small id="signin-remember-hint"
+                >Stays signed in on this device for up to 30 days, as long as you use Uptime Goblin
+                at least every 12 hours. Without it, closing the browser signs you out (a browser
+                that reopens your previous tabs may keep you signed in).</small
+              >
+            </div>
+            <p id="signin-error" class="field-error" role="alert" hidden></p>
+            <p id="signin-countdown" class="signin-countdown" aria-live="off" hidden></p>
+            <button id="signin-submit" class="button primary signin-submit" type="submit">
+              Sign in
+            </button>
+          </form>
+          <form id="display-form" class="signin-form" method="post" hidden>
+            <p id="display-intro" class="signin-intro">
+              This browser will only show the dashboard. It cannot change anything. Ask an admin for
+              a code: on the Uptime Goblin host,
+              <code>goblin-admin display code --name &lt;name&gt;</code>.
+            </p>
+            <div class="field">
+              <label for="display-code">Display code</label>
+              <input
+                id="display-code"
+                type="text"
+                autocomplete="off"
+                autocapitalize="characters"
+                spellcheck="false"
+                maxlength="64"
+                required
+                aria-describedby="display-code-hint"
+              />
+              <small id="display-code-hint">26 characters; spaces and dashes are optional.</small>
+            </div>
+            <p id="display-error" class="field-error" role="alert" hidden></p>
+            <p id="display-countdown" class="signin-countdown" aria-live="off" hidden></p>
+            <button id="display-submit" class="button primary signin-submit" type="submit">
+              Set up
+            </button>
+          </form>
+        </div>
+      </main>
+      <main id="dashboard-page">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">CONTROL ROOM</p>
+            <h1><span id="dashboard-title">Overview</span><span class="heading-dot">.</span></h1>
+            <p id="dashboard-subtitle" class="page-subtitle" hidden></p>
+          </div>
+          <div class="heading-aside">
+            <span class="local-label">PRIVATE BY DESIGN</span><span id="clock"></span>
+          </div>
+        </div>
+        <section class="summary" aria-label="Dashboard summary">
+          <div>
+            <span class="summary-label">Connected sources</span
+            ><strong id="connected-count">—</strong
+            ><small id="connected-note">Waiting for connection</small>
+          </div>
+          <button id="alerts-button" class="summary-alert">
+            <span class="summary-label">Active alerts</span><strong id="alert-count">—</strong
+            ><small id="alert-note">No measurements yet</small>
+          </button>
+          <div>
+            <span class="summary-label">Last collected</span
+            ><strong id="last-collected" class="smaller">—</strong
+            ><small>Refreshes automatically</small>
+          </div>
+          <div>
+            <span class="summary-label">History retained</span
+            ><strong id="retention">30<span> days</span></strong
+            ><small>Stored in your homelab</small>
+          </div>
+        </section>
+        <div id="notice" class="notice" role="status" hidden></div>
+        <div class="workspace-heading">
+          <p>YOUR SERVICES <span id="source-count"></span></p>
+          <div class="workspace-actions">
+            <button class="quiet-button" id="collapse-all">Collapse all</button
+            ><button class="button" id="add-source">
+              <span aria-hidden="true">＋</span> Add source
+            </button>
+          </div>
+        </div>
+        <div id="services"></div>
+        <footer>
+          <span
+            ><i class="mini-orbit" aria-hidden="true"></i> uptime goblin
+            <span class="footer-separator">/</span> a little clarity for your homelab</span
+          ><span id="footer-status">Local collection · no cloud required</span
+          ><span id="display-footer" class="display-footer"
+            >Wall display · read-only
+            <button class="quiet-button" type="button" id="display-sign-out">Sign out</button></span
+          >
+        </footer>
+      </main>
+      <main id="configuration-page" hidden>
+        <div class="configuration-heading">
+          <div>
+            <a class="back-link" href="#">← Back to dashboard</a>
+            <p class="eyebrow">YOUR SPACE, YOUR WAY</p>
+            <h1>Configuration<span class="heading-dot">.</span></h1>
+            <p class="page-subtitle">A home for everything behind your homelab.</p>
+          </div>
+          <span class="private-pill">Private by design</span>
+        </div>
+        <div id="configuration-notice" class="notice" role="status" hidden></div>
+        <div class="configuration-layout">
+          <aside class="configuration-sidebar">
+            <nav id="configuration-nav" aria-label="Configuration sections"></nav>
+            <div class="sidebar-note">
+              <span class="mini-orbit" aria-hidden="true"></span>
+              <p>Saved in your homelab.<br />Made for your everyday.</p>
+            </div>
+          </aside>
+          <section
+            id="configuration-content"
+            class="configuration-content"
+            aria-labelledby="configuration-section-title"
+          ></section>
+        </div>
+      </main>
+    </div>
+    <dialog id="settings-dialog" class="drawer">
+      <form method="dialog" class="dialog-heading">
+        <div>
+          <p class="eyebrow">MAKE YOURSELF AT HOME</p>
+          <h2>Connections</h2>
+        </div>
+        <button class="icon-button" aria-label="Close settings">×</button>
+      </form>
+      <div id="settings-content"></div>
+    </dialog>
+    <dialog id="alerts-dialog" class="alert-dialog">
+      <form method="dialog" class="dialog-heading">
+        <div>
+          <p class="eyebrow">NEEDS YOUR ATTENTION</p>
+          <h2>Alerts</h2>
+        </div>
+        <button class="icon-button" aria-label="Close alerts">×</button>
+      </form>
+      <div id="alerts-content"></div>
+    </dialog>
+    <dialog
+      id="signin-dialog"
+      class="alert-dialog signin-dialog"
+      aria-labelledby="signin-dialog-title"
+      aria-describedby="signin-dialog-text"
+    >
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">WELCOME BACK</p>
+          <h2 id="signin-dialog-title">Sign in again</h2>
+        </div>
+      </div>
+      <p id="signin-dialog-text" class="settings-info">
+        Your session has ended. Sign in to continue; your unsaved changes stay open.
+      </p>
+      <form id="reauth-form" class="signin-form" method="post">
+        <div class="field">
+          <label for="reauth-login">Login name</label>
+          <input
+            id="reauth-login"
+            name="username"
+            type="text"
+            autocomplete="username"
+            autocapitalize="none"
+            spellcheck="false"
+            maxlength="256"
+            required
+            aria-describedby="reauth-login-hint"
+          />
+          <small id="reauth-login-hint">The built-in login name is admin.</small>
+        </div>
+        <div class="field">
+          <label for="reauth-password">Password</label>
+          <input
+            id="reauth-password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+        <div class="signin-remember">
+          <input
+            id="reauth-remember"
+            name="remember"
+            type="checkbox"
+            aria-describedby="reauth-remember-hint"
+          />
+          <label for="reauth-remember">Keep me signed in on this device</label>
+          <small id="reauth-remember-hint"
+            >Stays signed in on this device for up to 30 days, as long as you use Uptime Goblin at
+            least every 12 hours. Without it, closing the browser signs you out (a browser that
+            reopens your previous tabs may keep you signed in).</small
+          >
+        </div>
+        <p id="reauth-error" class="field-error" role="alert" hidden></p>
+        <p id="reauth-countdown" class="signin-countdown" aria-live="off" hidden></p>
+        <div class="form-buttons">
+          <button id="reauth-cancel" class="button" type="button">Cancel</button
+          ><button id="reauth-submit" class="button primary" type="submit">Sign in</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog
+      id="signing-key-dialog"
+      class="alert-dialog key-dialog"
+      aria-labelledby="signing-key-title"
+      aria-describedby="signing-key-text"
+    >
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">ALERT WEBHOOK</p>
+          <h2 id="signing-key-title">Public key</h2>
+        </div>
+      </div>
+      <p id="signing-key-text" class="settings-info">
+        Receivers verify X-Goblin-Signature with this Ed25519 public key (see Help → Alerts and
+        notifications). It is not a secret.
+      </p>
+      <div class="field">
+        <label for="signing-key-value">Public key (PEM)</label>
+        <textarea
+          id="signing-key-value"
+          rows="3"
+          readonly
+          autocomplete="off"
+          autocapitalize="none"
+          spellcheck="false"
+        ></textarea>
+      </div>
+      <p id="signing-key-id" class="settings-info"></p>
+      <p id="signing-key-previous" class="settings-info" hidden></p>
+      <p id="signing-key-copy-result" class="settings-info" role="status"></p>
+      <div class="form-buttons">
+        <button id="signing-key-copy" class="button" type="button">Copy</button
+        ><button id="signing-key-close" class="button primary" type="button">Close</button>
+      </div>
+    </dialog>
+    <dialog
+      id="delivery-confirm-dialog"
+      class="alert-dialog confirm-dialog"
+      aria-labelledby="delivery-confirm-title"
+      aria-describedby="delivery-confirm-text"
+    >
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">PLEASE CONFIRM</p>
+          <h2 id="delivery-confirm-title">Send it again?</h2>
+        </div>
+      </div>
+      <p id="delivery-confirm-text" class="settings-info">
+        This notification may already have arrived. Send it again?
+      </p>
+      <div class="form-buttons">
+        <button id="delivery-confirm-cancel" class="button" type="button">Cancel</button
+        ><button id="delivery-confirm-accept" class="button primary" type="button">
+          Send again
+        </button>
+      </div>
+    </dialog>
+    <div id="toast" class="toast" role="status" hidden></div>
+  </body>
+</html>

@@ -1,0 +1,38 @@
+# Live state and local environment. Keep alternate data directories outside source.
+/data/
+/.env
+/.env.*
+!/.env.example
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+# Dependencies, local outputs, backups and private operational material.
+node_modules/
+coverage/
+*.log
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+/backups/
+/exports/
+/audit/
+/audits/
+/private/
+/secrets/
+config.export*.json
+*.private.json
+*-credentials*.json
+# Certificate/key material must be reviewed and deliberately included if needed.
+*.pem
+*.key
+# The encryption key file of compose.secret.yaml (it has no extension), the one its MOVE recipe
+# sets aside (orbit_secret_key.unused) and the file its recipes read the volume's key into.
+orbit_secret_key
+orbit_secret_key.*
+*.p12
+*.pfx
+.DS_Store
+# Source-only package outputs are generated, reviewed separately and not tracked.
+/release/

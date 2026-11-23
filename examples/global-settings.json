@@ -1,0 +1,31 @@
+{
+  "title": "Uptime Goblin",
+  "subtitle": "a little clarity for your homelab",
+  "retentionDays": 30,
+  "pollSeconds": 60,
+  "appearance": {
+    "accent": "cyan",
+    "density": "comfortable",
+    "columns": "auto",
+    "defaultRange": "24h",
+    "sortBy": "manual",
+    "showSummary": true,
+    "showPaused": true,
+    "showUnconfigured": true,
+    "openInNewTab": true,
+    "reduceMotion": false,
+    "timezone": "local",
+    "timeFormat": "auto"
+  },
+  "monitoring": {
+    "concurrency": 4,
+    "timeoutSeconds": 90,
+    "availabilityFailures": 2,
+    "availabilitySeconds": 60
+  },
+  "alerts": {
+    "enabled": true,
+    "notifyOnAlert": true,
+    "notifyOnRecovery": true
+  }
+}

@@ -1,0 +1,4 @@
+[
+  { "key": "cpu", "label": "CPU", "path": "system.cpu", "unit": "%" },
+  { "key": "free", "label": "Free disk", "path": "storage.freeBytes", "unit": "bytes" }
+]

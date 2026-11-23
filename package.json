@@ -1,0 +1,17 @@
+{
+  "name": "uptime-goblin",
+  "version": "1.5.0-dev.2",
+  "private": true,
+  "type": "module",
+  "description": "A private homelab dashboard with expandable metrics, history and alerts.",
+  "license": "AGPL-3.0-only",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.mjs"
+  },
+  "dependencies": {
+    "nodemailer": "10.6.1"
+  }
+}

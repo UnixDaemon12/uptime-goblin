@@ -1,0 +1,87 @@
+[Unit]
+Description=Uptime Goblin homelab dashboard
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# Active once Uptime Goblin serves: it sends READY=1 after it listens and has written
+# run/status.json. The message comes from systemd-notify, which Uptime Goblin starts (Node cannot
+# send a unix datagram), hence NotifyAccess=all; Uptime Goblin starts no other program in its
+# cgroup (lib/systemd-notify.mjs). A start is never stopped for taking long (a migration or an
+# index build on a large history may), as with Type=simple before: TimeoutStartSec=infinity.
+# `systemctl start` and `restart` wait until Uptime Goblin serves (--no-block returns at once).
+Type=notify
+NotifyAccess=all
+TimeoutStartSec=infinity
+User=uptime-goblin
+Group=uptime-goblin
+WorkingDirectory=/opt/uptime-goblin
+Environment=NODE_ENV=production
+Environment=GOBLIN_DATA_DIR=/var/lib/uptime-goblin
+# A larger libuv pool keeps one slow DNS lookup from delaying every other request.
+Environment=UV_THREADPOOL_SIZE=16
+# Under supervision Uptime Goblin exits 0 only after a stop signal and exits 78 when it refuses to start
+# (invalid settings or password rules, or a memory, CPU or process limit below not in force).
+# Any other exit, including an unexpected exit 0, is restarted; a refusal is not retried every
+# few seconds but left failed for the installer's verification and systemctl status to report.
+Environment=GOBLIN_SUPERVISED=1
+EnvironmentFile=/etc/uptime-goblin.env
+# The installer replaces this path with the unresolved `command -v node` (for example
+# /usr/bin/node), so upgrading Node through the package manager never strands the service.
+# --supervised keeps Uptime Goblin supervised whatever /etc/uptime-goblin.env says: that file overrides the
+# Environment= lines above, GOBLIN_SUPERVISED among them, but not this command line.
+ExecStart=/usr/bin/node /opt/uptime-goblin/server.mjs --supervised
+Restart=always
+RestartSec=5
+RestartPreventExitStatus=78
+UMask=0077
+# Limits, as compose.yaml sets them for the container: memory (no swap on top, on a kernel that
+# accounts swap), CPU time and tasks (threads count), so a runaway collection or a flood of
+# requests cannot take the whole host. Change them with a drop-in (sudo systemctl edit uptime-goblin),
+# which the installer keeps.
+MemoryMax=1G
+MemorySwapMax=0
+CPUQuota=200%
+TasksMax=256
+# Open files: Uptime Goblin uses about 30 and accepts at most 256 connections. No core dumps: one would
+# write the encryption key and passwords from Uptime Goblin's memory to disk.
+LimitNOFILE=4096
+LimitCORE=0
+StateDirectory=uptime-goblin
+StateDirectoryMode=0700
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/uptime-goblin
+CapabilityBoundingSet=
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallArchitectures=native
+# Uptime Goblin parses what other services answer, so it keeps no more of the kernel than it needs: no
+# clock, hostname or kernel log, and only an ordinary service's system calls, as Debian's own
+# systemd-logind unit has them (logind runs in containers too). @pkey keeps V8's memory
+# protection keys on CPUs that have them; a call outside the list fails with EPERM instead of
+# killing Uptime Goblin. Not ~@privileged: copying a file (snapshots) calls fchown, which Node's libuv
+# survives only while it fails with EPERM, and without capabilities Uptime Goblin cannot misuse those
+# calls anyway. Not ProtectProc=, ProcSubset= or PrivateIPC=, which mount a new /proc or
+# message-queue file system that an unprivileged LXC may refuse (not measured there yet), nor
+# MemoryDenyWriteExecute=, under which V8's compiler cannot run, nor RestrictFileSystems=, which
+# needs the BPF LSM that Debian's kernel does not enable by default (without it the directive
+# has no effect, so it would only look like protection).
+ProtectClock=yes
+ProtectHostname=yes
+ProtectKernelLogs=yes
+RemoveIPC=yes
+SystemCallFilter=@system-service @pkey
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=multi-user.target

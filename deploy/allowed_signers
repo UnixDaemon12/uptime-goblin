@@ -1,0 +1,11 @@
+# Uptime Goblin release signing key (ssh-keygen allowed_signers format).
+# Releases from 1.4.3 carry SHA256SUMS.sig, a signature over SHA256SUMS made with
+#   ssh-keygen -Y sign -n orbit-release -f <release key> SHA256SUMS
+# To verify a release, use a copy of this file you already trust (from an installed release or
+# the project repository, with the key fingerprint compared against README and SECURITY.md),
+# never the copy inside the archive you are checking. In the extracted release directory:
+#   ssh-keygen -Y verify -f /path/to/trusted/allowed_signers -I release@orbit-homelab \
+#     -n orbit-release -s SHA256SUMS.sig < SHA256SUMS
+#   sha256sum -c --strict SHA256SUMS        # macOS: shasum -a 256 -c SHA256SUMS
+# Key fingerprint: SHA256:DtqYV4kTfpOQSCfobFVmE8pnND8Z/kzMTuQZsntRKIo (ED25519)
+release@orbit-homelab namespaces="orbit-release" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGSYcqqz+MPsmEU9W5sKcz3kq5j8Y1Fw5J0TS7GQ72FI
